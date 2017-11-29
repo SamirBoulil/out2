@@ -25,7 +25,7 @@ class UserTest extends TestCase
         $slackUserId = SlackUserId::fromString('<@U041UN08U>');
         $name = Name::fromString('Alice Jardin');
 
-        $user = User::create($userId, $slackUserId, $name);
+        $user = User::register($userId, $slackUserId, $name);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertSame($userId, $user->id());

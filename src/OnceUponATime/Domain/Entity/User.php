@@ -19,7 +19,7 @@ class User
     /** @var Name */
     private $name;
 
-    public static function create(UserId $userId, SlackUserId $slackUserId, Name $name): User
+    public static function register(UserId $userId, SlackUserId $slackUserId, Name $name): User
     {
         $user = new self();
         $user->id = $userId;

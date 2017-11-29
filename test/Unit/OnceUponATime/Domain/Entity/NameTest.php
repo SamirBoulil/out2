@@ -24,7 +24,7 @@ class NameTest extends TestCase
     }
 
     /**
-     * @tests
+     * @test
      */
     public function it_should_be_a_non_empty_string()
     {
