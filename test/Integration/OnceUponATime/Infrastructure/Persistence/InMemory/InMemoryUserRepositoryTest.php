@@ -35,6 +35,7 @@ class InMemoryUserRepositoryTest extends TestCase
         $inMemoryUserRepository = new InMemoryUserRepository();
         $this->assertSame([], $inMemoryUserRepository->all());
     }
+
     /**
      * @test
      */
@@ -51,7 +52,7 @@ class InMemoryUserRepositoryTest extends TestCase
     /**
      * @test
      */
-    public function it_adds_a_user_generated_using_the_next_identity()
+    public function it_adds_a_user_with_id_generated_using_the_next_identity()
     {
         $inMemoryUserRepository = new InMemoryUserRepository();
         $userId = $inMemoryUserRepository->nextIdentity();
@@ -71,7 +72,7 @@ class InMemoryUserRepositoryTest extends TestCase
         $user1 = User::register($userId1, SlackUserId::fromString('<@U041UN081>'), Name::fromString('Samir Boulil'));
         $inMemoryUserRepository->add($user1);
         $userId2 = $inMemoryUserRepository->nextIdentity();
-        $user2 = User::register($userId2, SlackUserId::fromString('<@U042UN082>'), Name::fromString('Samir Boulil'));
+        $user2 = User::register($userId2, SlackUserId::fromString('<@U042UN082>'), Name::fromString('User 2'));
         $inMemoryUserRepository->add($user2);
         $this->assertSame($user1, $inMemoryUserRepository->byId($userId1));
         $this->assertSame($user2, $inMemoryUserRepository->byId($userId2));
