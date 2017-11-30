@@ -3,7 +3,8 @@
         "phpunit/phpunit": "^6.4"
     },
     "require": {
-        "beberlei/assert": "^2.7"
+        "beberlei/assert": "^2.7",
+        "ramsey/uuid": "^3.7"
     },
     "autoload": {
         "psr-4": {
