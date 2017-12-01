@@ -8,6 +8,7 @@ use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\SlackUserId;
+use OnceUponATime\Domain\Entity\Statement;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,11 +23,12 @@ class QuestionTest extends TestCase
     public function it_can_be_created_with_an_id_an_answer_and_two_clues()
     {
         $questionId = QuestionId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
+        $statement = Statement::fromString('What is the size of an elephant ?');
         $answer = SlackUserId::fromString('<@U041UN08U>');
         $clue1 = Clue::fromString('clue number one.');
         $clue2 = Clue::fromString('clue number two.');
 
-        $question = Question::ask($questionId, $answer, $clue1, $clue2);
+        $question = Question::ask($questionId, $statement, $answer, $clue1, $clue2);
 
         $this->assertInstanceOf(Question::class, $question);
         $this->assertSame($questionId, $question->id());
@@ -41,10 +43,11 @@ class QuestionTest extends TestCase
     public function it_can_determine_whether_the_answer_is_right()
     {
         $questionId = QuestionId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
+        $statement = Statement::fromString('What is the size of an elephant ?');
         $answer = SlackUserId::fromString('<@U041UN08U>');
         $clue1 = Clue::fromString('clue number one.');
         $clue2 = Clue::fromString('clue number two.');
-        $question = Question::ask($questionId, $answer, $clue1, $clue2);
+        $question = Question::ask($questionId, $statement, $answer, $clue1, $clue2);
 
         $rightAnswer = SlackUserId::fromString('<@U041UN08U>');
         $this->assertTrue($question->isCorrect($rightAnswer));

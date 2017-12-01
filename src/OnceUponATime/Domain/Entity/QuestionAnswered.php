@@ -14,7 +14,7 @@ final class QuestionAnswered
     private $questionId;
 
     /** @var UserId */
-    protected $userId;
+    private $userId;
 
     public function __construct(QuestionId $questionId, UserId $userId)
     {

@@ -11,21 +11,30 @@ namespace OnceUponATime\Domain\Entity;
 class Question
 {
     /** @var QuestionId */
-    protected $id;
+    private $id;
+
+    /** @var Statement */
+    private $statement;
 
     /** @var SlackUserId */
-    protected $answer;
+    private $answer;
 
     /** @var Clue */
-    protected $clue1;
+    private $clue1;
 
     /** @var Clue */
-    protected $clue2;
+    private $clue2;
 
-    public static function ask(QuestionId $questionId, SlackUserId $answer, Clue $clue1, Clue $clue2): Question
-    {
+    public static function ask(
+        QuestionId $questionId,
+        Statement $statement,
+        SlackUserId $answer,
+        Clue $clue1,
+        Clue $clue2
+    ): Question {
         $question = new self();
         $question->id = $questionId;
+        $question->statement = $statement;
         $question->answer = $answer;
         $question->clue1 = $clue1;
         $question->clue2 = $clue2;
