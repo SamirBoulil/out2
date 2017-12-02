@@ -16,10 +16,14 @@ final class QuestionAnswered
     /** @var UserId */
     private $userId;
 
-    public function __construct(QuestionId $questionId, UserId $userId)
+    /** @var bool */
+    private $isCorrect;
+
+    public function __construct(QuestionId $questionId, UserId $userId, bool $isCorrect)
     {
         $this->questionId = $questionId;
         $this->userId = $userId;
+        $this->isCorrect = $isCorrect;
     }
 
     public function questionId(): QuestionId
@@ -30,5 +34,10 @@ final class QuestionAnswered
     public function userId(): UserId
     {
         return $this->userId;
+    }
+
+    public function isCorrect(): bool
+    {
+        return $this->isCorrect;
     }
 }
