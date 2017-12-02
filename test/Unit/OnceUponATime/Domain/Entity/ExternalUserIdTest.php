@@ -19,8 +19,8 @@ class ExternalUserIdTest extends TestCase
     public function it_can_be_constructed_from_a_string_and_reverted_back_to_it()
     {
         $id = '<@U041UN08U>';
-        $slackUserId = ExternalUserId::fromString($id);
-        $this->assertSame($id, (string) $slackUserId);
+        $externalUserId = ExternalUserId::fromString($id);
+        $this->assertSame($id, (string) $externalUserId);
     }
 
     /**

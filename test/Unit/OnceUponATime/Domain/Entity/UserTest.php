@@ -22,14 +22,14 @@ class UserTest extends TestCase
     public function it_can_be_created_with_an_id_a_slack_user_id_and_a_name()
     {
         $userId = UserId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
-        $slackUserId = ExternalUserId::fromString('<@U041UN08U>');
+        $externalUserId = ExternalUserId::fromString('<@U041UN08U>');
         $name = Name::fromString('Alice Jardin');
 
-        $user = User::register($userId, $slackUserId, $name);
+        $user = User::register($userId, $externalUserId, $name);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertSame($userId, $user->id());
-        $this->assertSame($slackUserId, $user->externalUserId());
+        $this->assertSame($externalUserId, $user->externalUserId());
         $this->assertSame($name, $user->name());
     }
 }

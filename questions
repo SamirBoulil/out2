@@ -1,0 +1,4 @@
+// How to test Application layer ? Acceptance then unit or the other way around ?
+// Why the commands "AnswerQuestion" has properties of primitive types (string instead of UserId class)
+// in test/Acceptance/FeatureContext.php:73 should the command have the userId (even tough: the user is identified by its
+// externalId: slackuserId)
