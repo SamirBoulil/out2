@@ -10,7 +10,7 @@ use Assert\Assertion;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class SlackUserId
+class ExternalUserId
 {
     /** @var string */
     private $id;
@@ -19,7 +19,7 @@ class SlackUserId
     {
     }
 
-    public static function fromString(string $id): SlackUserId
+    public static function fromString(string $id): ExternalUserId
     {
         Assertion::notEmpty($id);
 
@@ -36,6 +36,6 @@ class SlackUserId
 
     public function equals($userId): bool
     {
-        return $userId instanceof SlackUserId && (string) $this === (string) $userId;
+        return $userId instanceof ExternalUserId && (string) $this === (string) $userId;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
+use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
 use OnceUponATime\Domain\Repository\UserRepositoryInterface;
@@ -23,7 +24,7 @@ class InMemoryUserRepository implements UserRepositoryInterface
         $this->users[(string) $user->id()] = $user;
     }
 
-    public function byId(UserId $userId): User
+    public function byId(UserId $userId): ?User
     {
         return $this->users[(string) $userId];
     }
@@ -36,5 +37,16 @@ class InMemoryUserRepository implements UserRepositoryInterface
     public function nextIdentity(): UserId
     {
         return UserId::fromString((string) Uuid::uuid4());
+    }
+
+    public function byExternalId(ExternalUserId $externalUserId): ?User
+    {
+        foreach ($this->users as $id => $user) {
+            if ($user->externalUserId()->equals($externalUserId)) {
+                return $user;
+            }
+        }
+
+        return null;
     }
 }

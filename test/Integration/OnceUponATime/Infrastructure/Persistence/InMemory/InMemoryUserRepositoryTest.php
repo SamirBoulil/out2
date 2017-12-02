@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 
+use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Name;
-use OnceUponATime\Domain\Entity\SlackUserId;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
@@ -42,7 +42,7 @@ class InMemoryUserRepositoryTest extends TestCase
     public function it_adds_a_user_to_the_repository_and_returns_it()
     {
         $userId = UserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9');
-        $user = User::register($userId, SlackUserId::fromString('<@U041UN081>'), Name::fromString('Samir Boulil'));
+        $user = User::register($userId, ExternalUserId::fromString('<@U041UN081>'), Name::fromString('Samir Boulil'));
         $inMemoryUserRepository = new InMemoryUserRepository();
         $inMemoryUserRepository->add($user);
         $this->assertSame($user, $inMemoryUserRepository->byId($userId));
@@ -52,13 +52,15 @@ class InMemoryUserRepositoryTest extends TestCase
     /**
      * @test
      */
-    public function it_adds_a_user_with_id_generated_using_the_next_identity()
+    public function it_adds_a_user_with_id_generated_using_the_next_identity_and_returns_it()
     {
         $inMemoryUserRepository = new InMemoryUserRepository();
         $userId = $inMemoryUserRepository->nextIdentity();
-        $user = User::register($userId, SlackUserId::fromString('<@U041UN081>'), Name::fromString('Samir Boulil'));
+        $externalUserId = ExternalUserId::fromString('<@U041UN081>');
+        $user = User::register($userId, $externalUserId, Name::fromString('Samir Boulil'));
         $inMemoryUserRepository->add($user);
         $this->assertSame($user, $inMemoryUserRepository->byId($userId));
+        $this->assertSame($user, $inMemoryUserRepository->byExternalId($externalUserId));
         $this->assertSame([$user], $inMemoryUserRepository->all());
     }
 
@@ -69,10 +71,10 @@ class InMemoryUserRepositoryTest extends TestCase
     {
         $inMemoryUserRepository = new InMemoryUserRepository();
         $userId1 = $inMemoryUserRepository->nextIdentity();
-        $user1 = User::register($userId1, SlackUserId::fromString('<@U041UN081>'), Name::fromString('Samir Boulil'));
+        $user1 = User::register($userId1, ExternalUserId::fromString('<@U041UN081>'), Name::fromString('Samir Boulil'));
         $inMemoryUserRepository->add($user1);
         $userId2 = $inMemoryUserRepository->nextIdentity();
-        $user2 = User::register($userId2, SlackUserId::fromString('<@U042UN082>'), Name::fromString('User 2'));
+        $user2 = User::register($userId2, ExternalUserId::fromString('<@U042UN082>'), Name::fromString('User 2'));
         $inMemoryUserRepository->add($user2);
         $this->assertSame($user1, $inMemoryUserRepository->byId($userId1));
         $this->assertSame($user2, $inMemoryUserRepository->byId($userId2));
@@ -80,5 +82,15 @@ class InMemoryUserRepositoryTest extends TestCase
         $this->assertContains($user1, $allUsers);
         $this->assertContains($user2, $allUsers);
         $this->assertCount(2, $allUsers);
+    }
+
+    public function it_returns_null_if_the_user_does_not_exists()
+    {
+        $inMemoryUserRepository = new InMemoryUserRepository();
+        $wrongUserId = UserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9');
+        $wrongExternalId = ExternalUserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9');
+
+        $this->assertNull($inMemoryUserRepository->byId($wrongUserId));
+        $this->assertNull($inMemoryUserRepository->byExternalId($wrongExternalId));
     }
 }

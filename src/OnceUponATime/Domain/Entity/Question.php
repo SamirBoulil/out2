@@ -16,7 +16,7 @@ class Question
     /** @var Statement */
     private $statement;
 
-    /** @var SlackUserId */
+    /** @var ExternalUserId */
     private $answer;
 
     /** @var Clue */
@@ -28,7 +28,7 @@ class Question
     public static function ask(
         QuestionId $questionId,
         Statement $statement,
-        SlackUserId $answer,
+        ExternalUserId $answer,
         Clue $clue1,
         Clue $clue2
     ): Question {
@@ -47,7 +47,7 @@ class Question
         return $this->id;
     }
 
-    public function answer(): SlackUserId
+    public function answer(): ExternalUserId
     {
         return $this->answer;
     }
@@ -62,7 +62,7 @@ class Question
         return $this->clue2;
     }
 
-    public function isCorrect(SlackUserId $answer): bool
+    public function isCorrect(ExternalUserId $answer): bool
     {
         return $this->answer()->equals($answer);
     }
