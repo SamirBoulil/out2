@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Domain\Repository;
 
+use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
 
@@ -16,9 +17,11 @@ interface UserRepositoryInterface
 {
     public function add(User $user): void;
 
-    public function byId(UserId $userId): User;
+    public function byId(UserId $userId): ?User;
 
     public function all(): array;
 
     public function nextIdentity(): UserId;
+
+    public function byExternalId(ExternalUserId $externalUserId): ?User;
 }

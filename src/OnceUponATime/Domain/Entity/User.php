@@ -13,17 +13,17 @@ class User
     /** @var UserId */
     private $id;
 
-    /** @var SlackUserId */
-    private $slackUserId;
+    /** @var ExternalUserId */
+    private $externalUserId;
 
     /** @var Name */
     private $name;
 
-    public static function register(UserId $userId, SlackUserId $slackUserId, Name $name): User
+    public static function register(UserId $userId, ExternalUserId $slackUserId, Name $name): User
     {
         $user = new self();
         $user->id = $userId;
-        $user->slackUserId = $slackUserId;
+        $user->externalUserId = $slackUserId;
         $user->name = $name;
 
         return $user;
@@ -34,9 +34,9 @@ class User
         return $this->id;
     }
 
-    public function slackUserId(): SlackUserId
+    public function externalUserId(): ExternalUserId
     {
-        return $this->slackUserId;
+        return $this->externalUserId;
     }
 
     public function name(): Name

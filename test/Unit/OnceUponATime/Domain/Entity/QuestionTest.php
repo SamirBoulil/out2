@@ -7,7 +7,7 @@ namespace Tests\Unit\OnceUponATime\Domain\Entity;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\SlackUserId;
+use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Statement;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ class QuestionTest extends TestCase
     {
         $questionId = QuestionId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $statement = Statement::fromString('What is the size of an elephant ?');
-        $answer = SlackUserId::fromString('<@U041UN08U>');
+        $answer = ExternalUserId::fromString('<@U041UN08U>');
         $clue1 = Clue::fromString('clue number one.');
         $clue2 = Clue::fromString('clue number two.');
 
@@ -44,14 +44,14 @@ class QuestionTest extends TestCase
     {
         $questionId = QuestionId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $statement = Statement::fromString('What is the size of an elephant ?');
-        $answer = SlackUserId::fromString('<@U041UN08U>');
+        $answer = ExternalUserId::fromString('<@U041UN08U>');
         $clue1 = Clue::fromString('clue number one.');
         $clue2 = Clue::fromString('clue number two.');
         $question = Question::ask($questionId, $statement, $answer, $clue1, $clue2);
 
-        $rightAnswer = SlackUserId::fromString('<@U041UN08U>');
+        $rightAnswer = ExternalUserId::fromString('<@U041UN08U>');
         $this->assertTrue($question->isCorrect($rightAnswer));
-        $wrongAnswer = SlackUserId::fromString('<@U041XXXXX>');
+        $wrongAnswer = ExternalUserId::fromString('<@U041XXXXX>');
         $this->assertFalse($question->isCorrect($wrongAnswer));
     }
 }
