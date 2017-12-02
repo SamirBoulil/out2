@@ -22,6 +22,7 @@ class AnswerQuestionHandlerTest extends TestCase
 {
     private const QUESTION_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
 
+    /** @var AnswerQuestionHandler */
     private $answerQuestionHandler;
 
     public function setUp()
@@ -42,7 +43,7 @@ class AnswerQuestionHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_handles_answer_question_objects_and_tells_if_the_question_is_right()
+    public function it_answers_question_tells_if_the_answer_is_correct()
     {
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = self::QUESTION_ID;
@@ -55,7 +56,7 @@ class AnswerQuestionHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_handles_answer_question_objects_and_tells_if_the_question_is_wrong()
+    public function it_answers_question_tells_if_the_answer_is_incorrect()
     {
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = self::QUESTION_ID;

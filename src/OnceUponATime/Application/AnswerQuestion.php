@@ -18,8 +18,4 @@ class AnswerQuestion
 
     /** @var string */
     public $answer;
-
-    public function __construct()
-    {
-    }
 }

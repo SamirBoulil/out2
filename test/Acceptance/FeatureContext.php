@@ -30,11 +30,11 @@ class FeatureContext implements Context
     /** @var UserRepositoryInterface */
     private $userRepository;
 
-    /** @var AnswerQuestion */
-    private $currentAnswerQuestion;
-
     /** @var QuestionRepositoryInterface */
     private $questionRepository;
+
+    /** @var bool */
+    private $isCorrect;
 
     public function __construct()
     {
@@ -58,10 +58,10 @@ class FeatureContext implements Context
     /**
      * @Given /^the questions?:$/
      */
-    public function theQuestion(TableNode $table): void
+    public function theQuestion(TableNode $questions): void
     {
-        foreach ($table as $row) {
-            $question = $this->createQuestionFromRow($row);
+        foreach ($questions as $questionHash) {
+            $question = $this->createQuestionFromHash($questionHash);
             $this->questionRepository->add($question);
         }
     }
@@ -71,31 +71,14 @@ class FeatureContext implements Context
      */
     public function theUserAnswersTheQuestionWithAnswer(string $externalId, string $questionId, string $answer): void
     {
-        $handler = new AnswerQuestionHandler($this->questionRepository);
+        $questionHandler = new AnswerQuestionHandler($this->questionRepository);
 
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->externalId = $externalId;
         $answerQuestion->questionId = $questionId;
         $answerQuestion->answer = $answer;
 
-        $this->currentAnswerQuestion = $answerQuestion;
-    }
-
-    /**
-     * @Then /^the question "([^"]*)" should be answered by the user "([^"]*)" with an incorrect answer$/
-     */
-    public function theQuestionShouldBeAnsweredByTheUserWithAnIncorrectAnswer(
-        string $questionId,
-        string $externalUserId
-    ) {
-        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalUserId));
-
-        if (null !== $answeredQuestion) {
-            throw new \RuntimeException('We found no answered questions matching the arguments.');
-        }
-        if (false !== $answeredQuestion->isCorrect()) {
-             throw new \RuntimeException('The question we found was not incorrect.');
-        }
+        $this->isCorrect = $questionHandler->handle($answerQuestion);
     }
 
     /**
@@ -114,7 +97,7 @@ class FeatureContext implements Context
         }
     }
 
-    private function createQuestionFromRow(array $row): Question
+    private function createQuestionFromHash(array $row): Question
     {
         return Question::ask(
             QuestionId::fromString($row['id']),
@@ -126,20 +109,18 @@ class FeatureContext implements Context
     }
 
     /**
-     * @Then /^the system should return "([^"]*)"$/
+     * @Then /^the answer should be ([^"]*)$/
      */
-    public function theSystemShouldReturn(string $value)
+    public function theAnswerShouldBe(string $value)
     {
-        $questionHandler = new AnswerQuestionHandler($this->questionRepository);
-        $isCorrect = $questionHandler->handle($this->currentAnswerQuestion);
-        if ((true === $isCorrect && "true" === $value) ||
-            (false === $isCorrect && "false" === $value)
+        if ((true === $this->isCorrect && "correct" === $value) ||
+            (false === $this->isCorrect && "incorrect" === $value)
         ) {
             return;
         }
 
         throw new \RuntimeException(
-            sprintf('Expected answer to be %s, %s given.', $value, $isCorrect)
+            sprintf('Expected answer to be %s, %s given.', $value, $this->isCorrect)
         );
     }
 }
