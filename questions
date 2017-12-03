@@ -2,3 +2,8 @@
 // Why the commands "AnswerQuestion" has properties of primitive types (string instead of UserId class)
 // in test/Acceptance/FeatureContext.php:73 should the command have the userId (even tough: the user is identified by its
 // externalId: slackuserId)
+
+- When I test a class like InMemoryQuestionAnsweredEventStoreTest, should I unit test it (tests\Unit\Infrastructure\...) or
+is it part of the integration part.
+
+- Seems like classes in Infra / Applications are not unit-tests ? (CF Handlers are not unit tested).

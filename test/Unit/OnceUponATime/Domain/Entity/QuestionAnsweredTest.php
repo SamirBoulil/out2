@@ -23,7 +23,7 @@ class QuestionAnsweredTest extends TestCase
         $questionId = QuestionId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $userId = UserId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $isCorrect = true;
-        $questionAnswered = new QuestionAnswered($questionId, $userId, $isCorrect);
+        $questionAnswered = new QuestionAnswered($userId, $questionId, $isCorrect);
         $this->assertSame($questionId, $questionAnswered->questionId());
         $this->assertSame($userId, $questionAnswered->userId());
         $this->assertSame($isCorrect, $questionAnswered->isCorrect());

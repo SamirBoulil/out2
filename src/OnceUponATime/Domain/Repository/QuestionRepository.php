@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OnceUponATime\Domain\Repository;
 
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\UserId;
 
-interface QuestionRepositoryInterface
+interface QuestionRepository
 {
     public function add(Question $user): void;
 
-    public function byId(QuestionId $userId): Question;
+    public function byId(QuestionId $questionId): ?Question;
 
     public function all(): array;
 

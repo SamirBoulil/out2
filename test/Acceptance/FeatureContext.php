@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
@@ -16,8 +17,11 @@ use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\Statement;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\Repository\QuestionRepositoryInterface;
-use OnceUponATime\Domain\Repository\UserRepositoryInterface;
+use OnceUponATime\Domain\Repository\QuestionRepository;
+use OnceUponATime\Domain\Repository\UserRepository;
+use OnceUponATime\Infrastructure\Notifications\NotifyMany;
+use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionAnsweredEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 
@@ -27,19 +31,35 @@ use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
  */
 class FeatureContext implements Context
 {
-    /** @var UserRepositoryInterface */
+    /** @var UserRepository */
     private $userRepository;
 
-    /** @var QuestionRepositoryInterface */
+    /** @var QuestionRepository */
     private $questionRepository;
+
+    /** @var AnswerQuestionHandler */
+    private $questionHandler;
+
+    /** @var InMemoryQuestionAnsweredEventStore */
+    private $eventStore;
 
     /** @var bool */
     private $isCorrect;
+
+    /** @var bool */
+    private $hasThrown;
 
     public function __construct()
     {
         $this->userRepository = new InMemoryUserRepository();
         $this->questionRepository = new InMemoryQuestionRepository();
+        $this->eventStore = new InMemoryQuestionAnsweredEventStore();
+        $notifier = new NotifyMany([new PublishToEventStore($this->eventStore)]);
+        $this->questionHandler = new AnswerQuestionHandler(
+            $this->userRepository,
+            $this->questionRepository,
+            $notifier
+        );
     }
 
     /**
@@ -71,14 +91,19 @@ class FeatureContext implements Context
      */
     public function theUserAnswersTheQuestionWithAnswer(string $externalId, string $questionId, string $answer): void
     {
-        $questionHandler = new AnswerQuestionHandler($this->questionRepository);
+        $this->isCorrect = false;
+        $this->hasThrown = false;
 
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->externalId = $externalId;
         $answerQuestion->questionId = $questionId;
         $answerQuestion->answer = $answer;
 
-        $this->isCorrect = $questionHandler->handle($answerQuestion);
+        try {
+            $this->isCorrect = $this->questionHandler->handle($answerQuestion);
+        } catch (\InvalidArgumentException $e) {
+            $this->hasThrown = true;
+        }
     }
 
     /**
@@ -122,5 +147,58 @@ class FeatureContext implements Context
         throw new \RuntimeException(
             sprintf('Expected answer to be %s, %s given.', $value, $this->isCorrect)
         );
+    }
+
+    /**
+     * @Then /^there is a question answered ([^"]*) by the user "([^"]*)" for the question "([^"]*)"$/
+     */
+    public function thereIsAQuestionAnsweredByTheUserForTheQuestion(
+        string $answerResult,
+        string $externalUserId,
+        string $questionId
+    ) {
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalUserId));
+        if (null === $user) {
+            throw new \LogicException(
+                sprintf('Expected valid user external id. "%s" given.', $externalUserId)
+            );
+        }
+
+        $question = $this->questionRepository->byId(QuestionId::fromString($questionId));
+        if (null === $question) {
+            throw new \LogicException(
+                sprintf('Expected valid question id. "%s" given.', $questionId)
+            );
+        }
+
+        $answers = $this->eventStore->byUser($user->id());
+        foreach ($answers as $answer) {
+            if ($user->id()->equals($answer->userId()) &&
+                $question->id()->equals($answer->questionId()) &&
+                $this->isAnswerSame($answer->isCorrect(), $answerResult)
+            ) {
+                return true;
+            }
+        }
+
+        throw new \LogicException(
+            sprintf('Answer for user external id "%s" and question id "%s" not found.', $externalUserId, $questionId)
+        );
+    }
+
+    private function isAnswerSame(bool $expectedResult, string $answerResult)
+    {
+        return ($answerResult === "correctly" && $expectedResult) ||
+            ($answerResult === "incorrectly" && !$expectedResult);
+    }
+
+    /**
+     * @Then /^there should be no answer$/
+     */
+    public function thereShouldBeNoAnswer()
+    {
+        if (!$this->hasThrown) {
+            throw new \LogicException('Expected handler to throw.');
+        }
     }
 }

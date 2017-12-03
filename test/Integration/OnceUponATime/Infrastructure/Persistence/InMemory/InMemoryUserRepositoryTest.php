@@ -84,13 +84,23 @@ class InMemoryUserRepositoryTest extends TestCase
         $this->assertCount(2, $allUsers);
     }
 
-    public function it_returns_null_if_the_user_does_not_exists()
+    /**
+     * @test
+     */
+    public function it_returns_null_if_the_user_id_does_not_exists()
     {
         $inMemoryUserRepository = new InMemoryUserRepository();
-        $wrongUserId = UserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9');
-        $wrongExternalId = ExternalUserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9');
-
+        $wrongUserId = UserId::fromString('00000000-0000-0000-0000-000000000000');
         $this->assertNull($inMemoryUserRepository->byId($wrongUserId));
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_null_if_the_external_id_does_not_exists()
+    {
+        $inMemoryUserRepository = new InMemoryUserRepository();
+        $wrongExternalId = ExternalUserId::fromString('00000000-0000-0000-0000-000000000000');
         $this->assertNull($inMemoryUserRepository->byExternalId($wrongExternalId));
     }
 }

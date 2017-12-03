@@ -7,14 +7,14 @@ namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\Repository\QuestionRepositoryInterface;
+use OnceUponATime\Domain\Repository\QuestionRepository;
 use Ramsey\Uuid\Uuid;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class InMemoryQuestionRepository implements QuestionRepositoryInterface
+class InMemoryQuestionRepository implements QuestionRepository
 {
     /** @var array */
     private $questions = [];
@@ -24,9 +24,9 @@ class InMemoryQuestionRepository implements QuestionRepositoryInterface
         $this->questions[(string) $question->id()] = $question;
     }
 
-    public function byId(QuestionId $questionId): Question
+    public function byId(QuestionId $questionId): ?Question
     {
-        return $this->questions[(string) $questionId];
+        return $this->questions[(string) $questionId] ?? null;
     }
 
     public function all(): array
