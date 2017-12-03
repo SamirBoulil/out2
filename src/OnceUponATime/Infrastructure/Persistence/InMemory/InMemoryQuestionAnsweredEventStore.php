@@ -6,13 +6,13 @@ namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
 use OnceUponATime\Domain\Entity\QuestionAnswered;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\EventStore\AnsweredQuestionEventStore;
+use OnceUponATime\Domain\EventStore\QuestionAnsweredEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class InMemoryQuestionAnsweredEventStore implements AnsweredQuestionEventStore
+class InMemoryQuestionAnsweredEventStore implements QuestionAnsweredEventStore
 {
     /** @var QuestionAnswered[] */
     private $questionsAnswered = [];

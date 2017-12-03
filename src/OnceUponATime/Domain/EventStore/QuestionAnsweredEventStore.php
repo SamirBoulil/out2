@@ -6,7 +6,10 @@ use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
 use OnceUponATime\Domain\Entity\UserId;
 
-interface AnsweredQuestionEventStore
+/**
+ * TODO: Not sure this interface should be in domain ? (but repositories are so...)
+ */
+interface QuestionAnsweredEventStore
 {
     public function add(QuestionAnswered $questionAnswered): void;
 
