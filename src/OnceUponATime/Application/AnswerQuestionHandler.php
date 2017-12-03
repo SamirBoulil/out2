@@ -57,7 +57,7 @@ class AnswerQuestionHandler
         $user = $this->userRepository->byExternalId($externalUserId);
         if (null === $user) {
             throw new \InvalidArgumentException(
-                sprintf('User not found for external id %s.', $id)
+                sprintf('User not found for external id "%s".', $id)
             );
         }
 
@@ -73,7 +73,7 @@ class AnswerQuestionHandler
         $question = $this->questionRepository->byId($questionId);
         if (null === $question) {
             throw new \InvalidArgumentException(
-                sprintf('Question not found for id: %s', $id)
+                sprintf('Question not found for id: "%s"', $id)
             );
         }
 

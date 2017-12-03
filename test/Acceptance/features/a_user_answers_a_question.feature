@@ -12,17 +12,15 @@ Feature: A user answer a question
   Scenario: A user incorrectly answers a question
     When the user "<\@testUser>" answers the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9" with answer "<\@wrong_answer>"
     Then there is a question answered incorrectly by the user "<\@testUser>" for the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9"
-    And the answer should be incorrect
 
   Scenario: A user correctly answers a question
     When the user "<\@testUser>" answers the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9" with answer "<\@right_answer>"
     Then there is a question answered correctly by the user "<\@testUser>" for the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9"
-    And the answer should be correct
 
   Scenario: A unknown user answers a question
     When the user "<\@unknown_user>" answers the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9" with answer "<\@right_answer>"
-    Then there should be no answer
+    Then there should be no answer for user "<\@testUser>"
 
-  Scenario: A unknown user answers a question
+  Scenario: A registered user answers a unknown question
     When the user "<\@testUser>" answers the question "00000000-0000-0000-0000-000000000000" with answer "<\@right_answer>"
-    Then there should be no answer
+    Then there should be no answer for user "<\@testUser>"

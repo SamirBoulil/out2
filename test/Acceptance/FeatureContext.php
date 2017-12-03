@@ -7,6 +7,7 @@ namespace Tests\Acceptance;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
+use LogicException;
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
 use OnceUponATime\Domain\Entity\Clue;
@@ -42,9 +43,6 @@ class FeatureContext implements Context
 
     /** @var InMemoryQuestionAnsweredEventStore */
     private $eventStore;
-
-    /** @var bool */
-    private $isCorrect;
 
     /** @var bool */
     private $hasThrown;
@@ -91,16 +89,13 @@ class FeatureContext implements Context
      */
     public function theUserAnswersTheQuestionWithAnswer(string $externalId, string $questionId, string $answer): void
     {
-        $this->isCorrect = false;
-        $this->hasThrown = false;
-
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->externalId = $externalId;
         $answerQuestion->questionId = $questionId;
         $answerQuestion->answer = $answer;
 
         try {
-            $this->isCorrect = $this->questionHandler->handle($answerQuestion);
+            $this->questionHandler->handle($answerQuestion);
         } catch (\InvalidArgumentException $e) {
             $this->hasThrown = true;
         }
@@ -130,22 +125,6 @@ class FeatureContext implements Context
             ExternalUserId::fromString($row['answer']),
             Clue::FromString($row['clue1']),
             Clue::FromString($row['clue2'])
-        );
-    }
-
-    /**
-     * @Then /^the answer should be ([^"]*)$/
-     */
-    public function theAnswerShouldBe(string $value)
-    {
-        if ((true === $this->isCorrect && "correct" === $value) ||
-            (false === $this->isCorrect && "incorrect" === $value)
-        ) {
-            return;
-        }
-
-        throw new \RuntimeException(
-            sprintf('Expected answer to be %s, %s given.', $value, $this->isCorrect)
         );
     }
 
@@ -193,12 +172,26 @@ class FeatureContext implements Context
     }
 
     /**
-     * @Then /^there should be no answer$/
+     * @Then /^there should be no answer for user "([^"]*)"$/
      */
-    public function thereShouldBeNoAnswer()
+    public function thereShouldBeNoAnswerForUser(string $externalUserId)
     {
         if (!$this->hasThrown) {
-            throw new \LogicException('Expected handler to throw.');
+            throw new \LogicException('Expected handler to throw an exception.');
+        }
+
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalUserId));
+        if (null === $user) {
+            throw new \LogicException(
+                sprintf('Expected valid user external id. "%s" given.', $externalUserId)
+            );
+        }
+
+        $answers = $this->eventStore->byUser($user->id());
+        if (!empty($answers)) {
+            throw new LogicException(
+                sprintf('Expected answers for users to be empty. "%s" answers found', count($answers))
+            );
         }
     }
 }

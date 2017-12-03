@@ -8,7 +8,7 @@ use OnceUponATime\Domain\Entity\UserId;
 
 interface AnsweredQuestionEventStore
 {
-    public function add(QuestionAnswered $questionAnswered);
+    public function add(QuestionAnswered $questionAnswered): void;
 
     public function byUser(UserId $userId): array;
 }

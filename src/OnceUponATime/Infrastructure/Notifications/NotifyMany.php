@@ -13,9 +13,7 @@ use OnceUponATime\Domain\Entity\QuestionAnswered;
  */
 class NotifyMany implements Notify
 {
-    /**
-     * @var Notify[]
-     */
+    /** @var Notify[] */
     private $notifiers;
 
     public function __construct(array $notifiers)

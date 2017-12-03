@@ -25,7 +25,9 @@ class InMemoryQuestionAnsweredEventStoreTest extends TestCase
 
         $questionAnsweredEventStore = new InMemoryQuestionAnsweredEventStore();
         $questionAnswered = new QuestionAnswered(
-            $userId, QuestionId::fromString('11111111-1111-1111-1111-111111111111'), true
+            $userId,
+            QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
+            true
         );
 
         $questionAnsweredEventStore->add($questionAnswered);
@@ -41,14 +43,20 @@ class InMemoryQuestionAnsweredEventStoreTest extends TestCase
 
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $questionAnswered1 = new QuestionAnswered(
-            $userId, QuestionId::fromString('11111111-1111-1111-1111-111111111111'), true
+            $userId,
+            QuestionId::fromString('11111111-1111-1111-1111-111111111111'),
+            true
         );
         $questionAnswered2 = new QuestionAnswered(
-            $userId, QuestionId::fromString('22222222-2222-2222-2222-222222222222'), true
+            $userId,
+            QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
+            true
         );
         $anotherUserId = UserId::fromString('22222222-2222-2222-2222-222222222222');
         $questionAnswered3 = new QuestionAnswered(
-            $anotherUserId, QuestionId::fromString('22222222-2222-2222-2222-222222222222'), true
+            $anotherUserId,
+            QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
+            true
         );
 
         $questionAnsweredEventStore->add($questionAnswered1);
