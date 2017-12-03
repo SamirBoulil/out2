@@ -110,4 +110,14 @@ class InMemoryQuestionRepositoryTest extends TestCase
         $this->assertContains($question2, $allQuestions);
         $this->assertCount(2, $allQuestions);
     }
+
+    /**
+     * @test
+     */
+    public function it_returns_null_if_the_id_is_not_found()
+    {
+        $inMemoryQuestionRepository = new InMemoryQuestionRepository();
+        $unknownId = QuestionId::fromString('00000000-0000-0000-0000-000000000000');
+        $this->assertSame(null, $inMemoryQuestionRepository->byId($unknownId));
+    }
 }

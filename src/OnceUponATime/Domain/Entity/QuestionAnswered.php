@@ -19,7 +19,7 @@ final class QuestionAnswered
     /** @var bool */
     private $isCorrect;
 
-    public function __construct(QuestionId $questionId, UserId $userId, bool $isCorrect)
+    public function __construct(UserId $userId, QuestionId $questionId, bool $isCorrect)
     {
         $this->questionId = $questionId;
         $this->userId = $userId;

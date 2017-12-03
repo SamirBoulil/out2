@@ -8,10 +8,15 @@ use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
+use OnceUponATime\Domain\Entity\Name;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\Statement;
+use OnceUponATime\Domain\Entity\User;
+use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Infrastructure\Notifications\NotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,7 +42,17 @@ class AnswerQuestionHandlerTest extends TestCase
         $questionRepository = new InMemoryQuestionRepository();
         $questionRepository->add($question);
 
-        $this->answerQuestionHandler = new AnswerQuestionHandler($questionRepository);
+        $userId = UserId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
+        $externalUserId = ExternalUserId::fromString('<@testUser>');
+        $name = Name::fromString('Alice Jardin');
+        $user = User::register($userId, $externalUserId, $name);
+        
+        $userRepository = new InMemoryUserRepository();
+        $userRepository->add($user);
+
+        $notify = new NotifyMany([]);
+
+        $this->answerQuestionHandler = new AnswerQuestionHandler($userRepository, $questionRepository, $notify);
     }
 
     /**
@@ -47,7 +62,7 @@ class AnswerQuestionHandlerTest extends TestCase
     {
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = self::QUESTION_ID;
-        $answerQuestion->externalId = '<@U041UN08U>';
+        $answerQuestion->externalId = '<@testUser>';
         $answerQuestion->answer = '<@wrong_answer>';
 
         $this->assertFalse($this->answerQuestionHandler->handle($answerQuestion));
@@ -60,9 +75,39 @@ class AnswerQuestionHandlerTest extends TestCase
     {
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = self::QUESTION_ID;
-        $answerQuestion->externalId = '<@U041UN08U>';
+        $answerQuestion->externalId = '<@testUser>';
         $answerQuestion->answer = '<@right_answer>';
 
         $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
     }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_user_id_is_not_found()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $answerQuestion = new AnswerQuestion();
+        $answerQuestion->questionId = self::QUESTION_ID;
+        $answerQuestion->externalId = '<@unknownUser>';
+        $answerQuestion->answer = '<@right_answer>';
+        $this->answerQuestionHandler->handle($answerQuestion);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_question_id_is_not_found()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $answerQuestion = new AnswerQuestion();
+        $answerQuestion->questionId = '00000000-0000-0000-0000-000000000000';
+        $answerQuestion->externalId = '<@testUser>';
+        $answerQuestion->answer = '<@right_answer>';
+        $this->answerQuestionHandler->handle($answerQuestion);
+    }
+
+    /**
+     * TODO: How can I / should I unit test the notification system ?
+     */
 }

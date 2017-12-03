@@ -7,14 +7,14 @@ namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\Repository\UserRepositoryInterface;
+use OnceUponATime\Domain\Repository\UserRepository;
 use Ramsey\Uuid\Uuid;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class InMemoryUserRepository implements UserRepositoryInterface
+class InMemoryUserRepository implements UserRepository
 {
     /** @var array */
     private $users = [];
@@ -26,7 +26,7 @@ class InMemoryUserRepository implements UserRepositoryInterface
 
     public function byId(UserId $userId): ?User
     {
-        return $this->users[(string) $userId];
+        return $this->users[(string) $userId] ?? null;
     }
 
     public function all(): array
