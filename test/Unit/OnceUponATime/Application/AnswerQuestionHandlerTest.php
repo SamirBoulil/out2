@@ -6,6 +6,7 @@ namespace Tests\Unit\OnceUponATime\Application\Entity;
 
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
+use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Name;
@@ -35,7 +36,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $question = Question::ask(
             QuestionId::fromString(self::QUESTION_ID),
             Statement::fromString('What is the most scared of an elephant ?'),
-            ExternalUserId::fromString('<@right_answer>'),
+            Answer::fromString('<@right_answer>'),
             Clue::fromString('Clue 1'),
             Clue::fromString('Clue 2')
         );
