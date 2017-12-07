@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 
+use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Statement;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +46,7 @@ class InMemoryQuestionRepositoryTest extends TestCase
         $question = Question::ask(
             $questionId,
             Statement::fromString('What is the size of an elephant ?'),
-            ExternalUserId::fromString('<@U041UN08U>'),
+            Answer::fromString('<@U041UN08U>'),
             Clue::fromString('clue number one.'),
             Clue::fromString('clue number two.')
         );
@@ -66,7 +66,7 @@ class InMemoryQuestionRepositoryTest extends TestCase
         $question = Question::ask(
             $questionId,
             Statement::fromString('What is the size of an elephant ?'),
-            ExternalUserId::fromString('<@U041UN08U>'),
+            Answer::fromString('<@U041UN08U>'),
             Clue::fromString('clue number one.'),
             Clue::fromString('clue number two.')
         );
@@ -85,7 +85,7 @@ class InMemoryQuestionRepositoryTest extends TestCase
         $question1 = Question::ask(
             $questionId1,
             Statement::fromString('What is the size of an elephant ?'),
-            ExternalUserId::fromString('<@U041UN08U>'),
+            Answer::fromString('<@U041UN08U>'),
             Clue::fromString('clue number one.'),
             Clue::fromString('clue number two.')
         );
@@ -95,7 +95,7 @@ class InMemoryQuestionRepositoryTest extends TestCase
         $question2 = Question::ask(
             $questionId2,
             Statement::fromString('What is the size of an mouse ?'),
-            ExternalUserId::fromString('<@U041UN0812>'),
+            Answer::fromString('<@U041UN0812>'),
             Clue::fromString('clue number one.'),
             Clue::fromString('clue number two.')
         );

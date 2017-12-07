@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Acceptance;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use LogicException;
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
+use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Name;
@@ -122,7 +122,7 @@ class FeatureContext implements Context
         return Question::ask(
             QuestionId::fromString($row['id']),
             Statement::fromString($row['statement']),
-            ExternalUserId::fromString($row['answer']),
+            Answer::fromString($row['answer']),
             Clue::FromString($row['clue1']),
             Clue::FromString($row['clue2'])
         );

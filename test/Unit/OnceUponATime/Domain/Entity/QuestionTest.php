@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Domain\Entity;
 
+use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionId;
@@ -24,7 +25,7 @@ class QuestionTest extends TestCase
     {
         $questionId = QuestionId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $statement = Statement::fromString('What is the size of an elephant ?');
-        $answer = ExternalUserId::fromString('<@U041UN08U>');
+        $answer = Answer::fromString('<@U041UN08U>');
         $clue1 = Clue::fromString('clue number one.');
         $clue2 = Clue::fromString('clue number two.');
 
@@ -44,14 +45,14 @@ class QuestionTest extends TestCase
     {
         $questionId = QuestionId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $statement = Statement::fromString('What is the size of an elephant ?');
-        $answer = ExternalUserId::fromString('<@U041UN08U>');
+        $answer = Answer::fromString('<@U041UN08U>');
         $clue1 = Clue::fromString('clue number one.');
         $clue2 = Clue::fromString('clue number two.');
         $question = Question::ask($questionId, $statement, $answer, $clue1, $clue2);
 
-        $rightAnswer = ExternalUserId::fromString('<@U041UN08U>');
+        $rightAnswer = Answer::fromString('<@U041UN08U>');
         $this->assertTrue($question->isCorrect($rightAnswer));
-        $wrongAnswer = ExternalUserId::fromString('<@U041XXXXX>');
+        $wrongAnswer = Answer::fromString('<@U041XXXXX>');
         $this->assertFalse($question->isCorrect($wrongAnswer));
     }
 }

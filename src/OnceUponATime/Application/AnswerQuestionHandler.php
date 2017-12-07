@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application;
 
+use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
@@ -80,8 +81,8 @@ class AnswerQuestionHandler
         return $question;
     }
 
-    private function getAnswer(AnswerQuestion $answerQuestion): ExternalUserId
+    private function getAnswer(AnswerQuestion $answerQuestion): Answer
     {
-        return ExternalUserId::fromString($answerQuestion->answer);
+        return Answer::fromString($answerQuestion->answer);
     }
 }
