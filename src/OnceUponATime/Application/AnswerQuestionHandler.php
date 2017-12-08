@@ -28,10 +28,10 @@ class AnswerQuestionHandler
     /** @var QuestionRepository */
     private $questionRepository;
 
-    /** @var Notify */
+    /** @var QuestionAnsweredNotify */
     private $notify;
 
-    public function __construct(UserRepository $userRepository, QuestionRepository $questionRepository, Notify $notify)
+    public function __construct(UserRepository $userRepository, QuestionRepository $questionRepository, QuestionAnsweredNotify $notify)
     {
         $this->questionRepository = $questionRepository;
         $this->userRepository = $userRepository;

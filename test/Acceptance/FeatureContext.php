@@ -23,7 +23,7 @@ use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
-use OnceUponATime\Infrastructure\Notifications\NotifyMany;
+use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionAnsweredEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
@@ -59,7 +59,7 @@ class FeatureContext implements Context
         $this->userRepository = new InMemoryUserRepository();
         $this->questionRepository = new InMemoryQuestionRepository();
         $this->questionsAnswered = new InMemoryQuestionAnsweredEventStore();
-        $notifier = new NotifyMany([new PublishToEventStore($this->questionsAnswered)]);
+        $notifier = new QuestionAnsweredNotifyMany([new PublishToEventStore($this->questionsAnswered)]);
         $this->questionHandler = new AnswerQuestionHandler(
             $this->userRepository,
             $this->questionRepository,

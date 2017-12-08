@@ -6,24 +6,25 @@ namespace OnceUponATime\Infrastructure\Notifications;
 
 use OnceUponATime\Application\QuestionAnsweredNotify;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\EventStore\QuestionAnsweredEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class PublishToEventStore implements QuestionAnsweredNotify
+class QuestionAnsweredNotifyMany implements QuestionAnsweredNotify
 {
-    /** @var QuestionAnsweredEventStore */
-    private $eventStore;
+    /** @var QuestionAnsweredNotify[] */
+    private $notifiers;
 
-    public function __construct(QuestionAnsweredEventStore $eventStore)
+    public function __construct(array $notifiers)
     {
-        $this->eventStore = $eventStore;
+        $this->notifiers = $notifiers;
     }
 
     public function questionAnswered(QuestionAnswered $event): void
     {
-        $this->eventStore->add($event);
+        foreach ($this->notifiers as $notify) {
+            $notify->questionAnswered($event);
+        }
     }
 }
