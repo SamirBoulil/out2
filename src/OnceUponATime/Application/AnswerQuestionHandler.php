@@ -40,42 +40,43 @@ class AnswerQuestionHandler
 
     public function handle(AnswerQuestion $answerQuestion): bool
     {
+        // TODO: Ok so, those throw an exception, but errors are thrown one at a time
+        // what happened when user id is not ok, question id is not ok ?
         $user = $this->getUser($answerQuestion->externalId);
         $question = $this->getQuestion($answerQuestion->questionId);
         $answer = $this->getAnswer($answerQuestion);
         $isCorrect = $question->isCorrect($answer);
         $this->notify->questionAnswered(new QuestionAnswered($user->id(), $question->id(), $isCorrect));
 
+        // TODO: Should it really return something ? (CQRS behavior?)
+        // TODO: Should it be something as simple as a boolean ? or an object related to the handler instead of a
+        //       primitive type ?
         return $isCorrect;
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidUserId
      */
     private function getUser(string $id): User
     {
         $externalUserId = ExternalUserId::fromString($id);
         $user = $this->userRepository->byExternalId($externalUserId);
         if (null === $user) {
-            throw new \InvalidArgumentException(
-                sprintf('User not found for external id "%s".', $id)
-            );
+            throw new InvalidUserId($id);
         }
 
         return $user;
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidQuestionId
      */
     private function getQuestion(string $id): Question
     {
         $questionId = QuestionId::fromString($id);
         $question = $this->questionRepository->byId($questionId);
         if (null === $question) {
-            throw new \InvalidArgumentException(
-                sprintf('Question not found for id: "%s"', $id)
-            );
+            throw new InvalidQuestionId($id);
         }
 
         return $question;

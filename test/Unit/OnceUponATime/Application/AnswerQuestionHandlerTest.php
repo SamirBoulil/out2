@@ -6,6 +6,8 @@ namespace Tests\Unit\OnceUponATime\Application\Entity;
 
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
+use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
@@ -87,7 +89,7 @@ class AnswerQuestionHandlerTest extends TestCase
      */
     public function it_throws_if_the_user_id_is_not_found()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidUserId::class);
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = self::QUESTION_ID;
         $answerQuestion->externalId = '<@unknownUser>';
@@ -100,7 +102,7 @@ class AnswerQuestionHandlerTest extends TestCase
      */
     public function it_throws_if_the_question_id_is_not_found()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidQuestionId::class);
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = '00000000-0000-0000-0000-000000000000';
         $answerQuestion->externalId = '<@testUser>';
@@ -110,5 +112,6 @@ class AnswerQuestionHandlerTest extends TestCase
 
     /**
      * TODO: How can I / should I unit test the notification system ?
+     * TODO: Quid Acceptance VS unit testing application layer ?
      */
 }

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Tests\Acceptance;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use LogicException;
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
+use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
@@ -25,6 +28,7 @@ use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionAnsweredEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
+use PHPUnit\Runner\Exception;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -42,17 +46,20 @@ class FeatureContext implements Context
     private $questionHandler;
 
     /** @var InMemoryQuestionAnsweredEventStore */
-    private $eventStore;
+    private $questionsAnswered;
 
     /** @var bool */
-    private $hasThrown;
+    private $isQuestionIdInvalid;
+
+    /** @var bool */
+    private $isUserIdInvalid;
 
     public function __construct()
     {
         $this->userRepository = new InMemoryUserRepository();
         $this->questionRepository = new InMemoryQuestionRepository();
-        $this->eventStore = new InMemoryQuestionAnsweredEventStore();
-        $notifier = new NotifyMany([new PublishToEventStore($this->eventStore)]);
+        $this->questionsAnswered = new InMemoryQuestionAnsweredEventStore();
+        $notifier = new NotifyMany([new PublishToEventStore($this->questionsAnswered)]);
         $this->questionHandler = new AnswerQuestionHandler(
             $this->userRepository,
             $this->questionRepository,
@@ -96,8 +103,10 @@ class FeatureContext implements Context
 
         try {
             $this->questionHandler->handle($answerQuestion);
-        } catch (\InvalidArgumentException $e) {
-            $this->hasThrown = true;
+        } catch (InvalidQuestionId $e) {
+            $this->isQuestionIdInvalid = true;
+        } catch (InvalidUserId $e) {
+            $this->isUserIdInvalid = true;
         }
     }
 
@@ -150,7 +159,7 @@ class FeatureContext implements Context
             );
         }
 
-        $answers = $this->eventStore->byUser($user->id());
+        $answers = $this->questionsAnswered->byUser($user->id());
         foreach ($answers as $answer) {
             if ($user->id()->equals($answer->userId()) &&
                 $question->id()->equals($answer->questionId()) &&
@@ -176,10 +185,6 @@ class FeatureContext implements Context
      */
     public function thereShouldBeNoAnswerForUser(string $externalUserId)
     {
-        if (!$this->hasThrown) {
-            throw new \LogicException('Expected handler to throw an exception.');
-        }
-
         $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalUserId));
         if (null === $user) {
             throw new \LogicException(
@@ -187,11 +192,44 @@ class FeatureContext implements Context
             );
         }
 
-        $answers = $this->eventStore->byUser($user->id());
+        $answers = $this->questionsAnswered->byUser($user->id());
         if (!empty($answers)) {
             throw new LogicException(
                 sprintf('Expected answers for users to be empty. "%s" answers found', count($answers))
             );
+        }
+    }
+
+    /**
+     * @Given /^there should be no question answered$/
+     */
+    public function thereShouldBeNoQuestionAnswered()
+    {
+        $questionsAnsweredCount = count($this->questionsAnswered->all());
+        if (0 !== $questionsAnsweredCount) {
+            throw new \RuntimeException(
+                sprintf('Expected questions answered event store to be empty. %s found.', $questionsAnsweredCount)
+            );
+        }
+    }
+
+    /**
+     * @Then /^the user id should not be known$/
+     */
+    public function theUserIdShouldNotBeKnown()
+    {
+        if (!$this->isUserIdInvalid) {
+            throw new \RuntimeException('Handler should have thrown for unknown user id');
+        }
+    }
+
+    /**
+     * @Then /^the question id should not be known$/
+     */
+    public function theQuestionIdShouldNotBeKnown()
+    {
+        if (!$this->isQuestionIdInvalid) {
+            throw new \RuntimeException('Handler should have thrown for unknown question id');
         }
     }
 }

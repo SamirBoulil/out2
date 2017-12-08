@@ -33,4 +33,9 @@ class InMemoryQuestionAnsweredEventStore implements QuestionAnsweredEventStore
 
         return $questionsAnsweredForUser;
     }
+
+    public function all(): array
+    {
+        return $this->questionsAnswered;
+    }
 }
