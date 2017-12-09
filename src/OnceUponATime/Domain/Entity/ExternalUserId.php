@@ -19,7 +19,7 @@ class ExternalUserId
     {
     }
 
-    public static function fromString(string $id): ExternalUserId
+    public static function fromString($id): ExternalUserId
     {
         Assertion::notEmpty($id);
 

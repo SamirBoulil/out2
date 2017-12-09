@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\OnceUponATime\Application\Entity;
+namespace Tests\Unit\OnceUponATime\Application;
 
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
+use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\QuestionAnsweredNotify;
 use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
@@ -15,7 +18,7 @@ use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\Statement;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Infrastructure\Notifications\NotifyMany;
+use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +30,9 @@ use PHPUnit\Framework\TestCase;
 class AnswerQuestionHandlerTest extends TestCase
 {
     private const QUESTION_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
+
+    /** @var QuestionAnsweredNotify */
+    private $testEventSubscriber;
 
     /** @var AnswerQuestionHandler */
     private $answerQuestionHandler;
@@ -51,7 +57,8 @@ class AnswerQuestionHandlerTest extends TestCase
         $userRepository = new InMemoryUserRepository();
         $userRepository->add($user);
 
-        $notify = new NotifyMany([]);
+        $this->testEventSubscriber = new TestEventSubscriber();
+        $notify = new QuestionAnsweredNotifyMany([$this->testEventSubscriber]);
 
         $this->answerQuestionHandler = new AnswerQuestionHandler($userRepository, $questionRepository, $notify);
     }
@@ -59,7 +66,7 @@ class AnswerQuestionHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_answers_question_tells_if_the_answer_is_correct()
+    public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_correct()
     {
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = self::QUESTION_ID;
@@ -67,6 +74,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $answerQuestion->answer = '<@wrong_answer>';
 
         $this->assertFalse($this->answerQuestionHandler->handle($answerQuestion));
+        $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
     }
 
     /**
@@ -78,8 +86,8 @@ class AnswerQuestionHandlerTest extends TestCase
         $answerQuestion->questionId = self::QUESTION_ID;
         $answerQuestion->externalId = '<@testUser>';
         $answerQuestion->answer = '<@right_answer>';
-
         $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
+        $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
     }
 
     /**
@@ -87,12 +95,13 @@ class AnswerQuestionHandlerTest extends TestCase
      */
     public function it_throws_if_the_user_id_is_not_found()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = self::QUESTION_ID;
         $answerQuestion->externalId = '<@unknownUser>';
         $answerQuestion->answer = '<@right_answer>';
+        $this->expectException(InvalidUserId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
+        $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
     }
 
     /**
@@ -100,15 +109,17 @@ class AnswerQuestionHandlerTest extends TestCase
      */
     public function it_throws_if_the_question_id_is_not_found()
     {
-        $this->expectException(\InvalidArgumentException::class);
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->questionId = '00000000-0000-0000-0000-000000000000';
         $answerQuestion->externalId = '<@testUser>';
         $answerQuestion->answer = '<@right_answer>';
+        $this->expectException(InvalidQuestionId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
+        $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
     }
 
     /**
      * TODO: How can I / should I unit test the notification system ?
+     * TODO: Quid Acceptance VS unit testing application layer ?
      */
 }

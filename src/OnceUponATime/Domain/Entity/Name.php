@@ -15,7 +15,7 @@ class Name
     /** @var string */
     private $text;
 
-    public static function fromString(string $text): Name
+    public static function fromString($text): Name
     {
         Assertion::notEmpty($text);
 

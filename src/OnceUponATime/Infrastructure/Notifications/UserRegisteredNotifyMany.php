@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\Notify;
+use OnceUponATime\Application\QuestionAnsweredNotify;
+use OnceUponATime\Application\UserRegisteredNotify;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
+use OnceUponATime\Domain\Entity\UserRegistered;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class NotifyMany implements Notify
+class UserRegisteredNotifyMany implements UserRegisteredNotify
 {
-    /** @var Notify[] */
+    /** @var UserRegisteredNotify[] */
     private $notifiers;
 
     public function __construct(array $notifiers)
@@ -21,10 +23,10 @@ class NotifyMany implements Notify
         $this->notifiers = $notifiers;
     }
 
-    public function questionAnswered(QuestionAnswered $event): void
+    public function userRegistered(UserRegistered $event): void
     {
         foreach ($this->notifiers as $notify) {
-            $notify->questionAnswered($event);
+            $notify->userRegistered($event);
         }
     }
 }

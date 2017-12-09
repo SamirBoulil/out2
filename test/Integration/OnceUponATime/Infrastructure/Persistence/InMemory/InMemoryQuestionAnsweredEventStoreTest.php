@@ -67,4 +67,38 @@ class InMemoryQuestionAnsweredEventStoreTest extends TestCase
             $questionAnsweredEventStore->byUser(UserId::fromString('11111111-1111-1111-1111-111111111111'))
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_returns_all_the_questions_answered_by_all_users()
+    {
+        $questionAnsweredEventStore = new InMemoryQuestionAnsweredEventStore();
+
+        $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
+        $questionAnswered1 = new QuestionAnswered(
+            $userId,
+            QuestionId::fromString('11111111-1111-1111-1111-111111111111'),
+            true
+        );
+        $questionAnswered2 = new QuestionAnswered(
+            $userId,
+            QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
+            true
+        );
+        $anotherUserId = UserId::fromString('22222222-2222-2222-2222-222222222222');
+        $questionAnswered3 = new QuestionAnswered(
+            $anotherUserId,
+            QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
+            true
+        );
+
+        $questionAnsweredEventStore->add($questionAnswered1);
+        $questionAnsweredEventStore->add($questionAnswered2);
+        $questionAnsweredEventStore->add($questionAnswered3);
+        $this->assertSame(
+            [$questionAnswered1, $questionAnswered2, $questionAnswered3],
+            $questionAnsweredEventStore->all()
+        );
+    }
 }

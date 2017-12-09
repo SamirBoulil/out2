@@ -15,7 +15,7 @@ class Answer
     /** @var ExternalUserId */
     protected $externalUserId;
 
-    public static function fromString(string $id): Answer
+    public static function fromString($id): Answer
     {
         Assertion::notEmpty($id);
 
