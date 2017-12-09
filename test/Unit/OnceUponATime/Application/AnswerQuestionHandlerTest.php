@@ -57,7 +57,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $userRepository = new InMemoryUserRepository();
         $userRepository->add($user);
 
-        $this->testEventSubscriber = new DummyEventSubscriber();
+        $this->testEventSubscriber = new TestEventSubscriber();
         $notify = new QuestionAnsweredNotifyMany([$this->testEventSubscriber]);
 
         $this->answerQuestionHandler = new AnswerQuestionHandler($userRepository, $questionRepository, $notify);

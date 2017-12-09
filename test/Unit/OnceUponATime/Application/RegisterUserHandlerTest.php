@@ -30,7 +30,7 @@ class RegisterUserHandlerTest extends TestCase
 
     public function setUp()
     {
-        $this->testEventSubscriber = new DummyEventSubscriber();
+        $this->testEventSubscriber = new TestEventSubscriber();
         $this->userRepository = new InMemoryUserRepository();
         $this->registerUserHandler = new RegisterUserHandler(
             $this->userRepository,
@@ -58,8 +58,8 @@ class RegisterUserHandlerTest extends TestCase
      */
     public function it_does_not_register_a_new_user_with_empty_information()
     {
-        $this->expectException(\Exception::class);
         $registerUser = new RegisterUser();
+        $this->expectException(\Exception::class);
         $this->registerUserHandler->register($registerUser);
         $this->assertEmpty($this->userRepository->all());
         $this->assertFalse($this->testEventSubscriber->isUserRegistered);
@@ -70,10 +70,10 @@ class RegisterUserHandlerTest extends TestCase
      */
     public function it_does_not_register_a_new_user_with_invalid_external_user_id()
     {
-        $this->expectException(\Exception::class);
         $registerUser = new RegisterUser();
         $registerUser->externalUserId = '';
         $registerUser->name = 'valid_name';
+        $this->expectException(\Exception::class);
         $this->registerUserHandler->register($registerUser);
         $this->assertEmpty($this->userRepository->all());
         $this->assertFalse($this->testEventSubscriber->isUserRegistered);
@@ -84,10 +84,10 @@ class RegisterUserHandlerTest extends TestCase
      */
     public function it_does_not_register_a_new_user_with_invalid_name()
     {
-        $this->expectException(\Exception::class);
         $registerUser = new RegisterUser();
         $registerUser->externalUserId = 'valid_external_user_id';
         $registerUser->name = '';
+        $this->expectException(\Exception::class);
         $this->registerUserHandler->register($registerUser);
         $this->assertEmpty($this->userRepository->all());
         $this->assertFalse($this->testEventSubscriber->isUserRegistered);
