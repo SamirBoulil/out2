@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Application;
 
+use OnceUponATime\Application\AskQuestion\AskQuestion;
+use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
 use OnceUponATime\Application\InvalidExternalUserId;
-use OnceUponATime\Application\NextQuestion;
-use OnceUponATime\Application\NextQuestionHandler;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class NextQuestionHandlerTest extends TestCase
+class AskQuestionHandlerTest extends TestCase
 {
     private const USER_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
     private const EXTERNAL_USER_ID = 'external_user_id';
@@ -131,9 +131,9 @@ class NextQuestionHandlerTest extends TestCase
 
     private function getNextQuestion(string $userId): ?Question
     {
-        $nextQuestion = new NextQuestion();
+        $nextQuestion = new AskQuestion();
         $nextQuestion->externalUserId = $userId;
-        $nextQuestionHandler = new NextQuestionHandler(
+        $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $this->questionRepository,
             $this->answeredQuestions

@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Domain\Entity\Event;
 
-use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizzEvent;
-use OnceUponATime\Domain\Event\QuizzEventStore;
 use OnceUponATime\Domain\Event\UserRegistered;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +26,6 @@ class UserRegisteredTest extends TestCase
         $externalUserId = ExternalUserId::fromString('external_user_id');
         $name = Name::fromString('Samir');
         $userRegistered = new UserRegistered($userId, $externalUserId, $name);
-        $this->assertInstanceOf(QuizzEvent::class, $userRegistered);
         $this->assertSame($userId, $userRegistered->userId());
         $this->assertSame($externalUserId, $userRegistered->externalUserId());
         $this->assertSame($name, $userRegistered->name());

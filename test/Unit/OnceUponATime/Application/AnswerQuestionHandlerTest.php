@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Application;
 
-use OnceUponATime\Application\AnswerQuestion;
-use OnceUponATime\Application\AnswerQuestionHandler;
+use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
+use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
+use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\InvalidQuestionId;
-use OnceUponATime\Application\QuestionAnsweredNotify;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -56,7 +56,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $externalUserId = ExternalUserId::fromString('<@testUser>');
         $name = Name::fromString('Alice Jardin');
         $user = User::register($userId, $externalUserId, $name);
-        
+
         $userRepository = new InMemoryUserRepository();
         $userRepository->add($user);
 

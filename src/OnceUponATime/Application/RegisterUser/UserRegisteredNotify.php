@@ -1,6 +1,6 @@
 <?php
 
-namespace OnceUponATime\Application;
+namespace OnceUponATime\Application\RegisterUser;
 
 use OnceUponATime\Domain\Event\UserRegistered;
 

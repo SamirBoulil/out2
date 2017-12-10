@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Application;
+namespace OnceUponATime\Application\AskQuestion;
 
-use OnceUponATime\Domain\Entity\NextQuestionSelected;
+use OnceUponATime\Domain\Event\QuestionAsked;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -12,6 +12,6 @@ use OnceUponATime\Domain\Entity\NextQuestionSelected;
  */
 interface QuestionAskedNotify
 {
-    public function nextQuestionSelected(NextQuestionSelected $event): void;
+    public function questionAsked(QuestionAsked $event): void;
 }
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\NextQuestion;
-use OnceUponATime\Application\NextQuestionHandler;
-use OnceUponATime\Application\UserRegisteredNotify;
+use OnceUponATime\Application\AskQuestion\AskQuestion;
+use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
+use OnceUponATime\Application\RegisterUser\UserRegisteredNotify;
 use OnceUponATime\Domain\Event\UserRegistered;
 
 /**
@@ -15,17 +15,17 @@ use OnceUponATime\Domain\Event\UserRegistered;
  */
 class NewQuestionForNewUser implements UserRegisteredNotify
 {
-    /** @var NextQuestionHandler */
+    /** @var AskQuestionHandler */
     private $nextQuestionHandler;
 
-    public function __construct(NextQuestionHandler $nextQuestionHandler)
+    public function __construct(AskQuestionHandler $nextQuestionHandler)
     {
         $this->nextQuestionHandler = $nextQuestionHandler;
     }
 
     public function userRegistered(UserRegistered $event): void
     {
-        $nextQuestion = new NextQuestion();
+        $nextQuestion = new AskQuestion();
         $nextQuestion->externalUserId = (string) $event->externalUserId();
         $this->nextQuestionHandler->handle($nextQuestion);
     }

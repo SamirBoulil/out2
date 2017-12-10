@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\QuestionAnsweredNotify;
-use OnceUponATime\Application\QuestionAskedNotify;
-use OnceUponATime\Domain\Entity\NextQuestionSelected;
+use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
+use OnceUponATime\Application\AskQuestion\QuestionAskedNotify;
 use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizzEventStore;
 
 /**
@@ -29,7 +29,7 @@ class PublishToEventStore implements QuestionAnsweredNotify, QuestionAskedNotify
         $this->eventStore->add($event);
     }
 
-    public function nextQuestionSelected(NextQuestionSelected $event): void
+    public function questionAsked(QuestionAsked $event): void
     {
         $this->eventStore->add($event);
     }

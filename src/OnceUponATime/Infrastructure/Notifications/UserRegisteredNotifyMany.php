@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\UserRegisteredNotify;
+use OnceUponATime\Application\RegisterUser\UserRegisteredNotify;
 use OnceUponATime\Domain\Event\UserRegistered;
 
 /**

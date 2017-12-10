@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Application;
 
-use OnceUponATime\Application\QuestionAnsweredNotify;
-use OnceUponATime\Application\UserRegisteredNotify;
+use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
+use OnceUponATime\Application\RegisterUser\UserRegisteredNotify;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\UserRegistered;
 

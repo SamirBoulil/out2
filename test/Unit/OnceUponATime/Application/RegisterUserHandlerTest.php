@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Application;
 
-use OnceUponATime\Application\RegisterUser;
-use OnceUponATime\Application\RegisterUserHandler;
-use OnceUponATime\Application\UserRegisteredNotify;
+use OnceUponATime\Application\RegisterUser\RegisterUser;
+use OnceUponATime\Application\RegisterUser\RegisterUserHandler;
+use OnceUponATime\Application\RegisterUser\UserRegisteredNotify;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\UserRegisteredNotifyMany;

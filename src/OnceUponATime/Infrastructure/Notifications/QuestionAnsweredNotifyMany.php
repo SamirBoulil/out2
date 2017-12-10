@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\QuestionAnsweredNotify;
+use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 
 /**
@@ -13,7 +13,7 @@ use OnceUponATime\Domain\Event\QuestionAnswered;
  */
 class QuestionAnsweredNotifyMany implements QuestionAnsweredNotify
 {
-    /** @var QuestionAnsweredNotify[] */
+    /** @var AnswerQuestion\QuestionAnsweredNotify[] */
     private $notifiers;
 
     public function __construct(array $notifiers)

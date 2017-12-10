@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Application;
+namespace OnceUponATime\Application\AnswerQuestion;
 
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
@@ -69,7 +70,7 @@ class AnswerQuestionHandler
         $externalUserId = ExternalUserId::fromString($id);
         $user = $this->userRepository->byExternalId($externalUserId);
         if (null === $user) {
-            throw new InvalidExternalUserId($id);
+            throw InvalidExternalUserId::fromString($id);
         }
 
         return $user;

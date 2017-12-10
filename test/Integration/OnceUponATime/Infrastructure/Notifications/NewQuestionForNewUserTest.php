@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\NextQuestionHandler;
+use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -57,7 +57,7 @@ class NewQuestionForNewUserTest extends TestCase
         );
 
         $this->quizzEventStore = new InMemoryQuizzEventStore();
-        $nextQuestionHandler = new NextQuestionHandler(
+        $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $questionRepository,
             $this->quizzEventStore

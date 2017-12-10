@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Application;
+namespace OnceUponATime\Application\AskQuestion;
 
-use OnceUponATime\Domain\Entity\NextQuestionSelected;
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
@@ -19,7 +19,7 @@ use OnceUponATime\Domain\Repository\UserRepository;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class NextQuestionHandler
+class AskQuestionHandler
 {
     /** @var UserRepository */
     private $userRepository;
@@ -40,7 +40,7 @@ class NextQuestionHandler
         $this->quizzEventStore = $quizzEventStore;
     }
 
-    public function handle(NextQuestion $nextQuestion): ?Question
+    public function handle(AskQuestion $nextQuestion): ?Question
     {
         $user = $this->getUser($nextQuestion);
         $unansweredQuestions = $this->findUnansweredQuestions($user->id());
@@ -83,7 +83,7 @@ class NextQuestionHandler
         return in_array((string) $question->id(), $answeredQuestionIds);
     }
 
-    private function getUser(NextQuestion $nextQuestion): User
+    private function getUser(AskQuestion $nextQuestion): User
     {
         $user = $this->userRepository->byExternalId(ExternalUserId::fromString($nextQuestion->externalUserId));
         if (null === $user) {

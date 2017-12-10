@@ -1,6 +1,6 @@
 <?php
 
-namespace OnceUponATime\Application;
+namespace OnceUponATime\Application\AnswerQuestion;
 
 use OnceUponATime\Domain\Event\QuestionAnswered;
 

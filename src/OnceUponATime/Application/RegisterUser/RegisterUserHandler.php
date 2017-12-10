@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Application;
+namespace OnceUponATime\Application\RegisterUser;
 
-use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\UserRegistered;
