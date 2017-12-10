@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionAsked;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
 use PHPUnit\Framework\TestCase;
 

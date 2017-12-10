@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionAsked;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\QuizzEvent;
-use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\EventStore\QuizzEventStore;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizzEvent;
+use OnceUponATime\Domain\Event\QuizzEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -17,24 +16,12 @@ use OnceUponATime\Domain\EventStore\QuizzEventStore;
  */
 class InMemoryQuizzEventStore implements QuizzEventStore
 {
-    /** @var QuestionAnswered[] */
+    /** @var \OnceUponATime\Domain\Event\QuestionAnswered[] */
     private $events = [];
 
     public function add(QuizzEvent $event): void
     {
         $this->events[] = $event;
-    }
-
-    public function byUser(UserId $userId): array
-    {
-        $events = [];
-        foreach ($this->events as $questionAnswered) {
-            if ($questionAnswered->userId()->equals($userId)) {
-                $events[] = $questionAnswered;
-            }
-        }
-
-        return $events;
     }
 
     public function all(): array
@@ -53,5 +40,17 @@ class InMemoryQuizzEventStore implements QuizzEventStore
         }
 
         throw new \LogicException(sprintf('User "%s" has no question to answer.', (string) $userId));
+    }
+
+    public function byUser(UserId $userId): array
+    {
+        $events = [];
+        foreach ($this->events as $questionAnswered) {
+            if ($questionAnswered->userId()->equals($userId)) {
+                $events[] = $questionAnswered;
+            }
+        }
+
+        return $events;
     }
 }

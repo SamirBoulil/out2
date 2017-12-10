@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Application;
 
-use OnceUponATime\Application\AnswerQuestion;
-use OnceUponATime\Application\AnswerQuestionHandler;
-use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
+use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
+use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\InvalidExternalUserId;
-use OnceUponATime\Application\QuestionAnsweredNotify;
-use OnceUponATime\Domain\Entity\Answer;
-use OnceUponATime\Domain\Entity\Clue;
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Name;
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionAsked;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\Statement;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Domain\Entity\Question\Answer;
+use OnceUponATime\Domain\Entity\Question\Clue;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\Question\Statement;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\Name;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
@@ -57,7 +56,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $externalUserId = ExternalUserId::fromString('<@testUser>');
         $name = Name::fromString('Alice Jardin');
         $user = User::register($userId, $externalUserId, $name);
-        
+
         $userRepository = new InMemoryUserRepository();
         $userRepository->add($user);
 

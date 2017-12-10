@@ -5,32 +5,30 @@ declare(strict_types=1);
 namespace Tests\Acceptance;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use LogicException;
-use OnceUponATime\Application\AnswerQuestion;
-use OnceUponATime\Application\AnswerQuestionHandler;
-use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
+use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
 use OnceUponATime\Application\InvalidExternalUserId;
-use OnceUponATime\Domain\Entity\Answer;
-use OnceUponATime\Domain\Entity\Clue;
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Name;
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionAsked;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\Statement;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Domain\Entity\Question\Answer;
+use OnceUponATime\Domain\Entity\Question\Clue;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\Question\Statement;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\Name;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
-use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
-use PHPUnit\Runner\Exception;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -94,6 +92,17 @@ class FeatureContext implements Context
         }
     }
 
+    private function createQuestionFromHash(array $row): Question
+    {
+        return Question::ask(
+            QuestionId::fromString($row['id']),
+            Statement::fromString($row['statement']),
+            Answer::fromString($row['answer']),
+            Clue::FromString($row['clue1']),
+            Clue::FromString($row['clue2'])
+        );
+    }
+
     /**
      * @When /^the user "([^"]*)" answers the question "([^"]*)" with answer "([^"]*)"$/
      */
@@ -125,17 +134,6 @@ class FeatureContext implements Context
         if (true !== $answeredQuestion->isCorrect()) {
             throw new \RuntimeException('The question we found was not incorrect.');
         }
-    }
-
-    private function createQuestionFromHash(array $row): Question
-    {
-        return Question::ask(
-            QuestionId::fromString($row['id']),
-            Statement::fromString($row['statement']),
-            Answer::fromString($row['answer']),
-            Clue::FromString($row['clue1']),
-            Clue::FromString($row['clue2'])
-        );
     }
 
     /**

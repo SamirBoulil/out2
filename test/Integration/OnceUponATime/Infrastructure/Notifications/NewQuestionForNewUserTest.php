@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\NextQuestionHandler;
-use OnceUponATime\Domain\Entity\Answer;
-use OnceUponATime\Domain\Entity\Clue;
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Name;
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\Statement;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\Entity\UserRegistered;
-use OnceUponATime\Domain\EventStore\QuizzEventStore;
+use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
+use OnceUponATime\Domain\Entity\Question\Answer;
+use OnceUponATime\Domain\Entity\Question\Clue;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\Question\Statement;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\Name;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
@@ -57,7 +57,7 @@ class NewQuestionForNewUserTest extends TestCase
         );
 
         $this->quizzEventStore = new InMemoryQuizzEventStore();
-        $nextQuestionHandler = new NextQuestionHandler(
+        $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $questionRepository,
             $this->quizzEventStore

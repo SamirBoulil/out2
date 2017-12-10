@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\OnceUponATime\Application\TestEventSubscriber;

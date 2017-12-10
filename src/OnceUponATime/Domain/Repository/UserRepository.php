@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Domain\Repository;
 
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
