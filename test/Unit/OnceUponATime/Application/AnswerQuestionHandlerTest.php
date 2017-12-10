@@ -7,7 +7,7 @@ namespace Tests\Unit\OnceUponATime\Application;
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
 use OnceUponATime\Application\InvalidQuestionId;
-use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\QuestionAnsweredNotify;
 use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
@@ -99,7 +99,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $answerQuestion->questionId = self::QUESTION_ID;
         $answerQuestion->externalId = '<@unknownUser>';
         $answerQuestion->answer = '<@right_answer>';
-        $this->expectException(InvalidUserId::class);
+        $this->expectException(InvalidExternalUserId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
         $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
     }

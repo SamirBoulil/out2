@@ -9,7 +9,7 @@ use OnceUponATime\Domain\Entity\UserId;
 /**
  * TODO: Not sure this interface should be in domain ? (but repositories are so...)
  */
-interface QuestionAnsweredEventStore
+interface QuestionsAnsweredEventStore
 {
     public function add(QuestionAnswered $questionAnswered): void;
 

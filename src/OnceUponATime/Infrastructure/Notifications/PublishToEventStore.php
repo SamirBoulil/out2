@@ -6,7 +6,7 @@ namespace OnceUponATime\Infrastructure\Notifications;
 
 use OnceUponATime\Application\QuestionAnsweredNotify;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\EventStore\QuestionAnsweredEventStore;
+use OnceUponATime\Domain\EventStore\QuestionsAnsweredEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -14,10 +14,10 @@ use OnceUponATime\Domain\EventStore\QuestionAnsweredEventStore;
  */
 class PublishToEventStore implements QuestionAnsweredNotify
 {
-    /** @var QuestionAnsweredEventStore */
+    /** @var QuestionsAnsweredEventStore */
     private $eventStore;
 
-    public function __construct(QuestionAnsweredEventStore $eventStore)
+    public function __construct(QuestionsAnsweredEventStore $eventStore)
     {
         $this->eventStore = $eventStore;
     }

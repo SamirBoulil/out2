@@ -7,7 +7,7 @@ namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
 use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionAnsweredEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionsAnsweredEventStore;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,7 +23,7 @@ class InMemoryQuestionAnsweredEventStoreTest extends TestCase
     {
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
 
-        $questionAnsweredEventStore = new InMemoryQuestionAnsweredEventStore();
+        $questionAnsweredEventStore = new InMemoryQuestionsAnsweredEventStore();
         $questionAnswered = new QuestionAnswered(
             $userId,
             QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
@@ -39,7 +39,7 @@ class InMemoryQuestionAnsweredEventStoreTest extends TestCase
      */
     public function it_can_add_multiple_questions_answered_and_return_them_by_user()
     {
-        $questionAnsweredEventStore = new InMemoryQuestionAnsweredEventStore();
+        $questionAnsweredEventStore = new InMemoryQuestionsAnsweredEventStore();
 
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $questionAnswered1 = new QuestionAnswered(
@@ -73,7 +73,7 @@ class InMemoryQuestionAnsweredEventStoreTest extends TestCase
      */
     public function it_returns_all_the_questions_answered_by_all_users()
     {
-        $questionAnsweredEventStore = new InMemoryQuestionAnsweredEventStore();
+        $questionAnsweredEventStore = new InMemoryQuestionsAnsweredEventStore();
 
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $questionAnswered1 = new QuestionAnswered(
