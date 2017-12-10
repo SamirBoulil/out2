@@ -2,27 +2,24 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Application\AnswerQuestion;
+namespace OnceUponATime\Application\ShowClue;
 
 use Assert\AssertionFailedException;
+use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\InvalidUserId;
-use OnceUponATime\Domain\Entity\Question\Answer;
+use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 
 /**
- * TODO: This handler returns whether the answer is right for the question. does it make sense ? shouldn't this be
- *       returned (somehow) via the event thrown ?
- *
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class AnswerQuestionHandler
+class ShowClueHandler
 {
     /** @var UserRepository */
     private $userRepository;
@@ -48,45 +45,64 @@ class AnswerQuestionHandler
         $this->notify = $notify;
     }
 
-    public function handle(AnswerQuestion $answerQuestion): bool
+    public function handle(ShowClue $askClue)
     {
-        // TODO: Ok so, those throw an exception, but errors are thrown one at a time
-        // what happened when user id is not ok, question id is not ok ?
-        $user = $this->getUser($answerQuestion);
-        $question = $this->getCurrentQuestionForUser($user);
-        $answer = $this->getAnswer($answerQuestion);
-        $isCorrect = $question->isCorrect($answer);
-        $this->notify->questionAnswered(new QuestionAnswered($user->id(), $question->id(), $isCorrect));
+        $user = $this->getUser($askClue);
+        $question = $this->getQuestionToAnswer($user);
+        $guessesCount = $this->guessesCount($user);
+        $this->checkGuessesCount($guessesCount, $question, $user);
 
-        // TODO: Should it really return something ? (CQRS behavior?)
-        // TODO: Should it be something as simple as a boolean ? or an object related to the handler instead of a primitive type ?
-        return $isCorrect;
+        return $this->getClue($guessesCount, $question);
     }
 
     /**
      * @throws InvalidUserId
-     * @throws AssertionFailedException
      */
-    private function getUser(AnswerQuestion $answerQuestion): User
+    private function getUser(ShowClue $askClue): User
     {
-        $userId = UserId::fromString($answerQuestion->userId);
+        $userId = UserId::fromString($askClue->userId);
         $user = $this->userRepository->byId($userId);
         if (null === $user) {
-            throw InvalidUserId::fromString($answerQuestion->userId);
+            throw InvalidUserId::fromString($askClue->userId);
         }
 
         return $user;
     }
 
-    private function getCurrentQuestionForUser(User $user): Question
+    private function getQuestionToAnswer(User $user): Question
     {
         $questionId = $this->quizEventStore->questionToAnswerForUser($user->id());
 
         return $this->questionRepository->byId($questionId);
     }
 
-    private function getAnswer(AnswerQuestion $answerQuestion): Answer
+    private function guessesCount(User $user): int
     {
-        return Answer::fromString($answerQuestion->answer);
+        return $this->quizEventStore->guessesCountForCurrentQuestionAndUser($user->id());
+    }
+
+    private function getClue($guessesCount, $question): Clue
+    {
+        if (0 === $guessesCount) {
+            return $question->clue1();
+        }
+
+        return $question->clue2();
+    }
+
+    /**
+     * @throws \LogicException
+     */
+    private function checkGuessesCount($guessesCount, $question, $user): void
+    {
+        if (2 < $guessesCount) {
+            throw new \LogicException(
+                sprintf(
+                    'There is no clue available for the question "%s" and user "%s"',
+                    $question->id(),
+                    $user->id()
+                )
+            );
+        }
     }
 }

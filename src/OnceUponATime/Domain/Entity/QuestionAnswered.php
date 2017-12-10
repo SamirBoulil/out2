@@ -21,8 +21,8 @@ final class QuestionAnswered
 
     public function __construct(UserId $userId, QuestionId $questionId, bool $isCorrect)
     {
-        $this->questionId = $questionId;
         $this->userId = $userId;
+        $this->questionId = $questionId;
         $this->isCorrect = $isCorrect;
     }
 

@@ -15,9 +15,9 @@ class InvalidQuestionId extends \InvalidArgumentException
     /** @var string */
     private $id;
 
-    public static function fromString(string $id): self
+    public static function fromString(string $id): InvalidQuestionId
     {
-        $e = new InvalidQuestionId(sprintf('Question not found for id: "%s"', $id));
+        $e = new self(sprintf('Question not found for id: "%s"', $id));
         $e->id = $id;
     }
 
