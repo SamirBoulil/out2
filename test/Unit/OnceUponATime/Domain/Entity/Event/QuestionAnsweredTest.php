@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\OnceUponATime\Domain\Entity;
+namespace Tests\Unit\OnceUponATime\Domain\Entity\Event;
 
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuizzEvent;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,6 +25,7 @@ class QuestionAnsweredTest extends TestCase
         $userId = UserId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $isCorrect = true;
         $questionAnswered = new QuestionAnswered($userId, $questionId, $isCorrect);
+        $this->assertInstanceOf(QuizzEvent::class, $questionAnswered);
         $this->assertSame($questionId, $questionAnswered->questionId());
         $this->assertSame($userId, $questionAnswered->userId());
         $this->assertSame($isCorrect, $questionAnswered->isCorrect());
