@@ -20,7 +20,7 @@ class UserIdTest extends TestCase
     {
         $id = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
         $userId = UserId::fromString($id);
-        $this->assertSame($id, (string)$userId);
+        $this->assertSame($id, (string) $userId);
     }
 
     /**

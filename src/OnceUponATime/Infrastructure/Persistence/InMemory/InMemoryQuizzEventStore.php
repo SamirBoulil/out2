@@ -6,7 +6,6 @@ namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizzEvent;
 use OnceUponATime\Domain\Event\QuizzEventStore;
@@ -25,18 +24,6 @@ class InMemoryQuizzEventStore implements QuizzEventStore
         $this->events[] = $event;
     }
 
-    public function byUser(UserId $userId): array
-    {
-        $events = [];
-        foreach ($this->events as $questionAnswered) {
-            if ($questionAnswered->userId()->equals($userId)) {
-                $events[] = $questionAnswered;
-            }
-        }
-
-        return $events;
-    }
-
     public function all(): array
     {
         return $this->events;
@@ -53,5 +40,17 @@ class InMemoryQuizzEventStore implements QuizzEventStore
         }
 
         throw new \LogicException(sprintf('User "%s" has no question to answer.', (string) $userId));
+    }
+
+    public function byUser(UserId $userId): array
+    {
+        $events = [];
+        foreach ($this->events as $questionAnswered) {
+            if ($questionAnswered->userId()->equals($userId)) {
+                $events[] = $questionAnswered;
+            }
+        }
+
+        return $events;
     }
 }

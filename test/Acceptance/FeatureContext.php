@@ -92,6 +92,17 @@ class FeatureContext implements Context
         }
     }
 
+    private function createQuestionFromHash(array $row): Question
+    {
+        return Question::ask(
+            QuestionId::fromString($row['id']),
+            Statement::fromString($row['statement']),
+            Answer::fromString($row['answer']),
+            Clue::FromString($row['clue1']),
+            Clue::FromString($row['clue2'])
+        );
+    }
+
     /**
      * @When /^the user "([^"]*)" answers the question "([^"]*)" with answer "([^"]*)"$/
      */
@@ -123,17 +134,6 @@ class FeatureContext implements Context
         if (true !== $answeredQuestion->isCorrect()) {
             throw new \RuntimeException('The question we found was not incorrect.');
         }
-    }
-
-    private function createQuestionFromHash(array $row): Question
-    {
-        return Question::ask(
-            QuestionId::fromString($row['id']),
-            Statement::fromString($row['statement']),
-            Answer::fromString($row['answer']),
-            Clue::FromString($row['clue1']),
-            Clue::FromString($row['clue2'])
-        );
     }
 
     /**

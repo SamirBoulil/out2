@@ -7,7 +7,6 @@ namespace Tests\Unit\OnceUponATime\Domain\Entity\Event;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\QuizzEvent;
 use OnceUponATime\Domain\Event\UserRegistered;
 use PHPUnit\Framework\TestCase;
 

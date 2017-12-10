@@ -55,9 +55,14 @@ class AskQuestionHandler
         return $question;
     }
 
-    private function pickRandomQuestion(array $questions): Question
+    private function getUser(AskQuestion $nextQuestion): User
     {
-        return $questions[array_rand($questions)];
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($nextQuestion->externalUserId));
+        if (null === $user) {
+            throw InvalidExternalUserId::fromString($nextQuestion->externalUserId);
+        }
+
+        return $user;
     }
 
     private function findUnansweredQuestions(UserId $userId): array
@@ -66,7 +71,7 @@ class AskQuestionHandler
         $questions = $this->questionRepository->all();
         foreach ($questions as $question) {
             if (!$this->isQuestionAlreadyAnsweredByUser($question, $userId)) {
-                 $unansweredQuestions[] = $question;
+                $unansweredQuestions[] = $question;
             }
         }
 
@@ -83,13 +88,8 @@ class AskQuestionHandler
         return in_array((string) $question->id(), $answeredQuestionIds);
     }
 
-    private function getUser(AskQuestion $nextQuestion): User
+    private function pickRandomQuestion(array $questions): Question
     {
-        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($nextQuestion->externalUserId));
-        if (null === $user) {
-            throw InvalidExternalUserId::fromString($nextQuestion->externalUserId);
-        }
-
-        return $user;
+        return $questions[array_rand($questions)];
     }
 }

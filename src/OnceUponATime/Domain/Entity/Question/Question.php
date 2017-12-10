@@ -47,11 +47,6 @@ class Question
         return $this->id;
     }
 
-    public function answer(): Answer
-    {
-        return $this->answer;
-    }
-
     public function clue1(): Clue
     {
         return $this->clue1;
@@ -65,5 +60,10 @@ class Question
     public function isCorrect(Answer $answer): bool
     {
         return $this->answer()->equals($answer);
+    }
+
+    public function answer(): Answer
+    {
+        return $this->answer;
     }
 }

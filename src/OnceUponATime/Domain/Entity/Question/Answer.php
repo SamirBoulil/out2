@@ -21,7 +21,7 @@ class Answer
         Assertion::notEmpty($id);
 
         $answer = new self();
-        $answer->externalUserId = ExternalUserId::fromString($id) ;
+        $answer->externalUserId = ExternalUserId::fromString($id);
 
         return $answer;
     }

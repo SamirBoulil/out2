@@ -87,6 +87,19 @@ class AskQuestionHandlerTest extends TestCase
         $this->assertInstanceOf(Question::class, $question);
     }
 
+    private function getNextQuestion(string $userId): ?Question
+    {
+        $nextQuestion = new AskQuestion();
+        $nextQuestion->externalUserId = $userId;
+        $nextQuestionHandler = new AskQuestionHandler(
+            $this->userRepository,
+            $this->questionRepository,
+            $this->answeredQuestions
+        );
+
+        return $nextQuestionHandler->handle($nextQuestion);
+    }
+
     /**
      * @test
      */
@@ -97,6 +110,16 @@ class AskQuestionHandlerTest extends TestCase
         $this->assertNotNull($question);
         $this->assertInstanceOf(Question::class, $question);
         $this->assertSame(self::QUESTION_ID_2, (string) $question->id());
+    }
+
+    private function userHasAnsweredQuestion(string $userId, string $questionId): void
+    {
+        $questionAnswered = new QuestionAnswered(
+            UserId::fromString($userId),
+            QuestionId::fromString($questionId),
+            true
+        );
+        $this->answeredQuestions->add($questionAnswered);
     }
 
     /**
@@ -117,28 +140,5 @@ class AskQuestionHandlerTest extends TestCase
     {
         $this->expectException(InvalidExternalUserId::class);
         $this->getNextQuestion('00000000-0000-0000-0000-000000000000');
-    }
-
-    private function userHasAnsweredQuestion(string $userId, string $questionId): void
-    {
-        $questionAnswered = new QuestionAnswered(
-            UserId::fromString($userId),
-            QuestionId::fromString($questionId),
-            true
-        );
-        $this->answeredQuestions->add($questionAnswered);
-    }
-
-    private function getNextQuestion(string $userId): ?Question
-    {
-        $nextQuestion = new AskQuestion();
-        $nextQuestion->externalUserId = $userId;
-        $nextQuestionHandler = new AskQuestionHandler(
-            $this->userRepository,
-            $this->questionRepository,
-            $this->answeredQuestions
-        );
-
-        return $nextQuestionHandler->handle($nextQuestion);
     }
 }
