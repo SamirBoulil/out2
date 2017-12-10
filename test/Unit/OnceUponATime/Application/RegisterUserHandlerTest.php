@@ -41,7 +41,7 @@ class RegisterUserHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_registers_a_new_user_with_valid_information()
+    public function it_registers_a_new_user_with_valid_information_and_notifies()
     {
         $externalUserId = '<@valid_external_user_id>';
         $registerUser = new RegisterUser();

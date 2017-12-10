@@ -14,12 +14,15 @@ use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Name;
 use OnceUponATime\Domain\Entity\Question;
+use OnceUponATime\Domain\Entity\QuestionAnswered;
+use OnceUponATime\Domain\Entity\QuestionAsked;
 use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\Statement;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -39,8 +42,9 @@ class AnswerQuestionHandlerTest extends TestCase
 
     public function setUp()
     {
+        $questionId = QuestionId::fromString(self::QUESTION_ID);
         $question = Question::ask(
-            QuestionId::fromString(self::QUESTION_ID),
+            $questionId,
             Statement::fromString('What is the most scared of an elephant ?'),
             Answer::fromString('<@right_answer>'),
             Clue::fromString('Clue 1'),
@@ -57,10 +61,19 @@ class AnswerQuestionHandlerTest extends TestCase
         $userRepository = new InMemoryUserRepository();
         $userRepository->add($user);
 
+        $questionAsked = new QuestionAsked($userId, $questionId);
+        $questionAnsweredEventStore = new InMemoryQuizzEventStore();
+        $questionAnsweredEventStore->add($questionAsked);
+
         $this->testEventSubscriber = new TestEventSubscriber();
         $notify = new QuestionAnsweredNotifyMany([$this->testEventSubscriber]);
 
-        $this->answerQuestionHandler = new AnswerQuestionHandler($userRepository, $questionRepository, $notify);
+        $this->answerQuestionHandler = new AnswerQuestionHandler(
+            $userRepository,
+            $questionRepository,
+            $questionAnsweredEventStore,
+            $notify
+        );
     }
 
     /**
@@ -100,20 +113,6 @@ class AnswerQuestionHandlerTest extends TestCase
         $answerQuestion->externalId = '<@unknownUser>';
         $answerQuestion->answer = '<@right_answer>';
         $this->expectException(InvalidExternalUserId::class);
-        $this->answerQuestionHandler->handle($answerQuestion);
-        $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
-    }
-
-    /**
-     * @test
-     */
-    public function it_throws_if_the_question_id_is_not_found()
-    {
-        $answerQuestion = new AnswerQuestion();
-        $answerQuestion->questionId = '00000000-0000-0000-0000-000000000000';
-        $answerQuestion->externalId = '<@testUser>';
-        $answerQuestion->answer = '<@right_answer>';
-        $this->expectException(InvalidQuestionId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
         $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
     }

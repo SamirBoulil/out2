@@ -10,6 +10,7 @@ use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
 use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\User;
+use OnceUponATime\Domain\EventStore\QuizzEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 
@@ -28,16 +29,21 @@ class AnswerQuestionHandler
     /** @var QuestionRepository */
     private $questionRepository;
 
+    /** @var QuizzEventStore */
+    private $questionsAnsweredEventStore;
+
     /** @var QuestionAnsweredNotify */
     private $notify;
 
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
+        QuizzEventStore $questionsAnsweredEventStore,
         QuestionAnsweredNotify $notify
     ) {
-        $this->questionRepository = $questionRepository;
         $this->userRepository = $userRepository;
+        $this->questionRepository = $questionRepository;
+        $this->questionsAnsweredEventStore = $questionsAnsweredEventStore;
         $this->notify = $notify;
     }
 
@@ -46,7 +52,7 @@ class AnswerQuestionHandler
         // TODO: Ok so, those throw an exception, but errors are thrown one at a time
         // what happened when user id is not ok, question id is not ok ?
         $user = $this->getUser($answerQuestion->externalId);
-        $question = $this->getQuestion($answerQuestion->questionId);
+        $question = $this->getCurrentQuestionForUser($user);
         $answer = $this->getAnswer($answerQuestion);
         $isCorrect = $question->isCorrect($answer);
         $this->notify->questionAnswered(new QuestionAnswered($user->id(), $question->id(), $isCorrect));
@@ -70,18 +76,11 @@ class AnswerQuestionHandler
         return $user;
     }
 
-    /**
-     * @throws InvalidQuestionId
-     */
-    private function getQuestion(string $id): Question
+    private function getCurrentQuestionForUser(User $user): Question
     {
-        $questionId = QuestionId::fromString($id);
-        $question = $this->questionRepository->byId($questionId);
-        if (null === $question) {
-            throw new InvalidQuestionId($id);
-        }
+        $questionId = $this->questionsAnsweredEventStore->currentQuestionForUser($user->id());
 
-        return $question;
+        return $this->questionRepository->byId($questionId);
     }
 
     private function getAnswer(AnswerQuestion $answerQuestion): Answer
