@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application;
 
-use OnceUponATime\Domain\Entity\Answer;
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\EventStore\QuizzEventStore;
+use OnceUponATime\Domain\Entity\Question\Answer;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuizzEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 

@@ -2,7 +2,7 @@
 
 namespace OnceUponATime\Application;
 
-use OnceUponATime\Domain\Entity\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 
 interface QuestionAnsweredNotify
 {

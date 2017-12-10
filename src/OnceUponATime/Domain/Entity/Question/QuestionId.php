@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Domain\Entity;
+namespace OnceUponATime\Domain\Entity\Question;
 
 use Assert\Assertion;
 
@@ -10,7 +10,7 @@ use Assert\Assertion;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class UserId
+class QuestionId
 {
     /**
      * @var string
@@ -21,7 +21,7 @@ class UserId
     {
     }
 
-    public static function fromString($id): UserId
+    public static function fromString($id): QuestionId
     {
         Assertion::notEmpty($id);
         Assertion::uuid($id);
@@ -39,6 +39,6 @@ class UserId
 
     public function equals($userId): bool
     {
-        return $userId instanceof UserId && (string) $this === (string) $userId;
+        return $userId instanceof QuestionId && (string) $this === (string) $userId;
     }
 }

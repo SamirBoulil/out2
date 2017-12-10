@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Domain\Entity;
+namespace OnceUponATime\Domain\Event;
+
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\Name;
+use OnceUponATime\Domain\Entity\User\UserId;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

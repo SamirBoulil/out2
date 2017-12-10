@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application;
 
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Name;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\Entity\UserRegistered;
+use OnceUponATime\Domain\Entity\User\Name;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Domain\Repository\UserRepository;
 use Ramsey\Uuid\Uuid;
 

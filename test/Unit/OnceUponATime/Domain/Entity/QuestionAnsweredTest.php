@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Domain\Entity;
 
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 use PHPUnit\Framework\TestCase;
 
 /**

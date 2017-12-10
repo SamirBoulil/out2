@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Domain\Entity;
+namespace OnceUponATime\Domain\Entity\Question;
 
 use Assert\Assertion;
 

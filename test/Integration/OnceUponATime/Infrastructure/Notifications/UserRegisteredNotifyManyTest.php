@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Name;
-use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\Entity\UserRegistered;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\Name;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Infrastructure\Notifications\UserRegisteredNotifyMany;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\OnceUponATime\Application\TestEventSubscriber;

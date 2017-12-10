@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Domain\Entity;
+namespace OnceUponATime\Domain\Entity\User;
 
 use Assert\Assertion;
 
@@ -10,23 +10,26 @@ use Assert\Assertion;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class ExternalUserId
+class UserId
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $id;
 
     private function __construct()
     {
     }
 
-    public static function fromString($id): ExternalUserId
+    public static function fromString($id): UserId
     {
         Assertion::notEmpty($id);
+        Assertion::uuid($id);
 
-        $slackUserId = new self();
-        $slackUserId->id = $id;
+        $userId = new self();
+        $userId->id = $id;
 
-        return $slackUserId;
+        return $userId;
     }
 
     public function __toString(): string
@@ -36,6 +39,6 @@ class ExternalUserId
 
     public function equals($userId): bool
     {
-        return $userId instanceof ExternalUserId && (string) $this === (string) $userId;
+        return $userId instanceof UserId && (string) $this === (string) $userId;
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OnceUponATime\Infrastructure\Notifications;
 
 use OnceUponATime\Application\QuestionAnsweredNotify;
-use OnceUponATime\Domain\Entity\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Name;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\Name;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 

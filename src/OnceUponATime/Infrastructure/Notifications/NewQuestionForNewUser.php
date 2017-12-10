@@ -7,7 +7,7 @@ namespace OnceUponATime\Infrastructure\Notifications;
 use OnceUponATime\Application\NextQuestion;
 use OnceUponATime\Application\NextQuestionHandler;
 use OnceUponATime\Application\UserRegisteredNotify;
-use OnceUponATime\Domain\Entity\UserRegistered;
+use OnceUponATime\Domain\Event\UserRegistered;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

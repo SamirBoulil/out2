@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Unit\OnceUponATime\Domain\Entity;
+namespace Tests\Unit\OnceUponATime\Domain\Entity\Question;
 
-use OnceUponATime\Domain\Entity\Answer;
+use OnceUponATime\Domain\Entity\Question\Answer;
 use PHPUnit\Framework\TestCase;
 
 class AnswerTest extends TestCase

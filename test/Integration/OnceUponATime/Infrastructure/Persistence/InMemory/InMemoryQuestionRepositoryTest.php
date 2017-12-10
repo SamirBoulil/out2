@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 
-use OnceUponATime\Domain\Entity\Answer;
-use OnceUponATime\Domain\Entity\Clue;
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\Statement;
+use OnceUponATime\Domain\Entity\Question\Answer;
+use OnceUponATime\Domain\Entity\Question\Clue;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\Question\Statement;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use PHPUnit\Framework\TestCase;
 

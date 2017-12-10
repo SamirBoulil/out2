@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Domain\Repository;
 
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionId;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
 
 interface QuestionRepository
 {

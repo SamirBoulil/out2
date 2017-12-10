@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Domain\Entity;
+namespace OnceUponATime\Domain\Event;
+
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\User\UserId;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-final class QuestionAsked implements QuizzEvent
+final class QuestionAnswered implements QuizzEvent
 {
     /** @var QuestionId */
     private $questionId;
@@ -16,10 +19,14 @@ final class QuestionAsked implements QuizzEvent
     /** @var UserId */
     private $userId;
 
-    public function __construct(UserId $userId, QuestionId $questionId)
+    /** @var bool */
+    private $isCorrect;
+
+    public function __construct(UserId $userId, QuestionId $questionId, bool $isCorrect)
     {
         $this->questionId = $questionId;
         $this->userId = $userId;
+        $this->isCorrect = $isCorrect;
     }
 
     public function questionId(): QuestionId
@@ -30,5 +37,10 @@ final class QuestionAsked implements QuizzEvent
     public function userId(): UserId
     {
         return $this->userId;
+    }
+
+    public function isCorrect(): bool
+    {
+        return $this->isCorrect;
     }
 }

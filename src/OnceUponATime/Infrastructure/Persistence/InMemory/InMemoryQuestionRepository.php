@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use Ramsey\Uuid\Uuid;
 

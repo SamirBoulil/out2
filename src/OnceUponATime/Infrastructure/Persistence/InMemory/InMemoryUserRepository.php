@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\User;
-use OnceUponATime\Domain\Entity\UserId;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Repository\UserRepository;
 use Ramsey\Uuid\Uuid;
 

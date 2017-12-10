@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\QuestionAsked;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\QuizzEvent;
-use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\EventStore\QuizzEventStore;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizzEvent;
+use OnceUponATime\Domain\Event\QuizzEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -17,7 +17,7 @@ use OnceUponATime\Domain\EventStore\QuizzEventStore;
  */
 class InMemoryQuizzEventStore implements QuizzEventStore
 {
-    /** @var QuestionAnswered[] */
+    /** @var \OnceUponATime\Domain\Event\QuestionAnswered[] */
     private $events = [];
 
     public function add(QuizzEvent $event): void

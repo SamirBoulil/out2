@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\QuestionAskedNotify;
 use OnceUponATime\Application\QuestionAnsweredNotify;
+use OnceUponATime\Application\QuestionAskedNotify;
 use OnceUponATime\Domain\Entity\NextQuestionSelected;
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\EventStore\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuizzEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

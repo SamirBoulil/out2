@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
-use OnceUponATime\Application\QuestionAnsweredNotify;
 use OnceUponATime\Application\UserRegisteredNotify;
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\UserRegistered;
+use OnceUponATime\Domain\Event\UserRegistered;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

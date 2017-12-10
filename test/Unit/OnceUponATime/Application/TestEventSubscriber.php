@@ -6,8 +6,8 @@ namespace Tests\Unit\OnceUponATime\Application;
 
 use OnceUponATime\Application\QuestionAnsweredNotify;
 use OnceUponATime\Application\UserRegisteredNotify;
-use OnceUponATime\Domain\Entity\QuestionAnswered;
-use OnceUponATime\Domain\Entity\UserRegistered;
+use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\UserRegistered;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

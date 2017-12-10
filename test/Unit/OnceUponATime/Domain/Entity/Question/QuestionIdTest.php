@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\OnceUponATime\Domain\Entity;
+namespace Tests\Unit\OnceUponATime\Domain\Entity\Question;
 
-use OnceUponATime\Domain\Entity\QuestionId;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
 use PHPUnit\Framework\TestCase;
 
 /**

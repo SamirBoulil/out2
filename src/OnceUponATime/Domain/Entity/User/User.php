@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Domain\Entity;
+namespace OnceUponATime\Domain\Entity\User;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

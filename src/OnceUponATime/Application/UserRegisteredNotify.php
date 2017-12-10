@@ -2,7 +2,7 @@
 
 namespace OnceUponATime\Application;
 
-use OnceUponATime\Domain\Entity\UserRegistered;
+use OnceUponATime\Domain\Event\UserRegistered;
 
 interface UserRegisteredNotify
 {

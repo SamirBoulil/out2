@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Domain\Entity;
+namespace OnceUponATime\Domain\Entity\Question;
 
 use Assert\Assertion;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -13,7 +14,7 @@ use Assert\Assertion;
 class Answer
 {
     /** @var ExternalUserId */
-    protected $externalUserId;
+    private $externalUserId;
 
     public static function fromString($id): Answer
     {

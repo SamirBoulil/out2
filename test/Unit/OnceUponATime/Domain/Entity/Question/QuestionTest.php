@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\OnceUponATime\Domain\Entity;
+namespace Tests\Unit\OnceUponATime\Domain\Entity\Question;
 
-use OnceUponATime\Domain\Entity\Answer;
-use OnceUponATime\Domain\Entity\Clue;
-use OnceUponATime\Domain\Entity\Question;
-use OnceUponATime\Domain\Entity\QuestionId;
-use OnceUponATime\Domain\Entity\ExternalUserId;
-use OnceUponATime\Domain\Entity\Statement;
+use OnceUponATime\Domain\Entity\Question\Answer;
+use OnceUponATime\Domain\Entity\Question\Clue;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\Question\QuestionId;
+use OnceUponATime\Domain\Entity\Question\Statement;
 use PHPUnit\Framework\TestCase;
 
 /**

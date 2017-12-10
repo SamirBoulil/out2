@@ -7,7 +7,7 @@ namespace Tests\Unit\OnceUponATime\Application;
 use OnceUponATime\Application\RegisterUser;
 use OnceUponATime\Application\RegisterUserHandler;
 use OnceUponATime\Application\UserRegisteredNotify;
-use OnceUponATime\Domain\Entity\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\UserRegisteredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
