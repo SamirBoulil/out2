@@ -14,7 +14,7 @@ use OnceUponATime\Domain\Entity\UserRegistered;
  */
 interface QuizzEventStore
 {
-    public function add(QuizzEvent $questionAnswered): void;
+    public function add(QuizzEvent $event): void;
 
     public function byUser(UserId $userId): array;
 

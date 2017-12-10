@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
+use OnceUponATime\Application\QuestionAskedNotify;
 use OnceUponATime\Application\QuestionAnsweredNotify;
+use OnceUponATime\Domain\Entity\NextQuestionSelected;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
 use OnceUponATime\Domain\EventStore\QuizzEventStore;
 
@@ -12,7 +14,7 @@ use OnceUponATime\Domain\EventStore\QuizzEventStore;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class PublishToEventStore implements QuestionAnsweredNotify
+class PublishToEventStore implements QuestionAnsweredNotify, QuestionAskedNotify
 {
     /** @var QuizzEventStore */
     private $eventStore;
@@ -23,6 +25,11 @@ class PublishToEventStore implements QuestionAnsweredNotify
     }
 
     public function questionAnswered(QuestionAnswered $event): void
+    {
+        $this->eventStore->add($event);
+    }
+
+    public function nextQuestionSelected(NextQuestionSelected $event): void
     {
         $this->eventStore->add($event);
     }

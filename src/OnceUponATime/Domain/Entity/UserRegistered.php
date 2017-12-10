@@ -19,11 +19,11 @@ final class UserRegistered
     /** @var ExternalUserId */
     private $externalUserId;
 
-    public function __construct(UserId $userId, Name $name, ExternalUserId $externalUserId)
+    public function __construct(UserId $userId, ExternalUserId $externalUserId, Name $name)
     {
         $this->userId = $userId;
-        $this->name = $name;
         $this->externalUserId = $externalUserId;
+        $this->name = $name;
     }
 
     public function userId(): UserId

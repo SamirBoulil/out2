@@ -31,9 +31,8 @@ class UserRegisteredNotifyManyTest extends TestCase
     private function createUserRegistered(): UserRegistered
     {
         return new UserRegistered(
-            UserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9'),
-            Name::fromString('Samir'),
-            ExternalUserId::fromString('<@external_id>')
+            UserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9'), ExternalUserId::fromString('<@external_id>'),
+            Name::fromString('Samir')
         );
     }
 }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace OnceUponATime\Application;
 
 use OnceUponATime\Domain\Entity\ExternalUserId;
+use OnceUponATime\Domain\Entity\NextQuestionSelected;
 use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
+use OnceUponATime\Domain\Entity\QuestionAsked;
+use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
 use OnceUponATime\Domain\EventStore\QuizzEventStore;
@@ -26,16 +29,16 @@ class NextQuestionHandler
     private $questionRepository;
 
     /** @var QuizzEventStore */
-    private $questionsAnswered;
+    private $quizzEventStore;
 
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuizzEventStore $questionsAnswered
+        QuizzEventStore $quizzEventStore
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;
-        $this->questionsAnswered = $questionsAnswered;
+        $this->quizzEventStore = $quizzEventStore;
     }
 
     public function handle(NextQuestion $nextQuestion): ?Question
@@ -46,7 +49,11 @@ class NextQuestionHandler
             return null;
         }
 
-        return $this->pickRandomQuestion($unansweredQuestions);
+        $question = $this->pickRandomQuestion($unansweredQuestions);
+
+        $this->quizzEventStore->add(new QuestionAsked($user->id(), $question->id()));
+
+        return $question;
     }
 
     private function pickRandomQuestion(array $questions): Question
@@ -69,7 +76,7 @@ class NextQuestionHandler
 
     private function isQuestionAlreadyAnsweredByUser(Question $question, UserId $userId): bool
     {
-        $answeredQuestions = $this->questionsAnswered->byUser($userId);
+        $answeredQuestions = $this->quizzEventStore->byUser($userId);
         $answeredQuestionIds = array_map(function (QuestionAnswered $question) {
             return (string) $question->questionId();
         }, $answeredQuestions);

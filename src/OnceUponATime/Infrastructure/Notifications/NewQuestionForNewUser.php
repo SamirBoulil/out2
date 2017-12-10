@@ -26,7 +26,7 @@ class NewQuestionForNewUser implements UserRegisteredNotify
     public function userRegistered(UserRegistered $event): void
     {
         $nextQuestion = new NextQuestion();
-        $nextQuestion->externalUserId = $event->externalUserId();
+        $nextQuestion->externalUserId = (string) $event->externalUserId();
         $this->nextQuestionHandler->handle($nextQuestion);
     }
 }

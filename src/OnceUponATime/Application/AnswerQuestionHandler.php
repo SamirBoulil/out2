@@ -35,7 +35,6 @@ class AnswerQuestionHandler
     /** @var QuestionAnsweredNotify */
     private $notify;
 
-
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,

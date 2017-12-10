@@ -18,28 +18,28 @@ use OnceUponATime\Domain\EventStore\QuizzEventStore;
 class InMemoryQuizzEventStore implements QuizzEventStore
 {
     /** @var QuestionAnswered[] */
-    private $questionsAnswered = [];
+    private $events = [];
 
-    public function add(QuizzEvent $questionAnswered): void
+    public function add(QuizzEvent $event): void
     {
-        $this->questionsAnswered[] = $questionAnswered;
+        $this->events[] = $event;
     }
 
     public function byUser(UserId $userId): array
     {
-        $questionsAnsweredForUser = [];
-        foreach ($this->questionsAnswered as $questionAnswered) {
+        $events = [];
+        foreach ($this->events as $questionAnswered) {
             if ($questionAnswered->userId()->equals($userId)) {
-                $questionsAnsweredForUser[] = $questionAnswered;
+                $events[] = $questionAnswered;
             }
         }
 
-        return $questionsAnsweredForUser;
+        return $events;
     }
 
     public function all(): array
     {
-        return $this->questionsAnswered;
+        return $this->events;
     }
 
     public function currentQuestionForUser(UserId $userId): QuestionId
