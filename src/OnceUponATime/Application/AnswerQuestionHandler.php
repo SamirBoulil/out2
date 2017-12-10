@@ -52,20 +52,19 @@ class AnswerQuestionHandler
         $this->notify->questionAnswered(new QuestionAnswered($user->id(), $question->id(), $isCorrect));
 
         // TODO: Should it really return something ? (CQRS behavior?)
-        // TODO: Should it be something as simple as a boolean ? or an object related to the handler instead of a
-        //       primitive type ?
+        // TODO: Should it be something as simple as a boolean ? or an object related to the handler instead of a primitive type ?
         return $isCorrect;
     }
 
     /**
-     * @throws InvalidUserId
+     * @throws InvalidExternalUserId
      */
     private function getUser(string $id): User
     {
         $externalUserId = ExternalUserId::fromString($id);
         $user = $this->userRepository->byExternalId($externalUserId);
         if (null === $user) {
-            throw new InvalidUserId($id);
+            throw new InvalidExternalUserId($id);
         }
 
         return $user;

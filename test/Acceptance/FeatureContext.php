@@ -11,7 +11,7 @@ use LogicException;
 use OnceUponATime\Application\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestionHandler;
 use OnceUponATime\Application\InvalidQuestionId;
-use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Domain\Entity\Answer;
 use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
@@ -25,7 +25,7 @@ use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionAnsweredEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionsAnsweredEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Runner\Exception;
@@ -45,7 +45,7 @@ class FeatureContext implements Context
     /** @var AnswerQuestionHandler */
     private $questionHandler;
 
-    /** @var InMemoryQuestionAnsweredEventStore */
+    /** @var InMemoryQuestionsAnsweredEventStore */
     private $questionsAnswered;
 
     /** @var bool */
@@ -58,7 +58,7 @@ class FeatureContext implements Context
     {
         $this->userRepository = new InMemoryUserRepository();
         $this->questionRepository = new InMemoryQuestionRepository();
-        $this->questionsAnswered = new InMemoryQuestionAnsweredEventStore();
+        $this->questionsAnswered = new InMemoryQuestionsAnsweredEventStore();
         $notifier = new QuestionAnsweredNotifyMany([new PublishToEventStore($this->questionsAnswered)]);
         $this->questionHandler = new AnswerQuestionHandler(
             $this->userRepository,
@@ -105,7 +105,7 @@ class FeatureContext implements Context
             $this->questionHandler->handle($answerQuestion);
         } catch (InvalidQuestionId $e) {
             $this->isQuestionIdInvalid = true;
-        } catch (InvalidUserId $e) {
+        } catch (InvalidExternalUserId $e) {
             $this->isUserIdInvalid = true;
         }
     }
