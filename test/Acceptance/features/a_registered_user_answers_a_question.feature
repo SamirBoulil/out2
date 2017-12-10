@@ -11,9 +11,9 @@ Feature: A user answer a question
     And the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9" has been asked to the user "3a021c08-ad15-43aa-aba3-8626fecd39a7"
 
   Scenario: A user incorrectly answers a question
-    When the user "<\@testUser>" answers the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9" with answer "<\@wrong_answer>"
+    When the user "3a021c08-ad15-43aa-aba3-8626fecd39a7" answers "<\@wrong_answer>"
     Then there is a question answered incorrectly by the user "<\@testUser>" for the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9"
 
   Scenario: A user correctly answers a question
-    When the user "<\@testUser>" answers the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9" with answer "<\@right_answer>"
+    When the user "3a021c08-ad15-43aa-aba3-8626fecd39a7" answers "<\@right_answer>"
     Then there is a question answered correctly by the user "<\@testUser>" for the question "7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9"

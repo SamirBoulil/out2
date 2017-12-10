@@ -24,9 +24,8 @@ class UserRegisteredTest extends TestCase
         $userId = UserId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
         $externalUserId = ExternalUserId::fromString('external_user_id');
         $name = Name::fromString('Samir');
-        $userRegistered = new UserRegistered($userId, $externalUserId, $name);
+        $userRegistered = new UserRegistered($userId, $name);
         $this->assertSame($userId, $userRegistered->userId());
-        $this->assertSame($externalUserId, $userRegistered->externalUserId());
         $this->assertSame($name, $userRegistered->name());
     }
 }

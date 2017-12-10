@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application\AnswerQuestion;
 
-use OnceUponATime\Application\InvalidExternalUserId;
+use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Question;
-use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuizzEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
@@ -51,7 +51,7 @@ class AnswerQuestionHandler
     {
         // TODO: Ok so, those throw an exception, but errors are thrown one at a time
         // what happened when user id is not ok, question id is not ok ?
-        $user = $this->getUser($answerQuestion->externalId);
+        $user = $this->getUser($answerQuestion);
         $question = $this->getCurrentQuestionForUser($user);
         $answer = $this->getAnswer($answerQuestion);
         $isCorrect = $question->isCorrect($answer);
@@ -63,14 +63,14 @@ class AnswerQuestionHandler
     }
 
     /**
-     * @throws InvalidExternalUserId
+     * @throws InvalidUserId
      */
-    private function getUser(string $id): User
+    private function getUser(AnswerQuestion $answerQuestion): User
     {
-        $externalUserId = ExternalUserId::fromString($id);
-        $user = $this->userRepository->byExternalId($externalUserId);
+        $userId = UserId::fromString($answerQuestion->userId);
+        $user = $this->userRepository->byId($userId);
         if (null === $user) {
-            throw InvalidExternalUserId::fromString($id);
+            throw InvalidUserId::fromString($answerQuestion->userId);
         }
 
         return $user;

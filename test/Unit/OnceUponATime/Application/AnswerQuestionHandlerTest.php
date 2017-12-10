@@ -7,8 +7,7 @@ namespace Tests\Unit\OnceUponATime\Application;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
 use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
-use OnceUponATime\Application\InvalidExternalUserId;
-use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -32,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 class AnswerQuestionHandlerTest extends TestCase
 {
     private const QUESTION_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
+    private const USER_ID = '3a021c08-ad15-43aa-aba3-8626fecd39a7';
 
     /** @var QuestionAnsweredNotify */
     private $testEventSubscriber;
@@ -52,7 +52,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $questionRepository = new InMemoryQuestionRepository();
         $questionRepository->add($question);
 
-        $userId = UserId::fromString('3a021c08-ad15-43aa-aba3-8626fecd39a7');
+        $userId = UserId::fromString(self::USER_ID);
         $externalUserId = ExternalUserId::fromString('<@testUser>');
         $name = Name::fromString('Alice Jardin');
         $user = User::register($userId, $externalUserId, $name);
@@ -81,8 +81,7 @@ class AnswerQuestionHandlerTest extends TestCase
     public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_correct()
     {
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->questionId = self::QUESTION_ID;
-        $answerQuestion->externalId = '<@testUser>';
+        $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@wrong_answer>';
 
         $this->assertFalse($this->answerQuestionHandler->handle($answerQuestion));
@@ -92,11 +91,10 @@ class AnswerQuestionHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_answers_question_tells_if_the_answer_is_incorrect()
+    public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_incorrect()
     {
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->questionId = self::QUESTION_ID;
-        $answerQuestion->externalId = '<@testUser>';
+        $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@right_answer>';
         $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
         $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
@@ -108,10 +106,9 @@ class AnswerQuestionHandlerTest extends TestCase
     public function it_throws_if_the_user_id_is_not_found()
     {
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->questionId = self::QUESTION_ID;
-        $answerQuestion->externalId = '<@unknownUser>';
+        $answerQuestion->userId = '00000000-0000-0000-0000-000000000000';
         $answerQuestion->answer = '<@right_answer>';
-        $this->expectException(InvalidExternalUserId::class);
+        $this->expectException(InvalidUserId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
         $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
     }

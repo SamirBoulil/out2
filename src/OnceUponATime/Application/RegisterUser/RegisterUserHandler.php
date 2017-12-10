@@ -34,9 +34,9 @@ class RegisterUserHandler
     {
         $externalUserId = ExternalUserId::fromString($registerUser->externalUserId);
         $name = Name::fromString($registerUser->name);
-        $userId = UserId::fromString((string) Uuid::uuid4());
+        $userId = $this->userRepository->nextIdentity();
         $user = User::register($userId, $externalUserId, $name);
         $this->userRepository->add($user);
-        $this->notify->userRegistered(new UserRegistered($userId, $externalUserId, $name));
+        $this->notify->userRegistered(new UserRegistered($userId, $name));
     }
 }

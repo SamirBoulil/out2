@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Domain\Event;
 
-use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\UserId;
 
@@ -20,13 +19,9 @@ final class UserRegistered
     /** @var Name */
     private $name;
 
-    /** @var ExternalUserId */
-    private $externalUserId;
-
-    public function __construct(UserId $userId, ExternalUserId $externalUserId, Name $name)
+    public function __construct(UserId $userId, Name $name)
     {
         $this->userId = $userId;
-        $this->externalUserId = $externalUserId;
         $this->name = $name;
     }
 
@@ -38,10 +33,5 @@ final class UserRegistered
     public function name(): Name
     {
         return $this->name;
-    }
-
-    public function externalUserId(): ExternalUserId
-    {
-        return $this->externalUserId;
     }
 }
