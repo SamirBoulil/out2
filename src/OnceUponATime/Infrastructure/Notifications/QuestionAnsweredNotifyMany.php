@@ -13,7 +13,7 @@ use OnceUponATime\Domain\Event\QuestionAnswered;
  */
 class QuestionAnsweredNotifyMany implements QuestionAnsweredNotify
 {
-    /** @var AnswerQuestion\QuestionAnsweredNotify[] */
+    /** @var QuestionAnsweredNotify[] */
     private $notifiers;
 
     public function __construct(array $notifiers)

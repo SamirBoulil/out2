@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OnceUponATime\Domain\Entity\User;
 
 use Assert\Assertion;
+use Assert\AssertionFailedException;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -21,6 +22,9 @@ class UserId
     {
     }
 
+    /**
+     * @throws AssertionFailedException
+     */
     public static function fromString($id): UserId
     {
         Assertion::notEmpty($id);
@@ -39,6 +43,6 @@ class UserId
 
     public function equals($userId): bool
     {
-        return $userId instanceof UserId && (string) $this === (string) $userId;
+        return $userId instanceof self && (string) $this === (string) $userId;
     }
 }

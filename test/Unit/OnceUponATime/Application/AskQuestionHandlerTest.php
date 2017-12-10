@@ -6,7 +6,7 @@ namespace Tests\Unit\OnceUponATime\Application;
 
 use OnceUponATime\Application\AskQuestion\AskQuestion;
 use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
-use OnceUponATime\Application\InvalidExternalUserId;
+use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -17,11 +17,11 @@ use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -42,7 +42,7 @@ class AskQuestionHandlerTest extends TestCase
     /** @var QuestionRepository */
     private $questionRepository;
 
-    /** @var QuizzEventStore */
+    /** @var QuizEventStore */
     private $answeredQuestions;
 
     public function setUp()
@@ -74,7 +74,7 @@ class AskQuestionHandlerTest extends TestCase
                 Clue::fromString('clue 2')
             )
         );
-        $this->answeredQuestions = new InMemoryQuizzEventStore();
+        $this->answeredQuestions = new InMemoryQuizEventStore();
     }
 
     /**
@@ -82,7 +82,7 @@ class AskQuestionHandlerTest extends TestCase
      */
     public function it_finds_the_next_question_for_a_new_user()
     {
-        $question = $this->getNextQuestion(self::EXTERNAL_USER_ID);
+        $question = $this->getNextQuestion(self::USER_ID);
         $this->assertNotNull($question);
         $this->assertInstanceOf(Question::class, $question);
     }
@@ -90,7 +90,7 @@ class AskQuestionHandlerTest extends TestCase
     private function getNextQuestion(string $userId): ?Question
     {
         $nextQuestion = new AskQuestion();
-        $nextQuestion->externalUserId = $userId;
+        $nextQuestion->userId = $userId;
         $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $this->questionRepository,
@@ -106,7 +106,7 @@ class AskQuestionHandlerTest extends TestCase
     public function it_finds_the_next_unresolved_question_for_the_user()
     {
         $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_1);
-        $question = $this->getNextQuestion(self::EXTERNAL_USER_ID);
+        $question = $this->getNextQuestion(self::USER_ID);
         $this->assertNotNull($question);
         $this->assertInstanceOf(Question::class, $question);
         $this->assertSame(self::QUESTION_ID_2, (string) $question->id());
@@ -129,7 +129,7 @@ class AskQuestionHandlerTest extends TestCase
     {
         $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_1);
         $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_2);
-        $question = $this->getNextQuestion(self::EXTERNAL_USER_ID);
+        $question = $this->getNextQuestion(self::USER_ID);
         $this->assertNull($question);
     }
 
@@ -138,7 +138,7 @@ class AskQuestionHandlerTest extends TestCase
      */
     public function it_throws_when_an_unregistered_user_asks_for_the_next_question()
     {
-        $this->expectException(InvalidExternalUserId::class);
+        $this->expectException(InvalidUserId::class);
         $this->getNextQuestion('00000000-0000-0000-0000-000000000000');
     }
 }

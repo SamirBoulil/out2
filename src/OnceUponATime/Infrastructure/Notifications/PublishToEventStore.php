@@ -8,7 +8,7 @@ use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\AskQuestion\QuestionAskedNotify;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -16,10 +16,10 @@ use OnceUponATime\Domain\Event\QuizzEventStore;
  */
 class PublishToEventStore implements QuestionAnsweredNotify, QuestionAskedNotify
 {
-    /** @var QuizzEventStore */
+    /** @var QuizEventStore */
     private $eventStore;
 
-    public function __construct(QuizzEventStore $eventStore)
+    public function __construct(QuizEventStore $eventStore)
     {
         $this->eventStore = $eventStore;
     }

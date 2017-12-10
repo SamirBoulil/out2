@@ -6,7 +6,7 @@ use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use PHPUnit\Framework\TestCase;
 
 class PublishToEventStoreTest extends TestCase
@@ -16,7 +16,7 @@ class PublishToEventStoreTest extends TestCase
      */
     public function it_is_publishes_to_the_event_store_from_which_it_is_constructed_with()
     {
-        $eventStore = new InMemoryQuizzEventStore();
+        $eventStore = new InMemoryQuizEventStore();
         $publisher = new PublishToEventStore($eventStore);
         $questionAnswered = $this->createQuestionAnswered();
         $publisher->questionAnswered($questionAnswered);

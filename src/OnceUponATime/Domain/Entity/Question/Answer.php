@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OnceUponATime\Domain\Entity\Question;
 
 use Assert\Assertion;
+use Assert\AssertionFailedException;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 
 /**
@@ -16,6 +17,9 @@ class Answer
     /** @var ExternalUserId */
     private $externalUserId;
 
+    /**
+     * @throws AssertionFailedException
+     */
     public static function fromString($id): Answer
     {
         Assertion::notEmpty($id);
@@ -33,7 +37,7 @@ class Answer
 
     public function equals($answer): bool
     {
-        return $answer instanceof Answer &&
+        return $answer instanceof self &&
             $this->externalUserId->equals($answer->externalUserId);
     }
 }

@@ -11,7 +11,7 @@ use OnceUponATime\Domain\Entity\User\UserId;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-final class QuestionAnswered implements QuizzEvent
+final class QuestionAnswered implements QuizEvent
 {
     /** @var QuestionId */
     private $questionId;

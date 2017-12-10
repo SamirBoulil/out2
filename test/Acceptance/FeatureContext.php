@@ -9,8 +9,8 @@ use Behat\Gherkin\Node\TableNode;
 use LogicException;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
-use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\InvalidQuestionId;
+use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -27,7 +27,7 @@ use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 
 /**
@@ -45,7 +45,7 @@ class FeatureContext implements Context
     /** @var AnswerQuestionHandler */
     private $questionHandler;
 
-    /** @var InMemoryQuizzEventStore */
+    /** @var InMemoryQuizEventStore */
     private $questionsAnswered;
 
     /** @var bool */
@@ -58,7 +58,7 @@ class FeatureContext implements Context
     {
         $this->userRepository = new InMemoryUserRepository();
         $this->questionRepository = new InMemoryQuestionRepository();
-        $this->questionsAnswered = new InMemoryQuizzEventStore();
+        $this->questionsAnswered = new InMemoryQuizEventStore();
         $notifier = new QuestionAnsweredNotifyMany([new PublishToEventStore($this->questionsAnswered)]);
         $this->questionHandler = new AnswerQuestionHandler(
             $this->userRepository,
@@ -104,18 +104,17 @@ class FeatureContext implements Context
     }
 
     /**
-     * @When /^the user "([^"]*)" answers the question "([^"]*)" with answer "([^"]*)"$/
+     * @When /^the user "([^"]*)" answers "([^"]*)"$/
      */
-    public function theUserAnswersTheQuestionWithAnswer(string $externalId, string $questionId, string $answer): void
+    public function theUserAnswers(string $userId, string $answer): void
     {
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->externalId = $externalId;
-        $answerQuestion->questionId = $questionId;
+        $answerQuestion->userId = $userId;
         $answerQuestion->answer = $answer;
 
         try {
             $this->questionHandler->handle($answerQuestion);
-        } catch (InvalidExternalUserId $e) {
+        } catch (InvalidUserId $e) {
             $this->isUserIdInvalid = true;
         }
     }
@@ -174,7 +173,7 @@ class FeatureContext implements Context
         );
     }
 
-    private function isAnswerSame(bool $expectedResult, string $answerResult)
+    private function isAnswerSame(bool $expectedResult, string $answerResult): bool
     {
         return ($answerResult === "correctly" && $expectedResult) ||
             ($answerResult === "incorrectly" && !$expectedResult);

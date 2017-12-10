@@ -8,14 +8,14 @@ use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class InMemoryQuizzEventStoreTest extends TestCase
+class InMemoryquizEventStoreTest extends TestCase
 {
     /**
      * @test
@@ -24,7 +24,7 @@ class InMemoryQuizzEventStoreTest extends TestCase
     {
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
 
-        $questionAnsweredEventStore = new InMemoryQuizzEventStore();
+        $questionAnsweredEventStore = new InMemoryQuizEventStore();
         $questionAnswered = new QuestionAnswered(
             $userId,
             QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
@@ -40,7 +40,7 @@ class InMemoryQuizzEventStoreTest extends TestCase
      */
     public function it_can_add_multiple_questions_answered_and_return_them_by_user()
     {
-        $questionAnsweredEventStore = new InMemoryQuizzEventStore();
+        $questionAnsweredEventStore = new InMemoryQuizEventStore();
 
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $questionAnswered1 = new QuestionAnswered(
@@ -74,7 +74,7 @@ class InMemoryQuizzEventStoreTest extends TestCase
      */
     public function it_returns_all_the_questions_answered_by_all_users()
     {
-        $questionAnsweredEventStore = new InMemoryQuizzEventStore();
+        $questionAnsweredEventStore = new InMemoryQuizEventStore();
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $anotherUserId = UserId::fromString('22222222-2222-2222-2222-222222222222');
         $questionId1 = QuestionId::fromString('11111111-1111-1111-1111-111111111111');
@@ -113,7 +113,7 @@ class InMemoryQuizzEventStoreTest extends TestCase
      */
     public function it_returns_the_current_question_for_the_user()
     {
-        $questionAnsweredEventStore = new InMemoryQuizzEventStore();
+        $questionAnsweredEventStore = new InMemoryQuizEventStore();
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $anotherUserId = UserId::fromString('22222222-2222-2222-2222-222222222222');
         $questionId1 = QuestionId::fromString('11111111-1111-1111-1111-111111111111');

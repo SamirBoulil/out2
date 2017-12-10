@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\Notifications;
 
+use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\AskQuestion\AskQuestion;
 use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
-use OnceUponATime\Application\RegisterUser\UserRegisteredNotify;
-use OnceUponATime\Domain\Event\UserRegistered;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class NewQuestionForNewUser implements UserRegisteredNotify
+class NewQuestionForUserWhoAnsweredCorrectly implements QuestionAnsweredNotify
 {
     /** @var AskQuestionHandler */
     private $nextQuestionHandler;
@@ -23,12 +23,14 @@ class NewQuestionForNewUser implements UserRegisteredNotify
         $this->nextQuestionHandler = $nextQuestionHandler;
     }
 
-    public function userRegistered(UserRegistered $event): void
+    public function questionAnswered(QuestionAnswered $event): void
     {
-        $this->askNewQuestion($event);
+        if ($event->isCorrect()) {
+            $this->askNewQuestion($event);
+        }
     }
 
-    private function askNewQuestion(UserRegistered $event): void
+    private function askNewQuestion(QuestionAnswered $event): void
     {
         $nextQuestion = new AskQuestion();
         $nextQuestion->userId = (string) $event->userId();

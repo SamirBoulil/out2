@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application\AskQuestion;
 
-use OnceUponATime\Application\InvalidExternalUserId;
+use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Question;
-use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 
@@ -27,17 +26,17 @@ class AskQuestionHandler
     /** @var QuestionRepository */
     private $questionRepository;
 
-    /** @var QuizzEventStore */
-    private $quizzEventStore;
+    /** @var QuizEventStore */
+    private $quizEventStore;
 
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuizzEventStore $quizzEventStore
+        QuizEventStore $quizEventStore
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;
-        $this->quizzEventStore = $quizzEventStore;
+        $this->quizEventStore = $quizEventStore;
     }
 
     public function handle(AskQuestion $nextQuestion): ?Question
@@ -50,16 +49,16 @@ class AskQuestionHandler
 
         $question = $this->pickRandomQuestion($unansweredQuestions);
 
-        $this->quizzEventStore->add(new QuestionAsked($user->id(), $question->id()));
+        $this->quizEventStore->add(new QuestionAsked($user->id(), $question->id()));
 
         return $question;
     }
 
     private function getUser(AskQuestion $nextQuestion): User
     {
-        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($nextQuestion->externalUserId));
+        $user = $this->userRepository->byId(UserId::fromString($nextQuestion->userId));
         if (null === $user) {
-            throw InvalidExternalUserId::fromString($nextQuestion->externalUserId);
+            throw InvalidUserId::fromString($nextQuestion->userId);
         }
 
         return $user;
@@ -80,12 +79,12 @@ class AskQuestionHandler
 
     private function isQuestionAlreadyAnsweredByUser(Question $question, UserId $userId): bool
     {
-        $answeredQuestions = $this->quizzEventStore->byUser($userId);
+        $answeredQuestions = $this->quizEventStore->byUser($userId);
         $answeredQuestionIds = array_map(function (QuestionAnswered $question) {
             return (string) $question->questionId();
         }, $answeredQuestions);
 
-        return in_array((string) $question->id(), $answeredQuestionIds);
+        return \in_array((string) $question->id(), $answeredQuestionIds, true);
     }
 
     private function pickRandomQuestion(array $questions): Question

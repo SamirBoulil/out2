@@ -14,4 +14,3 @@ interface QuestionAskedNotify
 {
     public function questionAsked(QuestionAsked $event): void;
 }
-

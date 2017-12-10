@@ -7,10 +7,8 @@ namespace OnceUponATime\Application\RegisterUser;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
-use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Domain\Repository\UserRepository;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -34,9 +32,9 @@ class RegisterUserHandler
     {
         $externalUserId = ExternalUserId::fromString($registerUser->externalUserId);
         $name = Name::fromString($registerUser->name);
-        $userId = UserId::fromString((string) Uuid::uuid4());
+        $userId = $this->userRepository->nextIdentity();
         $user = User::register($userId, $externalUserId, $name);
         $this->userRepository->add($user);
-        $this->notify->userRegistered(new UserRegistered($userId, $externalUserId, $name));
+        $this->notify->userRegistered(new UserRegistered($userId, $name));
     }
 }
