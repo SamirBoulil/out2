@@ -1,5 +1,5 @@
 Feature: A user answer a question
-  In order to not brake the quizz
+  In order to not brake the quiz
   As a non registered user
   I cannot be able to answer a question
 

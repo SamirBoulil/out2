@@ -13,9 +13,9 @@ class InvalidUserId extends \InvalidArgumentException
     /** @var string */
     private $id;
 
-    public static function fromString(string $id): self
+    public static function fromString(string $id): InvalidUserId
     {
-        $e = new InvalidUserId(sprintf('User not found for id "%s".', $id));
+        $e = new self(sprintf('User not found for id "%s".', $id));
         $e->id = $id;
 
         return $e;

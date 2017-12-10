@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OnceUponATime\Domain\Entity\Question;
 
 use Assert\Assertion;
+use Assert\AssertionFailedException;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -15,6 +16,9 @@ class Clue
     /** @var string */
     private $text;
 
+    /**
+     * @throws AssertionFailedException
+     */
     public static function fromString($text): Clue
     {
         Assertion::notEmpty($text);

@@ -14,11 +14,11 @@ use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -27,8 +27,8 @@ class NewQuestionForNewUserTest extends TestCase
     private const USER_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
     private const NAME = 'My name';
 
-    /** @var QuizzEventStore */
-    private $quizzEventStore;
+    /** @var QuizEventStore */
+    private $quizEventStore;
 
     /** @var NewQuestionForNewUser */
     private $newQuestionForNewUser;
@@ -55,11 +55,11 @@ class NewQuestionForNewUserTest extends TestCase
             )
         );
 
-        $this->quizzEventStore = new InMemoryQuizzEventStore();
+        $this->quizEventStore = new InMemoryQuizEventStore();
         $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $questionRepository,
-            $this->quizzEventStore
+            $this->quizEventStore
         );
         $this->newQuestionForNewUser = new NewQuestionForNewUser($nextQuestionHandler);
     }
@@ -77,7 +77,7 @@ class NewQuestionForNewUserTest extends TestCase
 
         $this->newQuestionForNewUser->userRegistered($userRegistered);
 
-        $questionsAsked = $this->quizzEventStore->all();
+        $questionsAsked = $this->quizEventStore->all();
         $this->assertCount(1, $questionsAsked);
         $questionAsked = current($questionsAsked);
         $this->assertTrue($questionAsked->userId()->equals($userId));

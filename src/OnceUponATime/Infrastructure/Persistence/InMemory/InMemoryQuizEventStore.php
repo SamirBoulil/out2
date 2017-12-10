@@ -7,19 +7,19 @@ namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAsked;
-use OnceUponATime\Domain\Event\QuizzEvent;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEvent;
+use OnceUponATime\Domain\Event\QuizEventStore;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class InMemoryQuizzEventStore implements QuizzEventStore
+class InMemoryQuizEventStore implements QuizEventStore
 {
     /** @var \OnceUponATime\Domain\Event\QuestionAnswered[] */
     private $events = [];
 
-    public function add(QuizzEvent $event): void
+    public function add(quizEvent $event): void
     {
         $this->events[] = $event;
     }

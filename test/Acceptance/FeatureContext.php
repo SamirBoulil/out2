@@ -27,7 +27,7 @@ use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 
 /**
@@ -45,7 +45,7 @@ class FeatureContext implements Context
     /** @var AnswerQuestionHandler */
     private $questionHandler;
 
-    /** @var InMemoryQuizzEventStore */
+    /** @var InMemoryQuizEventStore */
     private $questionsAnswered;
 
     /** @var bool */
@@ -58,7 +58,7 @@ class FeatureContext implements Context
     {
         $this->userRepository = new InMemoryUserRepository();
         $this->questionRepository = new InMemoryQuestionRepository();
-        $this->questionsAnswered = new InMemoryQuizzEventStore();
+        $this->questionsAnswered = new InMemoryQuizEventStore();
         $notifier = new QuestionAnsweredNotifyMany([new PublishToEventStore($this->questionsAnswered)]);
         $this->questionHandler = new AnswerQuestionHandler(
             $this->userRepository,

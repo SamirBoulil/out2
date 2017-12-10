@@ -15,11 +15,11 @@ use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\NewQuestionForUserWhoAnsweredCorrectly;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -33,8 +33,8 @@ class NewQuestionForUserWhoAnsweredCorrectlyTest extends TestCase
     private const NAME = 'My name';
     private const QUESTION_ID = '11111111-1111-1111-1111-111111111111';
 
-    /** @var QuizzEventStore */
-    private $quizzEventStore;
+    /** @var QuizEventStore */
+    private $quizEventStore;
 
     /** @var NewQuestionForUserWhoAnsweredCorrectly */
     private $newQuestionForUserWhoAnsweredCorrectly;
@@ -61,11 +61,11 @@ class NewQuestionForUserWhoAnsweredCorrectlyTest extends TestCase
             )
         );
 
-        $this->quizzEventStore = new InMemoryQuizzEventStore();
+        $this->quizEventStore = new InMemoryQuizEventStore();
         $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $questionRepository,
-            $this->quizzEventStore
+            $this->quizEventStore
         );
         $this->newQuestionForUserWhoAnsweredCorrectly = new NewQuestionForUserWhoAnsweredCorrectly($nextQuestionHandler);
     }
@@ -84,7 +84,7 @@ class NewQuestionForUserWhoAnsweredCorrectlyTest extends TestCase
 
         $this->newQuestionForUserWhoAnsweredCorrectly->questionAnswered($questionAnsweredCorrectly);
 
-        $questionsAsked = $this->quizzEventStore->all();
+        $questionsAsked = $this->quizEventStore->all();
         $this->assertCount(1, $questionsAsked);
         $questionAsked = current($questionsAsked);
         $this->assertTrue($questionAsked->userId()->equals($userId));
@@ -105,6 +105,6 @@ class NewQuestionForUserWhoAnsweredCorrectlyTest extends TestCase
 
         $this->newQuestionForUserWhoAnsweredCorrectly->questionAnswered($questionAnsweredCorrectly);
 
-        $this->assertCount(0, $this->quizzEventStore->all());
+        $this->assertCount(0, $this->quizEventStore->all());
     }
 }

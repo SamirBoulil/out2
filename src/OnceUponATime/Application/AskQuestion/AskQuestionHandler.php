@@ -10,7 +10,7 @@ use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 
@@ -26,17 +26,17 @@ class AskQuestionHandler
     /** @var QuestionRepository */
     private $questionRepository;
 
-    /** @var QuizzEventStore */
-    private $quizzEventStore;
+    /** @var QuizEventStore */
+    private $quizEventStore;
 
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuizzEventStore $quizzEventStore
+        QuizEventStore $quizEventStore
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;
-        $this->quizzEventStore = $quizzEventStore;
+        $this->quizEventStore = $quizEventStore;
     }
 
     public function handle(AskQuestion $nextQuestion): ?Question
@@ -49,7 +49,7 @@ class AskQuestionHandler
 
         $question = $this->pickRandomQuestion($unansweredQuestions);
 
-        $this->quizzEventStore->add(new QuestionAsked($user->id(), $question->id()));
+        $this->quizEventStore->add(new QuestionAsked($user->id(), $question->id()));
 
         return $question;
     }
@@ -79,12 +79,12 @@ class AskQuestionHandler
 
     private function isQuestionAlreadyAnsweredByUser(Question $question, UserId $userId): bool
     {
-        $answeredQuestions = $this->quizzEventStore->byUser($userId);
+        $answeredQuestions = $this->quizEventStore->byUser($userId);
         $answeredQuestionIds = array_map(function (QuestionAnswered $question) {
             return (string) $question->questionId();
         }, $answeredQuestions);
 
-        return in_array((string) $question->id(), $answeredQuestionIds);
+        return \in_array((string) $question->id(), $answeredQuestionIds, true);
     }
 
     private function pickRandomQuestion(array $questions): Question

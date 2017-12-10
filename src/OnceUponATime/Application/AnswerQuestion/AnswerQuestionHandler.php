@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application\AnswerQuestion;
 
+use Assert\AssertionFailedException;
 use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
-use OnceUponATime\Domain\Event\QuizzEventStore;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 
@@ -29,7 +30,7 @@ class AnswerQuestionHandler
     /** @var QuestionRepository */
     private $questionRepository;
 
-    /** @var QuizzEventStore */
+    /** @var QuizEventStore */
     private $questionsAnsweredEventStore;
 
     /** @var QuestionAnsweredNotify */
@@ -38,7 +39,7 @@ class AnswerQuestionHandler
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuizzEventStore $questionsAnsweredEventStore,
+        QuizEventStore $questionsAnsweredEventStore,
         QuestionAnsweredNotify $notify
     ) {
         $this->userRepository = $userRepository;
@@ -64,6 +65,7 @@ class AnswerQuestionHandler
 
     /**
      * @throws InvalidUserId
+     * @throws AssertionFailedException
      */
     private function getUser(AnswerQuestion $answerQuestion): User
     {

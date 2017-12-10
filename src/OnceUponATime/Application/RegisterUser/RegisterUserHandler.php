@@ -7,10 +7,8 @@ namespace OnceUponATime\Application\RegisterUser;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
-use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Domain\Repository\UserRepository;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

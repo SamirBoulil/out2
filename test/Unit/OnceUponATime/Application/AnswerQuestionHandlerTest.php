@@ -20,7 +20,7 @@ use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -61,7 +61,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $userRepository->add($user);
 
         $questionAsked = new QuestionAsked($userId, $questionId);
-        $questionAnsweredEventStore = new InMemoryQuizzEventStore();
+        $questionAnsweredEventStore = new InMemoryQuizEventStore();
         $questionAnsweredEventStore->add($questionAsked);
 
         $this->testEventSubscriber = new TestEventSubscriber();

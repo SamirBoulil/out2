@@ -10,9 +10,9 @@ use OnceUponATime\Domain\Entity\User\UserId;
 /**
  * TODO: Not sure this interface should be in domain ? (but repositories are so...)
  */
-interface QuizzEventStore
+interface QuizEventStore
 {
-    public function add(QuizzEvent $event): void;
+    public function add(quizEvent $event): void;
 
     public function byUser(UserId $userId): array;
 
