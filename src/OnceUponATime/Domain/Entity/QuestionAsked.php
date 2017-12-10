@@ -8,7 +8,7 @@ namespace OnceUponATime\Domain\Entity;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-final class QuestionAnswered implements QuizzEvent
+final class QuestionAsked implements QuizzEvent
 {
     /** @var QuestionId */
     private $questionId;
@@ -16,14 +16,10 @@ final class QuestionAnswered implements QuizzEvent
     /** @var UserId */
     private $userId;
 
-    /** @var bool */
-    private $isCorrect;
-
-    public function __construct(UserId $userId, QuestionId $questionId, bool $isCorrect)
+    public function __construct(UserId $userId, QuestionId $questionId)
     {
         $this->questionId = $questionId;
         $this->userId = $userId;
-        $this->isCorrect = $isCorrect;
     }
 
     public function questionId(): QuestionId
@@ -34,10 +30,5 @@ final class QuestionAnswered implements QuizzEvent
     public function userId(): UserId
     {
         return $this->userId;
-    }
-
-    public function isCorrect(): bool
-    {
-        return $this->isCorrect;
     }
 }

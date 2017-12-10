@@ -17,11 +17,11 @@ use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\Statement;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\EventStore\QuestionsAnsweredEventStore;
+use OnceUponATime\Domain\EventStore\QuizzEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionsAnsweredEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -42,7 +42,7 @@ class NextQuestionHandlerTest extends TestCase
     /** @var QuestionRepository */
     private $questionRepository;
 
-    /** @var QuestionsAnsweredEventStore */
+    /** @var QuizzEventStore */
     private $answeredQuestions;
 
     public function setUp()
@@ -74,7 +74,7 @@ class NextQuestionHandlerTest extends TestCase
                 Clue::fromString('clue 2')
             )
         );
-        $this->answeredQuestions = new InMemoryQuestionsAnsweredEventStore();
+        $this->answeredQuestions = new InMemoryQuizzEventStore();
     }
 
     /**

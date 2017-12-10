@@ -17,6 +17,8 @@ use OnceUponATime\Domain\Entity\Clue;
 use OnceUponATime\Domain\Entity\ExternalUserId;
 use OnceUponATime\Domain\Entity\Name;
 use OnceUponATime\Domain\Entity\Question;
+use OnceUponATime\Domain\Entity\QuestionAnswered;
+use OnceUponATime\Domain\Entity\QuestionAsked;
 use OnceUponATime\Domain\Entity\QuestionId;
 use OnceUponATime\Domain\Entity\Statement;
 use OnceUponATime\Domain\Entity\User;
@@ -25,7 +27,7 @@ use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionsAnsweredEventStore;
+use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizzEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Runner\Exception;
@@ -45,7 +47,7 @@ class FeatureContext implements Context
     /** @var AnswerQuestionHandler */
     private $questionHandler;
 
-    /** @var InMemoryQuestionsAnsweredEventStore */
+    /** @var InMemoryQuizzEventStore */
     private $questionsAnswered;
 
     /** @var bool */
@@ -58,11 +60,12 @@ class FeatureContext implements Context
     {
         $this->userRepository = new InMemoryUserRepository();
         $this->questionRepository = new InMemoryQuestionRepository();
-        $this->questionsAnswered = new InMemoryQuestionsAnsweredEventStore();
+        $this->questionsAnswered = new InMemoryQuizzEventStore();
         $notifier = new QuestionAnsweredNotifyMany([new PublishToEventStore($this->questionsAnswered)]);
         $this->questionHandler = new AnswerQuestionHandler(
             $this->userRepository,
             $this->questionRepository,
+            $this->questionsAnswered,
             $notifier
         );
     }
@@ -103,8 +106,6 @@ class FeatureContext implements Context
 
         try {
             $this->questionHandler->handle($answerQuestion);
-        } catch (InvalidQuestionId $e) {
-            $this->isQuestionIdInvalid = true;
         } catch (InvalidExternalUserId $e) {
             $this->isUserIdInvalid = true;
         }
@@ -161,7 +162,8 @@ class FeatureContext implements Context
 
         $answers = $this->questionsAnswered->byUser($user->id());
         foreach ($answers as $answer) {
-            if ($user->id()->equals($answer->userId()) &&
+            if ($answer instanceof QuestionAnswered &&
+                $user->id()->equals($answer->userId()) &&
                 $question->id()->equals($answer->questionId()) &&
                 $this->isAnswerSame($answer->isCorrect(), $answerResult)
             ) {
@@ -224,12 +226,11 @@ class FeatureContext implements Context
     }
 
     /**
-     * @Then /^the question id should not be known$/
+     * @Given /^the question "([^"]*)" has been asked to the user "([^"]*)"$/
      */
-    public function theQuestionIdShouldNotBeKnown()
+    public function theQuestionHasBeenAskedToTheUser($questionId, $userId)
     {
-        if (!$this->isQuestionIdInvalid) {
-            throw new \RuntimeException('Handler should have thrown for unknown question id');
-        }
+        $questionAsked = new QuestionAsked(UserId::fromString($userId), QuestionId::fromString($questionId));
+        $this->questionsAnswered->add($questionAsked);
     }
 }

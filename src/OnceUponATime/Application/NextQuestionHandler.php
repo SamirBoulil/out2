@@ -9,7 +9,7 @@ use OnceUponATime\Domain\Entity\Question;
 use OnceUponATime\Domain\Entity\QuestionAnswered;
 use OnceUponATime\Domain\Entity\User;
 use OnceUponATime\Domain\Entity\UserId;
-use OnceUponATime\Domain\EventStore\QuestionsAnsweredEventStore;
+use OnceUponATime\Domain\EventStore\QuizzEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
 
@@ -25,13 +25,13 @@ class NextQuestionHandler
     /** @var QuestionRepository */
     private $questionRepository;
 
-    /** @var QuestionsAnsweredEventStore */
+    /** @var QuizzEventStore */
     private $questionsAnswered;
 
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuestionsAnsweredEventStore $questionsAnswered
+        QuizzEventStore $questionsAnswered
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;

@@ -14,8 +14,5 @@ class AnswerQuestion
     public $externalId;
 
     /** @var string */
-    public $questionId;
-
-    /** @var string */
     public $answer;
 }
