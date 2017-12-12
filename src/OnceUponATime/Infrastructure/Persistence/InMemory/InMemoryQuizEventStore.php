@@ -29,7 +29,7 @@ class InMemoryQuizEventStore implements QuizEventStore
         return $this->events;
     }
 
-    public function currentQuestionForUser(UserId $userId): QuestionId
+    public function questionToAnswerForUser(UserId $userId): QuestionId
     {
         $eventsForUser = $this->byUser($userId);
 

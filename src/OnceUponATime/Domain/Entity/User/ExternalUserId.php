@@ -20,9 +20,6 @@ class ExternalUserId
     {
     }
 
-    /**
-     * @throws AssertionFailedException
-     */
     public static function fromString($id): ExternalUserId
     {
         Assertion::notEmpty($id);

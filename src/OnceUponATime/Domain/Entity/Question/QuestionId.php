@@ -22,9 +22,6 @@ class QuestionId
     {
     }
 
-    /**
-     * @throws AssertionFailedException
-     */
     public static function fromString($id): QuestionId
     {
         Assertion::notEmpty($id);

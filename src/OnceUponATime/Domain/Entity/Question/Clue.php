@@ -16,9 +16,6 @@ class Clue
     /** @var string */
     private $text;
 
-    /**
-     * @throws AssertionFailedException
-     */
     public static function fromString($text): Clue
     {
         Assertion::notEmpty($text);

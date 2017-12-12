@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class InMemoryquizEventStoreTest extends TestCase
+class InMemoryQuizEventStoreTest extends TestCase
 {
     /**
      * @test
@@ -24,15 +24,15 @@ class InMemoryquizEventStoreTest extends TestCase
     {
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
 
-        $questionAnsweredEventStore = new InMemoryQuizEventStore();
+        $quizEventStore = new InMemoryQuizEventStore();
         $questionAnswered = new QuestionAnswered(
             $userId,
             QuestionId::fromString('22222222-2222-2222-2222-222222222222'),
             true
         );
 
-        $questionAnsweredEventStore->add($questionAnswered);
-        $this->assertSame([$questionAnswered], $questionAnsweredEventStore->byUser($userId));
+        $quizEventStore->add($questionAnswered);
+        $this->assertSame([$questionAnswered], $quizEventStore->byUser($userId));
     }
 
     /**
@@ -40,7 +40,7 @@ class InMemoryquizEventStoreTest extends TestCase
      */
     public function it_can_add_multiple_questions_answered_and_return_them_by_user()
     {
-        $questionAnsweredEventStore = new InMemoryQuizEventStore();
+        $quizEventStore = new InMemoryQuizEventStore();
 
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $questionAnswered1 = new QuestionAnswered(
@@ -60,12 +60,12 @@ class InMemoryquizEventStoreTest extends TestCase
             true
         );
 
-        $questionAnsweredEventStore->add($questionAnswered1);
-        $questionAnsweredEventStore->add($questionAnswered2);
-        $questionAnsweredEventStore->add($questionAnswered3);
+        $quizEventStore->add($questionAnswered1);
+        $quizEventStore->add($questionAnswered2);
+        $quizEventStore->add($questionAnswered3);
         $this->assertSame(
             [$questionAnswered1, $questionAnswered2],
-            $questionAnsweredEventStore->byUser(UserId::fromString('11111111-1111-1111-1111-111111111111'))
+            $quizEventStore->byUser(UserId::fromString('11111111-1111-1111-1111-111111111111'))
         );
     }
 
@@ -74,7 +74,7 @@ class InMemoryquizEventStoreTest extends TestCase
      */
     public function it_returns_all_the_questions_answered_by_all_users()
     {
-        $questionAnsweredEventStore = new InMemoryQuizEventStore();
+        $quizEventStore = new InMemoryQuizEventStore();
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $anotherUserId = UserId::fromString('22222222-2222-2222-2222-222222222222');
         $questionId1 = QuestionId::fromString('11111111-1111-1111-1111-111111111111');
@@ -88,12 +88,12 @@ class InMemoryquizEventStoreTest extends TestCase
         $questionAnswered2 = new QuestionAnswered($userId, $questionId2, true);
         $questionAnsweredOtherUser = new QuestionAnswered($anotherUserId, $questionId2, true);
 
-        $questionAnsweredEventStore->add($questionAsked1);
-        $questionAnsweredEventStore->add($questionAnswered1);
-        $questionAnsweredEventStore->add($questionAsked2);
-        $questionAnsweredEventStore->add($questionAnswered2);
-        $questionAnsweredEventStore->add($questionAskedOtherUser);
-        $questionAnsweredEventStore->add($questionAnsweredOtherUser);
+        $quizEventStore->add($questionAsked1);
+        $quizEventStore->add($questionAnswered1);
+        $quizEventStore->add($questionAsked2);
+        $quizEventStore->add($questionAnswered2);
+        $quizEventStore->add($questionAskedOtherUser);
+        $quizEventStore->add($questionAnsweredOtherUser);
 
         $this->assertSame(
             [
@@ -104,16 +104,16 @@ class InMemoryquizEventStoreTest extends TestCase
                 $questionAskedOtherUser,
                 $questionAnsweredOtherUser,
             ],
-            $questionAnsweredEventStore->all()
+            $quizEventStore->all()
         );
     }
 
     /**
      * @test
      */
-    public function it_returns_the_current_question_for_the_user()
+    public function it_returns_the_question_the_user_has_to_answer()
     {
-        $questionAnsweredEventStore = new InMemoryQuizEventStore();
+        $quizEventStore = new InMemoryQuizEventStore();
         $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
         $anotherUserId = UserId::fromString('22222222-2222-2222-2222-222222222222');
         $questionId1 = QuestionId::fromString('11111111-1111-1111-1111-111111111111');
@@ -127,17 +127,17 @@ class InMemoryquizEventStoreTest extends TestCase
         $questionAnswered2 = new QuestionAnswered($userId, $questionId2, true);
         $questionAnsweredOtherUser = new QuestionAnswered($anotherUserId, $questionId1, true);
 
-        $questionAnsweredEventStore->add($questionAsked1);
-        $questionAnsweredEventStore->add($questionAnswered1);
-        $questionAnsweredEventStore->add($questionAsked2);
-        $questionAnsweredEventStore->add($questionAnswered2);
-        $questionAnsweredEventStore->add($questionAskedOtherUser);
-        $questionAnsweredEventStore->add($questionAnsweredOtherUser);
+        $quizEventStore->add($questionAsked1);
+        $quizEventStore->add($questionAnswered1);
+        $quizEventStore->add($questionAsked2);
+        $quizEventStore->add($questionAnswered2);
+        $quizEventStore->add($questionAskedOtherUser);
+        $quizEventStore->add($questionAnsweredOtherUser);
 
-        $currentQuestionId = $questionAnsweredEventStore->currentQuestionForUser($userId);
+        $currentQuestionId = $quizEventStore->questionToAnswerForUser($userId);
         $this->assertSame($questionId2, $currentQuestionId);
 
-        $currentQuestionId = $questionAnsweredEventStore->currentQuestionForUser($anotherUserId);
+        $currentQuestionId = $quizEventStore->questionToAnswerForUser($anotherUserId);
         $this->assertSame($questionId1, $currentQuestionId);
     }
 }
