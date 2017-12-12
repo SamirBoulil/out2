@@ -80,7 +80,7 @@ class AnswerQuestionHandler
 
     private function getCurrentQuestionForUser(User $user): Question
     {
-        $questionId = $this->questionsAnsweredEventStore->currentQuestionForUser($user->id());
+        $questionId = $this->questionsAnsweredEventStore->questionToAnswerForUser($user->id());
 
         return $this->questionRepository->byId($questionId);
     }

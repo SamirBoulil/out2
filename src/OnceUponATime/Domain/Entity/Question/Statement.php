@@ -16,9 +16,6 @@ class Statement
     /** @var string */
     private $text;
 
-    /**
-     * @throws AssertionFailedException
-     */
     public static function fromString($text): Statement
     {
         Assertion::notEmpty($text);

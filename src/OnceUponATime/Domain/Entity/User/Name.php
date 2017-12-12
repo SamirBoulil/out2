@@ -16,9 +16,6 @@ class Name
     /** @var string */
     private $text;
 
-    /**
-     * @throws AssertionFailedException
-     */
     public static function fromString($text): Name
     {
         Assertion::notEmpty($text);

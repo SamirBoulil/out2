@@ -22,9 +22,6 @@ class UserId
     {
     }
 
-    /**
-     * @throws AssertionFailedException
-     */
     public static function fromString($id): UserId
     {
         Assertion::notEmpty($id);

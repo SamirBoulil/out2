@@ -17,9 +17,6 @@ class Answer
     /** @var ExternalUserId */
     private $externalUserId;
 
-    /**
-     * @throws AssertionFailedException
-     */
     public static function fromString($id): Answer
     {
         Assertion::notEmpty($id);
