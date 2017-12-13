@@ -2,5 +2,4 @@ language: php
 php: 7.1
 install: composer install
 script:
-    - ./vendor/bin/phpunit
-    - ./vendor/bin/behat
+    - make run_tests
