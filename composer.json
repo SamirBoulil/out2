@@ -5,6 +5,7 @@
         "friendsofphp/php-cs-fixer": "^2.9"
     },
     "require": {
+        "php": "^7.1",
         "beberlei/assert": "^2.7",
         "ramsey/uuid": "^3.7"
     },
