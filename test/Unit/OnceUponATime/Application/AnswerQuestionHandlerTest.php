@@ -8,6 +8,7 @@ use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
 use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -17,7 +18,9 @@ use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
@@ -32,6 +35,9 @@ class AnswerQuestionHandlerTest extends TestCase
 {
     private const QUESTION_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
     private const USER_ID = '3a021c08-ad15-43aa-aba3-8626fecd39a7';
+
+    /** @var QuizEventStore */
+    private $quizEventStore;
 
     /** @var QuestionAnsweredNotify */
     private $testEventSubscriber;
@@ -61,8 +67,8 @@ class AnswerQuestionHandlerTest extends TestCase
         $userRepository->add($user);
 
         $questionAsked = new QuestionAsked($userId, $questionId);
-        $quizEventStore = new InMemoryQuizEventStore();
-        $quizEventStore->add($questionAsked);
+        $this->quizEventStore = new InMemoryQuizEventStore();
+        $this->quizEventStore->add($questionAsked);
 
         $this->testEventSubscriber = new TestEventSubscriber();
         $notify = new QuestionAnsweredNotifyMany([$this->testEventSubscriber]);
@@ -70,7 +76,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $this->answerQuestionHandler = new AnswerQuestionHandler(
             $userRepository,
             $questionRepository,
-            $quizEventStore,
+            $this->quizEventStore,
             $notify
         );
     }
@@ -96,6 +102,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@right_answer>';
+
         $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
         $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
     }
@@ -111,6 +118,16 @@ class AnswerQuestionHandlerTest extends TestCase
         $this->expectException(InvalidUserId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
         $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
+    }
+
+    public function it_throws_if_the_has_no_question_to_answer()
+    {
+        $this->expectException(NoQuestionToAnswer::class);
+        $this->quizEventStore->add(new NoQuestionsLeft(UserId::fromString(self::USER_ID)));
+        $answerQuestion = new AnswerQuestion();
+        $answerQuestion->userId = self::USER_ID;
+        $answerQuestion->answer = '<@an_answer>';
+        $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
     }
 
     /**

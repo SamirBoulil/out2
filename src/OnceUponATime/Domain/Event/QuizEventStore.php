@@ -16,5 +16,9 @@ interface QuizEventStore
 
     public function byUser(UserId $userId): array;
 
-    public function questionToAnswerForUser(UserId $userId): QuestionId;
+    public function questionToAnswerForUser(UserId $userId): ?QuestionId;
+
+    public function guessesCountForCurrentQuestionAndUser(UserId $id): int;
+
+    public function correctlyAnsweredQuestionsByUser(UserId $userId): array;
 }

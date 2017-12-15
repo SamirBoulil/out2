@@ -45,6 +45,9 @@ class AskQuestionHandlerTest extends TestCase
     /** @var QuizEventStore */
     private $answeredQuestions;
 
+    /** @var TestEventSubscriber */
+    private $testEventSubscriber;
+
     public function setUp()
     {
         $this->userRepository = new InMemoryUserRepository();
@@ -75,6 +78,8 @@ class AskQuestionHandlerTest extends TestCase
             )
         );
         $this->answeredQuestions = new InMemoryQuizEventStore();
+
+        $this->testEventSubscriber = new TestEventSubscriber();
     }
 
     /**
@@ -85,19 +90,7 @@ class AskQuestionHandlerTest extends TestCase
         $question = $this->getNextQuestion(self::USER_ID);
         $this->assertNotNull($question);
         $this->assertInstanceOf(Question::class, $question);
-    }
-
-    private function getNextQuestion(string $userId): ?Question
-    {
-        $nextQuestion = new AskQuestion();
-        $nextQuestion->userId = $userId;
-        $nextQuestionHandler = new AskQuestionHandler(
-            $this->userRepository,
-            $this->questionRepository,
-            $this->answeredQuestions
-        );
-
-        return $nextQuestionHandler->handle($nextQuestion);
+        $this->assertTrue($this->testEventSubscriber->isQuestionAsked);
     }
 
     /**
@@ -110,6 +103,43 @@ class AskQuestionHandlerTest extends TestCase
         $this->assertNotNull($question);
         $this->assertInstanceOf(Question::class, $question);
         $this->assertSame(self::QUESTION_ID_2, (string) $question->id());
+        $this->assertTrue($this->testEventSubscriber->isQuestionAsked);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_null_when_the_user_has_answered_all_the_questions()
+    {
+        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_1);
+        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_2);
+        $question = $this->getNextQuestion(self::USER_ID);
+        $this->assertNull($question);
+        $this->assertTrue($this->testEventSubscriber->isNoQuestionLeft);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_when_an_unregistered_user_asks_for_the_next_question()
+    {
+        $this->expectException(InvalidUserId::class);
+        $this->getNextQuestion('00000000-0000-0000-0000-000000000000');
+    }
+
+    private function getNextQuestion(string $userId): ?Question
+    {
+        $nextQuestion = new AskQuestion();
+        $nextQuestion->userId = $userId;
+        $nextQuestionHandler = new AskQuestionHandler(
+            $this->userRepository,
+            $this->questionRepository,
+            $this->answeredQuestions,
+            $this->testEventSubscriber,
+            $this->testEventSubscriber
+        );
+
+        return $nextQuestionHandler->handle($nextQuestion);
     }
 
     private function userHasAnsweredQuestion(string $userId, string $questionId): void
@@ -120,25 +150,5 @@ class AskQuestionHandlerTest extends TestCase
             true
         );
         $this->answeredQuestions->add($questionAnswered);
-    }
-
-    /**
-     * @test
-     */
-    public function it_returns_an_empty_array_when_the_user_has_answered_all_the_questions()
-    {
-        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_1);
-        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_2);
-        $question = $this->getNextQuestion(self::USER_ID);
-        $this->assertNull($question);
-    }
-
-    /**
-     * @test
-     */
-    public function it_throws_when_an_unregistered_user_asks_for_the_next_question()
-    {
-        $this->expectException(InvalidUserId::class);
-        $this->getNextQuestion('00000000-0000-0000-0000-000000000000');
     }
 }

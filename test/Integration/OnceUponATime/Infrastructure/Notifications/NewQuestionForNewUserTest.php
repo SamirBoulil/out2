@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OnceUponATime\Infrastructure\Notifications;
+namespace Tests\OnceUponATime\Infrastructure\Notifications;
 
 use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
 use OnceUponATime\Domain\Entity\Question\Answer;
@@ -17,6 +17,8 @@ use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Domain\Repository\UserRepository;
+use OnceUponATime\Infrastructure\Notifications\NewQuestionForNewUser;
+use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
@@ -56,10 +58,13 @@ class NewQuestionForNewUserTest extends TestCase
         );
 
         $this->quizEventStore = new InMemoryQuizEventStore();
+        $notifier = new PublishToEventStore($this->quizEventStore);
         $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $questionRepository,
-            $this->quizEventStore
+            $this->quizEventStore,
+            $notifier,
+            $notifier
         );
         $this->newQuestionForNewUser = new NewQuestionForNewUser($nextQuestionHandler);
     }

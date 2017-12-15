@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application\AnswerQuestion;
 
-use Assert\AssertionFailedException;
 use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\User;
@@ -50,8 +50,6 @@ class AnswerQuestionHandler
 
     public function handle(AnswerQuestion $answerQuestion): bool
     {
-        // TODO: Ok so, those throw an exception, but errors are thrown one at a time
-        // what happened when user id is not ok, question id is not ok ?
         $user = $this->getUser($answerQuestion);
         $question = $this->getCurrentQuestionForUser($user);
         $answer = $this->getAnswer($answerQuestion);
@@ -65,7 +63,6 @@ class AnswerQuestionHandler
 
     /**
      * @throws InvalidUserId
-     * @throws AssertionFailedException
      */
     private function getUser(AnswerQuestion $answerQuestion): User
     {
@@ -81,6 +78,9 @@ class AnswerQuestionHandler
     private function getCurrentQuestionForUser(User $user): Question
     {
         $questionId = $this->questionsAnsweredEventStore->questionToAnswerForUser($user->id());
+        if (null === $questionId) {
+            throw NoQuestionToAnswer::fromString((string) $user->id());
+        }
 
         return $this->questionRepository->byId($questionId);
     }

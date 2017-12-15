@@ -18,6 +18,7 @@ use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\NewQuestionForUserWhoAnsweredCorrectly;
+use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
@@ -62,10 +63,13 @@ class NewQuestionForUserWhoAnsweredCorrectlyTest extends TestCase
         );
 
         $this->quizEventStore = new InMemoryQuizEventStore();
+        $publisher = new PublishToEventStore($this->quizEventStore);
         $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $questionRepository,
-            $this->quizEventStore
+            $this->quizEventStore,
+            $publisher,
+            $publisher
         );
         $this->newQuestionForUserWhoAnsweredCorrectly = new NewQuestionForUserWhoAnsweredCorrectly($nextQuestionHandler);
     }
