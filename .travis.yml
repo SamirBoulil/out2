@@ -1,5 +1,6 @@
 language: php
 php: 7.1
-install: composer install
+before_install: phpenv config-rm xdebug.ini || echo "xdebug not available for PHP $TRAVIS_PHP_VERSION"
+install: composer install --prefer-dist --no-interaction
 script:
     - make run_tests
