@@ -156,7 +156,7 @@ class InMemoryQuizEventStoreTest extends TestCase
 
         $questionAskedUser1 = new QuestionAsked($userId1, $questionId);
         $questionAskedUser2 = new QuestionAsked($userId2, $questionId);
-        $questionAskedNewUser = new QuestionAsked($userId2, $questionId);
+        $questionAskedNewUser = new QuestionAsked($newUserId, $questionId);
 
         $questionAnsweredUser1 = new QuestionAnswered($userId1, $questionId, false);
         $questionAnsweredUser2 = new QuestionAnswered($userId2, $questionId, false);
@@ -170,13 +170,13 @@ class InMemoryQuizEventStoreTest extends TestCase
         $quizEventStore->add($questionAnsweredUser2);
         $quizEventStore->add($questionAnsweredUser2);
 
-        $guessesCount = $quizEventStore->guessesCountForCurrentQuestionAndUser($userId1);
+        $guessesCount = $quizEventStore->answersCount($userId1);
         $this->assertSame(1, $guessesCount);
 
-        $guessesCount = $quizEventStore->guessesCountForCurrentQuestionAndUser($userId2);
+        $guessesCount = $quizEventStore->answersCount($userId2);
         $this->assertSame(2, $guessesCount);
 
-        $guessesCount = $quizEventStore->guessesCountForCurrentQuestionAndUser($newUserId);
+        $guessesCount = $quizEventStore->answersCount($newUserId);
         $this->assertSame(0, $guessesCount);
     }
 

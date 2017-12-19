@@ -45,25 +45,24 @@ class ShowClueHandler
         $this->notify = $notify;
     }
 
-    public function handle(ShowClue $askClue)
+    public function handle(ShowClue $showClue)
     {
-        $user = $this->getUser($askClue);
+        $user = $this->getUser($showClue);
         $question = $this->getQuestionToAnswer($user);
-        $guessesCount = $this->guessesCount($user);
-        $this->checkGuessesCount($guessesCount, $question, $user);
+        $answersCount = $this->answersCount($user);
 
-        return $this->getClue($guessesCount, $question);
+        return $this->getClue($answersCount, $question);
     }
 
     /**
      * @throws InvalidUserId
      */
-    private function getUser(ShowClue $askClue): User
+    private function getUser(ShowClue $showClue): User
     {
-        $userId = UserId::fromString($askClue->userId);
+        $userId = UserId::fromString($showClue->userId);
         $user = $this->userRepository->byId($userId);
         if (null === $user) {
-            throw InvalidUserId::fromString($askClue->userId);
+            throw InvalidUserId::fromString($showClue->userId);
         }
 
         return $user;
@@ -79,9 +78,9 @@ class ShowClueHandler
         return $this->questionRepository->byId($questionId);
     }
 
-    private function guessesCount(User $user): int
+    private function answersCount(User $user): int
     {
-        return $this->quizEventStore->guessesCountForCurrentQuestionAndUser($user->id());
+        return $this->quizEventStore->answersCount($user->id());
     }
 
     private function getClue($guessesCount, $question): Clue
@@ -91,21 +90,5 @@ class ShowClueHandler
         }
 
         return $question->clue2();
-    }
-
-    /**
-     * @throws \LogicException
-     */
-    private function checkGuessesCount($guessesCount, $question, $user): void
-    {
-        if (2 < $guessesCount) {
-            throw new \LogicException(
-                sprintf(
-                    'There is no clue available for the question "%s" and user "%s"',
-                    $question->id(),
-                    $user->id()
-                )
-            );
-        }
     }
 }

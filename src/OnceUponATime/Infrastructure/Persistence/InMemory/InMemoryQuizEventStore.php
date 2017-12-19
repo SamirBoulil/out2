@@ -45,12 +45,12 @@ class InMemoryQuizEventStore implements QuizEventStore
 
     public function questionToAnswerForUser(UserId $userId): ?QuestionId
     {
-        $quizEventsForUser = $this->byUser($userId);
-        if (end($quizEventsForUser) instanceof NoQuestionsLeft) {
+        $eventsForUser = $this->byUser($userId);
+        if ($this->hasCompletedQuiz($eventsForUser)) {
             return null;
         }
 
-        foreach (array_reverse($quizEventsForUser) as $quizEventForUser) {
+        foreach (array_reverse($eventsForUser) as $quizEventForUser) {
             if ($quizEventForUser instanceof QuestionAsked) {
                 return $quizEventForUser->questionId();
             }
@@ -59,9 +59,13 @@ class InMemoryQuizEventStore implements QuizEventStore
         throw new \LogicException(sprintf('User "%s" has no question to answer.', (string) $userId));
     }
 
-    public function guessesCountForCurrentQuestionAndUser(UserId $userId): int
+    public function answersCount(UserId $userId): ?int
     {
         $eventsForUser = $this->byUser($userId);
+        if ($this->hasCompletedQuiz($eventsForUser)) {
+            return null;
+        }
+
         $guesses = [];
         foreach (array_reverse($eventsForUser) as $quizEvent) {
             if ($quizEvent instanceof QuestionAsked) {
@@ -86,5 +90,10 @@ class InMemoryQuizEventStore implements QuizEventStore
         }
 
         return $correctlyAnsweredQuestions;
+    }
+
+    private function hasCompletedQuiz(array $eventsForUser): bool
+    {
+        return end($eventsForUser) instanceof NoQuestionsLeft;
     }
 }
