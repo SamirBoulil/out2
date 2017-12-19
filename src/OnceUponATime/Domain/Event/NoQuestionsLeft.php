@@ -4,33 +4,23 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Domain\Event;
 
-use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-final class QuestionAsked implements QuizEvent
+class NoQuestionsLeft implements QuizEvent
 {
-    /** @var QuestionId */
-    private $questionId;
-
     /** @var UserId */
     private $userId;
 
-    public function __construct(UserId $userId, QuestionId $questionId)
+    public function __construct(UserId $userId)
     {
         $this->userId = $userId;
-        $this->questionId = $questionId;
     }
 
-    public function questionId(): QuestionId
-    {
-        return $this->questionId;
-    }
-
-    public function userId(): UserId
+    public function userId()
     {
         return $this->userId;
     }

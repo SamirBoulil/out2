@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\OnceUponATime\Application;
 
-use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
-use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
 use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Application\NoQuestionToAnswer;
+use OnceUponATime\Application\ShowClue\ShowClue;
+use OnceUponATime\Application\ShowClue\ShowClueHandler;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -19,31 +19,33 @@ use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\NoQuestionsLeft;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizEventStore;
+use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
-class AnswerQuestionHandlerTest extends TestCase
+class ShowClueHandlerTest extends TestCase
 {
     private const QUESTION_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
     private const USER_ID = '3a021c08-ad15-43aa-aba3-8626fecd39a7';
+    private const USER_ID_2 = '22222222-2222-2222-2222-222222222222';
+
+    /** @var ShowClueHandler */
+    private $askClueHandler;
+
+    /** @var UserRepository */
+    protected $userRepository;
 
     /** @var QuizEventStore */
     private $quizEventStore;
 
     /** @var QuestionAnsweredNotify */
     private $testEventSubscriber;
-
-    /** @var AnswerQuestionHandler */
-    private $answerQuestionHandler;
 
     public function setUp()
     {
@@ -63,8 +65,8 @@ class AnswerQuestionHandlerTest extends TestCase
         $name = Name::fromString('Alice Jardin');
         $user = User::register($userId, $externalUserId, $name);
 
-        $userRepository = new InMemoryUserRepository();
-        $userRepository->add($user);
+        $this->userRepository = new InMemoryUserRepository();
+        $this->userRepository->add($user);
 
         $questionAsked = new QuestionAsked($userId, $questionId);
         $this->quizEventStore = new InMemoryQuizEventStore();
@@ -73,8 +75,8 @@ class AnswerQuestionHandlerTest extends TestCase
         $this->testEventSubscriber = new TestEventSubscriber();
         $notify = new QuestionAnsweredNotifyMany([$this->testEventSubscriber]);
 
-        $this->answerQuestionHandler = new AnswerQuestionHandler(
-            $userRepository,
+        $this->askClueHandler = new ShowClueHandler(
+            $this->userRepository,
             $questionRepository,
             $this->quizEventStore,
             $notify
@@ -84,54 +86,70 @@ class AnswerQuestionHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_correct()
+    public function it_shows_the_first_clue_for_the_user()
     {
-        $answerQuestion = new AnswerQuestion();
-        $answerQuestion->userId = self::USER_ID;
-        $answerQuestion->answer = '<@wrong_answer>';
-
-        $this->assertFalse($this->answerQuestionHandler->handle($answerQuestion));
-        $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
+        $askClue = new ShowClue();
+        $askClue->userId = self::USER_ID;
+        $clue = $this->askClueHandler->handle($askClue);
+        $this->assertSame('Clue 1', (string) $clue);
     }
 
     /**
      * @test
      */
-    public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_incorrect()
+    public function it_finds_the_second_clue_for_the_user()
     {
-        $answerQuestion = new AnswerQuestion();
-        $answerQuestion->userId = self::USER_ID;
-        $answerQuestion->answer = '<@right_answer>';
-
-        $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
-        $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
+        $this->answerIncorrectly();
+        $askClue = new ShowClue();
+        $askClue->userId = self::USER_ID;
+        $clue = $this->askClueHandler->handle($askClue);
+        $this->assertSame('Clue 2', (string) $clue);
     }
 
     /**
      * @test
      */
-    public function it_throws_if_the_user_id_is_not_found()
+    public function it_throws_if_the_user_is_not_found()
     {
-        $answerQuestion = new AnswerQuestion();
-        $answerQuestion->userId = '00000000-0000-0000-0000-000000000000';
-        $answerQuestion->answer = '<@right_answer>';
         $this->expectException(InvalidUserId::class);
-        $this->answerQuestionHandler->handle($answerQuestion);
-        $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
-    }
-
-    public function it_throws_if_the_has_no_question_to_answer()
-    {
-        $this->expectException(NoQuestionToAnswer::class);
-        $this->quizEventStore->add(new NoQuestionsLeft(UserId::fromString(self::USER_ID)));
-        $answerQuestion = new AnswerQuestion();
-        $answerQuestion->userId = self::USER_ID;
-        $answerQuestion->answer = '<@an_answer>';
-        $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
+        $askClue = new ShowClue();
+        $askClue->userId = '00000000-0000-0000-0000-000000000000';
+        $this->askClueHandler->handle($askClue);
     }
 
     /**
-     * TODO: How can I / should I unit test the notification system ?
-     * TODO: Quid Acceptance VS unit testing application layer ?
+     * @test
      */
+    public function it_throws_if_the_user_has_no_question_to_answer()
+    {
+        $this->userHasCompletedQuiz();
+        $this->expectException(NoQuestionToAnswer::class);
+        $askClue = new ShowClue();
+        $askClue->userId = self::USER_ID;
+        $this->assertNull($this->askClueHandler->handle($askClue));
+    }
+
+    private function answerIncorrectly(): void
+    {
+        $questionAnswered = new QuestionAnswered(
+            UserId::fromString(self::USER_ID),
+            QuestionId::fromString(self::QUESTION_ID),
+            false
+        );
+        $this->quizEventStore->add($questionAnswered);
+    }
+
+    private function addNewUser(): void
+    {
+        $userId = UserId::fromString(self::USER_ID_2);
+        $externalUserId = ExternalUserId::fromString('<@testUser2>');
+        $name = Name::fromString('Bob Marteau');
+        $user = User::register($userId, $externalUserId, $name);
+        $this->userRepository->add($user);
+    }
+
+    private function userHasCompletedQuiz()
+    {
+        $this->quizEventStore->add(new NoQuestionsLeft(UserId::fromString(self::USER_ID)));
+    }
 }

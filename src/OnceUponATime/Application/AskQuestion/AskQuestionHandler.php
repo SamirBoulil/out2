@@ -8,6 +8,7 @@ use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizEventStore;
@@ -29,14 +30,24 @@ class AskQuestionHandler
     /** @var QuizEventStore */
     private $quizEventStore;
 
+    /** @var NoQuestionsLeftNotify */
+    private $noQuestionsLeftNotify;
+
+    /** @var QuestionAskedNotify */
+    private $questionAskedNotify;
+
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuizEventStore $quizEventStore
+        QuizEventStore $quizEventStore,
+        NoQuestionsLeftNotify $noQuestionsLeftNotify,
+        QuestionAskedNotify $questionAskedNotify
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;
         $this->quizEventStore = $quizEventStore;
+        $this->noQuestionsLeftNotify = $noQuestionsLeftNotify;
+        $this->questionAskedNotify = $questionAskedNotify;
     }
 
     public function handle(AskQuestion $nextQuestion): ?Question
@@ -44,12 +55,12 @@ class AskQuestionHandler
         $user = $this->getUser($nextQuestion);
         $unansweredQuestions = $this->findUnansweredQuestions($user->id());
         if (empty($unansweredQuestions)) {
+            $this->noQuestionsLeftNotify->noQuestionsLeft(new NoQuestionsLeft($user->id()));
+
             return null;
         }
-
         $question = $this->pickRandomQuestion($unansweredQuestions);
-
-        $this->quizEventStore->add(new QuestionAsked($user->id(), $question->id()));
+        $this->questionAskedNotify->questionAsked(new QuestionAsked($user->id(), $question->id()));
 
         return $question;
     }
@@ -66,25 +77,17 @@ class AskQuestionHandler
 
     private function findUnansweredQuestions(UserId $userId): array
     {
-        $unansweredQuestions = [];
+        $answeredQuestionIds = $this->quizEventStore->correctlyAnsweredQuestionsByUser($userId);
         $questions = $this->questionRepository->all();
+
+        $unansweredQuestions = [];
         foreach ($questions as $question) {
-            if (!$this->isQuestionAlreadyAnsweredByUser($question, $userId)) {
+            if (!\in_array($question->id(), $answeredQuestionIds, false)) {
                 $unansweredQuestions[] = $question;
             }
         }
 
         return $unansweredQuestions;
-    }
-
-    private function isQuestionAlreadyAnsweredByUser(Question $question, UserId $userId): bool
-    {
-        $answeredQuestions = $this->quizEventStore->byUser($userId);
-        $answeredQuestionIds = array_map(function (QuestionAnswered $question) {
-            return (string) $question->questionId();
-        }, $answeredQuestions);
-
-        return \in_array((string) $question->id(), $answeredQuestionIds, true);
     }
 
     private function pickRandomQuestion(array $questions): Question

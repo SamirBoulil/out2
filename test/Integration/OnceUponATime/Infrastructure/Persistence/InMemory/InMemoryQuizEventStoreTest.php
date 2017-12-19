@@ -6,6 +6,7 @@ namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
@@ -139,5 +140,92 @@ class InMemoryQuizEventStoreTest extends TestCase
 
         $currentQuestionId = $quizEventStore->questionToAnswerForUser($anotherUserId);
         $this->assertSame($questionId1, $currentQuestionId);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_the_number_of_guesses_a_user_has_made_for_the_current_question()
+    {
+        $quizEventStore = new InMemoryQuizEventStore();
+
+        $userId1 = UserId::fromString('11111111-1111-1111-1111-111111111111');
+        $userId2 = UserId::fromString('22222222-2222-2222-2222-222222222222');
+        $newUserId = UserId::fromString('33333333-3333-3333-3333-333333333333');
+        $questionId = QuestionId::fromString('11111111-1111-1111-1111-111111111111');
+
+        $questionAskedUser1 = new QuestionAsked($userId1, $questionId);
+        $questionAskedUser2 = new QuestionAsked($userId2, $questionId);
+        $questionAskedNewUser = new QuestionAsked($newUserId, $questionId);
+
+        $questionAnsweredUser1 = new QuestionAnswered($userId1, $questionId, false);
+        $questionAnsweredUser2 = new QuestionAnswered($userId2, $questionId, false);
+
+        $quizEventStore->add($questionAskedUser1);
+        $quizEventStore->add($questionAskedUser2);
+        $quizEventStore->add($questionAskedNewUser);
+
+        $quizEventStore->add($questionAnsweredUser1);
+
+        $quizEventStore->add($questionAnsweredUser2);
+        $quizEventStore->add($questionAnsweredUser2);
+
+        $guessesCount = $quizEventStore->answersCount($userId1);
+        $this->assertSame(1, $guessesCount);
+
+        $guessesCount = $quizEventStore->answersCount($userId2);
+        $this->assertSame(2, $guessesCount);
+
+        $guessesCount = $quizEventStore->answersCount($newUserId);
+        $this->assertSame(0, $guessesCount);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_the_questions_the_user_has_answered_correctly()
+    {
+        $quizEventStore = new InMemoryQuizEventStore();
+
+        $userId = UserId::fromString('11111111-1111-1111-1111-111111111111');
+        $anotherUserId = UserId::fromString('22222222-2222-2222-2222-222222222222');
+
+        $questionId1 = QuestionId::fromString('11111111-1111-1111-1111-111111111111');
+        $questionId2 = QuestionId::fromString('22222222-2222-2222-2222-222222222222');
+        $questionId3 = QuestionId::fromString('33333333-3333-3333-3333-333333333333');
+
+        $questionAsked1 = new QuestionAsked($userId, $questionId1);
+        $questionAsked2 = new QuestionAsked($userId, $questionId2);
+        $questionAsked3 = new QuestionAsked($userId, $questionId2);
+        $questionAskedOtherUser = new QuestionAsked($anotherUserId, $questionId1);
+
+        $questionAnswered1 = new QuestionAnswered($userId, $questionId1, true);
+        $questionAnswered2 = new QuestionAnswered($userId, $questionId2, true);
+        $questionAnswered3f = new QuestionAnswered($userId, $questionId3, false);
+        $questionAnswered3t = new QuestionAnswered($userId, $questionId3, true);
+        $noQuestion = new NoQuestionsLeft($userId);
+        $questionAnsweredOtherUser = new QuestionAnswered($anotherUserId, $questionId1, true);
+
+        $quizEventStore->add($questionAsked1);
+        $quizEventStore->add($questionAnswered1);
+        $quizEventStore->add($questionAsked2);
+        $quizEventStore->add($questionAnswered2);
+        $quizEventStore->add($questionAskedOtherUser);
+        $quizEventStore->add($questionAnsweredOtherUser);
+        $quizEventStore->add($questionAsked3);
+        $quizEventStore->add($questionAnswered3f);
+        $quizEventStore->add($questionAnswered3t);
+        $quizEventStore->add($noQuestion);
+
+        $this->assertSame(
+            [
+                $questionId1,
+                $questionId2,
+                $questionId3,
+            ],
+            $quizEventStore->correctlyAnsweredQuestionsByUser($userId)
+        );
+
+        $this->assertSame([$questionId1], $quizEventStore->correctlyAnsweredQuestionsByUser($anotherUserId));
     }
 }

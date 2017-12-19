@@ -6,6 +6,8 @@ namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\NoQuestionsLeft;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizEvent;
 use OnceUponATime\Domain\Event\QuizEventStore;
@@ -16,7 +18,7 @@ use OnceUponATime\Domain\Event\QuizEventStore;
  */
 class InMemoryQuizEventStore implements QuizEventStore
 {
-    /** @var \OnceUponATime\Domain\Event\QuestionAnswered[] */
+    /** @var QuestionAnswered[] */
     private $events = [];
 
     public function add(quizEvent $event): void
@@ -29,28 +31,69 @@ class InMemoryQuizEventStore implements QuizEventStore
         return $this->events;
     }
 
-    public function questionToAnswerForUser(UserId $userId): QuestionId
+    public function byUser(UserId $userId): array
+    {
+        $events = [];
+        foreach ($this->events as $quizEvent) {
+            if ($quizEvent->userId()->equals($userId)) {
+                $events[] = $quizEvent;
+            }
+        }
+
+        return $events;
+    }
+
+    public function questionToAnswerForUser(UserId $userId): ?QuestionId
     {
         $eventsForUser = $this->byUser($userId);
+        if ($this->hasCompletedQuiz($eventsForUser)) {
+            return null;
+        }
 
-        foreach (array_reverse($eventsForUser) as $questionAnswered) {
-            if ($questionAnswered instanceof QuestionAsked) {
-                return $questionAnswered->questionId();
+        foreach (array_reverse($eventsForUser) as $quizEventForUser) {
+            if ($quizEventForUser instanceof QuestionAsked) {
+                return $quizEventForUser->questionId();
             }
         }
 
         throw new \LogicException(sprintf('User "%s" has no question to answer.', (string) $userId));
     }
 
-    public function byUser(UserId $userId): array
+    public function answersCount(UserId $userId): ?int
     {
-        $events = [];
-        foreach ($this->events as $questionAnswered) {
-            if ($questionAnswered->userId()->equals($userId)) {
-                $events[] = $questionAnswered;
+        $eventsForUser = $this->byUser($userId);
+        if ($this->hasCompletedQuiz($eventsForUser)) {
+            return null;
+        }
+
+        $guesses = [];
+        foreach (array_reverse($eventsForUser) as $quizEvent) {
+            if ($quizEvent instanceof QuestionAsked) {
+                break;
+            }
+            $guesses[] = $quizEvent;
+        }
+
+        return \count($guesses);
+    }
+
+    public function correctlyAnsweredQuestionsByUser(UserId $userId): array
+    {
+        $correctlyAnsweredQuestions = [];
+        $userEvents = $this->byUser($userId);
+        foreach ($userEvents as $answeredQuestion) {
+            if ($answeredQuestion instanceof QuestionAnswered &&
+                $answeredQuestion->isCorrect()
+            ) {
+                $correctlyAnsweredQuestions[] = $answeredQuestion->questionId();
             }
         }
 
-        return $events;
+        return $correctlyAnsweredQuestions;
+    }
+
+    private function hasCompletedQuiz(array $eventsForUser): bool
+    {
+        return end($eventsForUser) instanceof NoQuestionsLeft;
     }
 }
