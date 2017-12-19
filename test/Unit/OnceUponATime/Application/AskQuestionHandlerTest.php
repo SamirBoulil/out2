@@ -43,7 +43,7 @@ class AskQuestionHandlerTest extends TestCase
     private $questionRepository;
 
     /** @var QuizEventStore */
-    private $answeredQuestions;
+    private $quizEventStore;
 
     /** @var TestEventSubscriber */
     private $testEventSubscriber;
@@ -77,7 +77,7 @@ class AskQuestionHandlerTest extends TestCase
                 Clue::fromString('clue 2')
             )
         );
-        $this->answeredQuestions = new InMemoryQuizEventStore();
+        $this->quizEventStore = new InMemoryQuizEventStore();
 
         $this->testEventSubscriber = new TestEventSubscriber();
     }
@@ -88,7 +88,6 @@ class AskQuestionHandlerTest extends TestCase
     public function it_finds_the_next_question_for_a_new_user()
     {
         $question = $this->getNextQuestion(self::USER_ID);
-        $this->assertNotNull($question);
         $this->assertInstanceOf(Question::class, $question);
         $this->assertTrue($this->testEventSubscriber->isQuestionAsked);
     }
@@ -134,7 +133,7 @@ class AskQuestionHandlerTest extends TestCase
         $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $this->questionRepository,
-            $this->answeredQuestions,
+            $this->quizEventStore,
             $this->testEventSubscriber,
             $this->testEventSubscriber
         );
@@ -149,6 +148,6 @@ class AskQuestionHandlerTest extends TestCase
             QuestionId::fromString($questionId),
             true
         );
-        $this->answeredQuestions->add($questionAnswered);
+        $this->quizEventStore->add($questionAnswered);
     }
 }
