@@ -14,8 +14,10 @@ use OnceUponATime\Domain\Event\QuizEventStore;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimes implements QuestionAnsweredNotify
+class NewQuestionForUserWhoAnsweredIncorrectly implements QuestionAnsweredNotify
 {
+    private const MAX_GUESSES = 2;
+
     /** @var QuizEventStore */
     private $quizEventStore;
 
@@ -40,6 +42,6 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimes implements QuestionAn
 
     private function tooManyTries($answersCount): bool
     {
-        return $answersCount >= 2;
+        return $answersCount >= self::MAX_GUESSES;
     }
 }

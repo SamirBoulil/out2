@@ -6,9 +6,9 @@ namespace Tests\Integration\OnceUponATime\Infrastructure\Persistence\InMemory;
 
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use PHPUnit\Framework\TestCase;
 
@@ -203,7 +203,7 @@ class InMemoryQuizEventStoreTest extends TestCase
         $questionAnswered2 = new QuestionAnswered($userId, $questionId2, true);
         $questionAnswered3f = new QuestionAnswered($userId, $questionId3, false);
         $questionAnswered3t = new QuestionAnswered($userId, $questionId3, true);
-        $noQuestion = new NoQuestionsLeft($userId);
+        $noQuestion = new QuizCompleted($userId);
         $questionAnsweredOtherUser = new QuestionAnswered($anotherUserId, $questionId1, true);
 
         $quizEventStore->add($questionAsked1);

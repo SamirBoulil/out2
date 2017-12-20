@@ -6,9 +6,9 @@ namespace OnceUponATime\Infrastructure\Persistence\InMemory;
 
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEvent;
 use OnceUponATime\Domain\Event\QuizEventStore;
 
@@ -94,6 +94,6 @@ class InMemoryQuizEventStore implements QuizEventStore
 
     private function hasCompletedQuiz(array $eventsForUser): bool
     {
-        return end($eventsForUser) instanceof NoQuestionsLeft;
+        return end($eventsForUser) instanceof QuizCompleted;
     }
 }

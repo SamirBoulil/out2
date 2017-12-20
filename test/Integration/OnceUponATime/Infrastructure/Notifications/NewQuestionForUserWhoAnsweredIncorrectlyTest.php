@@ -15,7 +15,7 @@ use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizEventStore;
-use OnceUponATime\Infrastructure\Notifications\NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimes;
+use OnceUponATime\Infrastructure\Notifications\NewQuestionForUserWhoAnsweredIncorrectly;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
@@ -23,7 +23,7 @@ use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\OnceUponATime\Application\TestEventSubscriber;
 
-class NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimesTest extends TestCase
+class NewQuestionForUserWhoAnsweredIncorrectlyTest extends TestCase
 {
     private const USER_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
     private const QUESTION_ID = '11111111-1111-1111-1111-111111111111';
@@ -93,7 +93,7 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimesTest extends TestCase
         ));
 
         $lastTry = new QuestionAnswered($userId, $questionId, false);
-        $handler = new NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimes(
+        $handler = new NewQuestionForUserWhoAnsweredIncorrectly(
             $this->quizEventStore,
             $this->askQuestionHandler
         );
@@ -123,7 +123,7 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimesTest extends TestCase
         ));
 
         $lastTry = new QuestionAnswered($userId, $questionId, false);
-        $handler = new NewQuestionForUserWhoAnsweredIncorrectlyTooManyTimes(
+        $handler = new NewQuestionForUserWhoAnsweredIncorrectly(
             $this->quizEventStore,
             $this->askQuestionHandler
         );

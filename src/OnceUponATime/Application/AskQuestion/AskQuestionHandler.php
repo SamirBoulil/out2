@@ -8,9 +8,9 @@ use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
@@ -30,7 +30,7 @@ class AskQuestionHandler
     /** @var QuizEventStore */
     private $quizEventStore;
 
-    /** @var NoQuestionsLeftNotify */
+    /** @var QuizCompletedNotify */
     private $noQuestionsLeftNotify;
 
     /** @var QuestionAskedNotify */
@@ -40,7 +40,7 @@ class AskQuestionHandler
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
         QuizEventStore $quizEventStore,
-        NoQuestionsLeftNotify $noQuestionsLeftNotify,
+        QuizCompletedNotify $noQuestionsLeftNotify,
         QuestionAskedNotify $questionAskedNotify
     ) {
         $this->userRepository = $userRepository;
@@ -55,7 +55,7 @@ class AskQuestionHandler
         $user = $this->getUser($nextQuestion);
         $unansweredQuestions = $this->findUnansweredQuestions($user->id());
         if (empty($unansweredQuestions)) {
-            $this->noQuestionsLeftNotify->noQuestionsLeft(new NoQuestionsLeft($user->id()));
+            $this->noQuestionsLeftNotify->quizCompleted(new QuizCompleted($user->id()));
 
             return null;
         }
