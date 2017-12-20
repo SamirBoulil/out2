@@ -114,7 +114,7 @@ class AskQuestionHandlerTest extends TestCase
         $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_2);
         $question = $this->getNextQuestion(self::USER_ID);
         $this->assertNull($question);
-        $this->assertTrue($this->testEventSubscriber->isNoQuestionLeft);
+        $this->assertTrue($this->testEventSubscriber->isQuizCompleted);
     }
 
     /**

@@ -18,8 +18,8 @@ use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
@@ -123,7 +123,7 @@ class AnswerQuestionHandlerTest extends TestCase
     public function it_throws_if_the_has_no_question_to_answer()
     {
         $this->expectException(NoQuestionToAnswer::class);
-        $this->quizEventStore->add(new NoQuestionsLeft(UserId::fromString(self::USER_ID)));
+        $this->quizEventStore->add(new QuizCompleted(UserId::fromString(self::USER_ID)));
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@an_answer>';

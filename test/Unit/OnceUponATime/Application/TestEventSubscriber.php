@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Unit\OnceUponATime\Application;
 
 use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
-use OnceUponATime\Application\AskQuestion\NoQuestionsLeftNotify;
 use OnceUponATime\Application\AskQuestion\QuestionAskedNotify;
+use OnceUponATime\Application\AskQuestion\QuizCompletedNotify;
 use OnceUponATime\Application\RegisterUser\UserRegisteredNotify;
-use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\UserRegistered;
 
 /**
@@ -21,7 +21,7 @@ class TestEventSubscriber implements
     QuestionAnsweredNotify,
     UserRegisteredNotify,
     QuestionAskedNotify,
-    NoQuestionsLeftNotify
+    QuizCompletedNotify
 {
     /** @var bool */
     public $isQuestionAnswered = false;
@@ -33,7 +33,7 @@ class TestEventSubscriber implements
     public $isQuestionAsked = false;
 
     /** @var bool */
-    public $isNoQuestionLeft = false;
+    public $isQuizCompleted = false;
 
     public function questionAnswered(QuestionAnswered $event): void
     {
@@ -50,8 +50,8 @@ class TestEventSubscriber implements
         $this->isQuestionAsked = true;
     }
 
-    public function noQuestionsLeft(NoQuestionsLeft $event): void
+    public function quizCompleted(QuizCompleted $event): void
     {
-        $this->isNoQuestionLeft = true;
+        $this->isQuizCompleted = true;
     }
 }

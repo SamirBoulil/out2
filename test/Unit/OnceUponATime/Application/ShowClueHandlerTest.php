@@ -18,9 +18,9 @@ use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\UserRepository;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
@@ -150,6 +150,6 @@ class ShowClueHandlerTest extends TestCase
 
     private function userHasCompletedQuiz()
     {
-        $this->quizEventStore->add(new NoQuestionsLeft(UserId::fromString(self::USER_ID)));
+        $this->quizEventStore->add(new QuizCompleted(UserId::fromString(self::USER_ID)));
     }
 }

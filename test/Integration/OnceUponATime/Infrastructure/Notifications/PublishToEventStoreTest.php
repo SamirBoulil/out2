@@ -4,9 +4,9 @@ namespace Tests\Integration\OnceUponATime\Infrastructure\Notifications;
 
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\NoQuestionsLeft;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Infrastructure\Notifications\PublishToEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use PHPUnit\Framework\TestCase;
@@ -46,10 +46,10 @@ class PublishToEventStoreTest extends TestCase
     {
         $eventStore = new InMemoryQuizEventStore();
         $publisher = new PublishToEventStore($eventStore);
-        $noQuestionLeft = $this->createNoQuestionsLeft();
-        $publisher->noQuestionsLeft($noQuestionLeft);
+        $quizCompleted = $this->createQuizCompleted();
+        $publisher->quizCompleted($quizCompleted);
 
-        $this->assertSame([$noQuestionLeft], $eventStore->all());
+        $this->assertSame([$quizCompleted], $eventStore->all());
     }
 
     private function createQuestionAnswered(): QuestionAnswered
@@ -69,8 +69,8 @@ class PublishToEventStoreTest extends TestCase
         );
     }
 
-    private function createNoQuestionsLeft(): NoQuestionsLeft
+    private function createQuizCompleted(): QuizCompleted
     {
-        return new NoQuestionsLeft(UserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9'));
+        return new QuizCompleted(UserId::fromString('7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9'));
     }
 }
