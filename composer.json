@@ -2,7 +2,6 @@
     "license": "OSL-3.0",
     "require-dev": {
         "phpunit/phpunit": "^6.4",
-        "behat/behat": "^3.4",
         "friendsofphp/php-cs-fixer": "^2.9"
     },
     "require": {

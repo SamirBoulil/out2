@@ -21,7 +21,7 @@ use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
-use Tests\Unit\OnceUponATime\Application\TestEventSubscriber;
+use Tests\Acceptance\OnceUponATime\Application\TestEventSubscriber;
 
 class NewQuestionForUserWhoAnsweredIncorrectlyTest extends TestCase
 {

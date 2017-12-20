@@ -7,7 +7,7 @@ use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use PHPUnit\Framework\TestCase;
-use Tests\Unit\OnceUponATime\Application\TestEventSubscriber;
+use Tests\Acceptance\OnceUponATime\Application\TestEventSubscriber;
 
 class QuestionAnsweredNotifyManyTest extends TestCase
 {
