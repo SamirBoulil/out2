@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\OnceUponATime\Infrastructure\Notifications;
+namespace Tests\Integration\OnceUponATime\Infrastructure\Notifications;
 
 use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
 use OnceUponATime\Domain\Entity\Question\Answer;
