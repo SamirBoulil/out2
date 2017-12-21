@@ -41,10 +41,13 @@ class NewQuestionForNewUserTest extends TestCase
     public function setUp()
     {
         $this->userRepository = new InMemoryUserRepository();
-        $userId = UserId::fromString(self::USER_ID);
-        $externalUserId = ExternalUserId::fromString('external_user_id');
-        $name = Name::fromString(self::NAME);
-        $this->userRepository->add(User::register($userId, $externalUserId, $name));
+        $this->userRepository->add(
+            User::register(
+                UserId::fromString(self::USER_ID),
+                ExternalUserId::fromString('external_user_id'),
+                Name::fromString(self::NAME)
+            )
+        );
 
         $questionRepository = new InMemoryQuestionRepository();
         $questionRepository->add(
@@ -75,10 +78,7 @@ class NewQuestionForNewUserTest extends TestCase
     public function it_asks_for_a_new_question_when_a_new_user_registered()
     {
         $userId = UserId::fromString(self::USER_ID);
-        $userRegistered = new UserRegistered(
-            $userId,
-            Name::fromString(self::NAME)
-        );
+        $userRegistered = new UserRegistered($userId, Name::fromString(self::NAME));
 
         $this->newQuestionForNewUser->userRegistered($userRegistered);
 
