@@ -7,7 +7,7 @@ use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\UserRegistered;
 use OnceUponATime\Infrastructure\Notifications\UserRegisteredNotifyMany;
 use PHPUnit\Framework\TestCase;
-use Tests\Unit\OnceUponATime\Application\TestEventSubscriber;
+use Tests\Acceptance\OnceUponATime\Application\TestEventSubscriber;
 
 class UserRegisteredNotifyManyTest extends TestCase
 {

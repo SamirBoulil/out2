@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\OnceUponATime\Application;
+namespace Tests\Acceptance\OnceUponATime\Application;
 
 use OnceUponATime\Application\RegisterUser\RegisterUser;
 use OnceUponATime\Application\RegisterUser\RegisterUserHandler;

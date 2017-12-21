@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\OnceUponATime\Application;
+namespace Tests\Acceptance\OnceUponATime\Application;
 
 use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
 use OnceUponATime\Application\AskQuestion\QuestionAskedNotify;

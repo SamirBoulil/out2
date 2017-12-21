@@ -7,7 +7,7 @@ use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEvent;
 use PHPUnit\Framework\TestCase;
 
-class NoQuestionsLeftTest extends TestCase
+class QuizCompletedTest extends TestCase
 {
     /**
      * @test
