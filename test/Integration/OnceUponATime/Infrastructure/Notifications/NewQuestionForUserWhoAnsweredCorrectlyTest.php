@@ -31,7 +31,6 @@ use PHPUnit\Framework\TestCase;
 class NewQuestionForUserWhoAnsweredCorrectlyTest extends TestCase
 {
     private const USER_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
-    private const NAME = 'My name';
     private const QUESTION_ID = '11111111-1111-1111-1111-111111111111';
 
     /** @var QuizEventStore */
@@ -46,10 +45,13 @@ class NewQuestionForUserWhoAnsweredCorrectlyTest extends TestCase
     public function setUp()
     {
         $this->userRepository = new InMemoryUserRepository();
-        $userId = UserId::fromString(self::USER_ID);
-        $externalUserId = ExternalUserId::fromString('external_user_id');
-        $name = Name::fromString(self::NAME);
-        $this->userRepository->add(User::register($userId, $externalUserId, $name));
+        $this->userRepository->add(
+            User::register(
+                UserId::fromString(self::USER_ID),
+                ExternalUserId::fromString('external_user_id'),
+                Name::fromString('my name')
+            )
+        );
 
         $questionRepository = new InMemoryQuestionRepository();
         $questionRepository->add(

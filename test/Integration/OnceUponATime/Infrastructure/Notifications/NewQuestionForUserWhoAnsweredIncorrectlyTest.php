@@ -77,29 +77,11 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTest extends TestCase
         $userId = UserId::fromString(self::USER_ID);
         $questionId = QuestionId::fromString(self::QUESTION_ID);
 
-        $this->quizEventStore->add(new QuestionAsked(
-            $userId,
-            $questionId
-        ));
-        $this->quizEventStore->add(new QuestionAnswered(
-            $userId,
-            $questionId,
-            false
-        ));
-        $this->quizEventStore->add(new QuestionAnswered(
-            $userId,
-            $questionId,
-            false
-        ));
-
-        $lastTry = new QuestionAnswered($userId, $questionId, false);
-        $handler = new NewQuestionForUserWhoAnsweredIncorrectly(
-            $this->quizEventStore,
-            $this->askQuestionHandler
-        );
-        $handler->questionAnswered($lastTry);
+        $this->userAnsweredIncorrectlyTimes($userId, $questionId, 2);
+        $this->userAnswersIncorrectly($userId, $questionId);
 
         $quizEvents = $this->quizEventStore->byUser($userId);
+        $this->assertCount(4, $quizEvents);
         $lastEvent = end($quizEvents);
         $this->assertInstanceOf(QuestionAsked::class, $lastEvent);
     }
@@ -112,25 +94,28 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTest extends TestCase
         $userId = UserId::fromString(self::USER_ID);
         $questionId = QuestionId::fromString(self::QUESTION_ID);
 
-        $this->quizEventStore->add(new QuestionAsked(
-            $userId,
-            $questionId
-        ));
-        $this->quizEventStore->add(new QuestionAnswered(
-            $userId,
-            $questionId,
-            false
-        ));
+        $this->quizEventStore->add(new QuestionAsked($userId, $questionId));
+        $this->quizEventStore->add(new QuestionAnswered($userId, $questionId, false));
 
-        $lastTry = new QuestionAnswered($userId, $questionId, false);
-        $handler = new NewQuestionForUserWhoAnsweredIncorrectly(
-            $this->quizEventStore,
-            $this->askQuestionHandler
-        );
-        $handler->questionAnswered($lastTry);
+        $this->userAnswersIncorrectly($userId, $questionId);
 
         $quizEvents = $this->quizEventStore->byUser($userId);
         $lastEvent = end($quizEvents);
         $this->assertNotInstanceOf(QuestionAsked::class, $lastEvent);
+    }
+
+    private function userAnsweredIncorrectlyTimes(UserId $userId, QuestionId $questionId, int $times): void
+    {
+        $this->quizEventStore->add(new QuestionAsked($userId, $questionId));
+        for ($i = 0; $i < $times; $i++) {
+            $this->quizEventStore->add(new QuestionAnswered($userId, $questionId, false));
+        }
+    }
+
+    private function userAnswersIncorrectly(UserId $userId, QuestionId $questionId): void
+    {
+        $lastTry = new QuestionAnswered($userId, $questionId, false);
+        $handler = new NewQuestionForUserWhoAnsweredIncorrectly($this->quizEventStore, $this->askQuestionHandler);
+        $handler->questionAnswered($lastTry);
     }
 }
