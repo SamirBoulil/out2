@@ -35,9 +35,9 @@ class LeaderboardTest extends TestCase
         $rank3 = $this->createRank('33333333-1111-43aa-aba3-8626fecd39e8', 1000);
 
         $leaderboard = new Leaderboard();
-        $leaderboard->addRank($rank2);
-        $leaderboard->addRank($rank1);
-        $leaderboard->addRank($rank3);
+        $leaderboard->add($rank2);
+        $leaderboard->add($rank1);
+        $leaderboard->add($rank3);
 
         $this->assertSame([$rank1, $rank2, $rank3], $leaderboard->publish());
     }

@@ -20,5 +20,7 @@ interface QuizEventStore
 
     public function answersCount(UserId $id): ?int;
 
+    public function answersCountAll(UserId $userId): array;
+
     public function correctlyAnsweredQuestionsByUser(UserId $userId): array;
 }

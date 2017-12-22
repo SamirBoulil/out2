@@ -22,7 +22,7 @@ class Leaderboard
         return $this->ranks;
     }
 
-    public function addRank(Rank $rank): void
+    public function add(Rank $rank): void
     {
         $this->ranks[] = $rank;
     }
