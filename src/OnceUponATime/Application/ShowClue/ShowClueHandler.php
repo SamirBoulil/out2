@@ -30,19 +30,14 @@ class ShowClueHandler
     /** @var QuizEventStore */
     private $quizEventStore;
 
-    /** @var QuestionAnsweredNotify */
-    private $notify;
-
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuizEventStore $quizEventStore,
-        QuestionAnsweredNotify $notify
+        QuizEventStore $quizEventStore
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;
         $this->quizEventStore = $quizEventStore;
-        $this->notify = $notify;
     }
 
     public function handle(ShowClue $showClue)

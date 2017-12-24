@@ -16,11 +16,11 @@ use OnceUponATime\Domain\Event\QuestionAnswered;
 class NewQuestionForUserWhoAnsweredCorrectly implements QuestionAnsweredNotify
 {
     /** @var AskQuestionHandler */
-    private $nextQuestionHandler;
+    private $askQuestionHandler;
 
-    public function __construct(AskQuestionHandler $nextQuestionHandler)
+    public function __construct(AskQuestionHandler $askQuestionHandler)
     {
-        $this->nextQuestionHandler = $nextQuestionHandler;
+        $this->askQuestionHandler = $askQuestionHandler;
     }
 
     public function questionAnswered(QuestionAnswered $event): void
@@ -34,6 +34,6 @@ class NewQuestionForUserWhoAnsweredCorrectly implements QuestionAnsweredNotify
     {
         $nextQuestion = new AskQuestion();
         $nextQuestion->userId = (string) $event->userId();
-        $this->nextQuestionHandler->handle($nextQuestion);
+        $this->askQuestionHandler->handle($nextQuestion);
     }
 }

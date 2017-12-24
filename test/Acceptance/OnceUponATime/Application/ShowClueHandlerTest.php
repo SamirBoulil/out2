@@ -73,13 +73,11 @@ class ShowClueHandlerTest extends TestCase
         $this->quizEventStore->add($questionAsked);
 
         $this->testEventSubscriber = new TestEventSubscriber();
-        $notify = new QuestionAnsweredNotifyMany([$this->testEventSubscriber]);
 
         $this->askClueHandler = new ShowClueHandler(
             $this->userRepository,
             $questionRepository,
-            $this->quizEventStore,
-            $notify
+            $this->quizEventStore
         );
     }
 
@@ -137,15 +135,6 @@ class ShowClueHandlerTest extends TestCase
             false
         );
         $this->quizEventStore->add($questionAnswered);
-    }
-
-    private function addNewUser(): void
-    {
-        $userId = UserId::fromString(self::USER_ID_2);
-        $externalUserId = ExternalUserId::fromString('<@testUser2>');
-        $name = Name::fromString('Bob Marteau');
-        $user = User::register($userId, $externalUserId, $name);
-        $this->userRepository->add($user);
     }
 
     private function userHasCompletedQuiz()
