@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types = 1);
+
+use OnceUponATime\Application\RegisterUser\RegisterUserHandler;
+use OnceUponATime\Infrastructure\Common\OnceUponATimeApplicationContainer;
+use Symfony\Component\Console\Application;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$container = new OnceUponATimeApplicationContainer();
+$application = $container->getConsoleApplication();
+$application->run();
