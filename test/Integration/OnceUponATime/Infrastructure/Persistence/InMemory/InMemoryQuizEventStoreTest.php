@@ -183,6 +183,51 @@ class InMemoryQuizEventStoreTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_the_number_of_guesses_a_user_has_made_for_all_questions()
+    {
+        $quizEventStore = new InMemoryQuizEventStore();
+
+        $userId1 = UserId::fromString('11111111-1111-1111-1111-111111111111');
+
+        $questionId0 = QuestionId::fromString('00000000-0000-0000-0000-000000000000');
+        $questionId1 = QuestionId::fromString('11111111-1111-1111-1111-111111111111');
+        $questionId2 = QuestionId::fromString('22222222-2222-2222-2222-222222222222');
+        $questionId3 = QuestionId::fromString('33333333-3333-3333-3333-333333333333');
+
+        $questionAsked0 = new QuestionAsked($userId1, $questionId0);
+        $questionAskedQ1 = new QuestionAsked($userId1, $questionId1);
+        $questionAskedQ2 = new QuestionAsked($userId1, $questionId2);
+        $questionAskedQ3 = new QuestionAsked($userId1, $questionId3);
+
+        $questionAnsweredQ1 = new QuestionAnswered($userId1, $questionId1, true);
+        $questionAnsweredQ2_1 = new QuestionAnswered($userId1, $questionId2, false);
+        $questionAnsweredQ2_2 = new QuestionAnswered($userId1, $questionId2, true);
+        $questionAnsweredQ3_1 = new QuestionAnswered($userId1, $questionId3, false);
+        $questionAnsweredQ3_2 = new QuestionAnswered($userId1, $questionId3, false);
+        $questionAnsweredQ3_3 = new QuestionAnswered($userId1, $questionId3, true);
+
+        $quizEventStore->add($questionAsked0);
+        $quizEventStore->add($questionAskedQ1);
+        $quizEventStore->add($questionAnsweredQ1);
+        $quizEventStore->add($questionAskedQ2);
+        $quizEventStore->add($questionAnsweredQ2_1);
+        $quizEventStore->add($questionAnsweredQ2_2);
+        $quizEventStore->add($questionAskedQ3);
+        $quizEventStore->add($questionAnsweredQ3_1);
+        $quizEventStore->add($questionAnsweredQ3_2);
+        $quizEventStore->add($questionAnsweredQ3_3);
+
+        $guessesCountAll = $quizEventStore->answersCountAll($userId1);
+        $this->assertSame([
+           '11111111-1111-1111-1111-111111111111' => 1,
+           '22222222-2222-2222-2222-222222222222' => 2,
+           '33333333-3333-3333-3333-333333333333' => 3
+        ], $guessesCountAll);
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_the_questions_the_user_has_answered_correctly()
     {
         $quizEventStore = new InMemoryQuizEventStore();

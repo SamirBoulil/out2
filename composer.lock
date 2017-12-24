@@ -82,7 +82,7 @@
                 "phpunit/phpunit": "4.*|5.*"
             },
             "suggest": {
-                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
+                "ext-libsodium": "Provides a modern crypto API that can be used to publish random bytes."
             },
             "type": "library",
             "autoload": {

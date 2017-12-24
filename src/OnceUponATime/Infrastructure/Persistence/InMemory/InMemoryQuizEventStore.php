@@ -18,7 +18,7 @@ use OnceUponATime\Domain\Event\QuizEventStore;
  */
 class InMemoryQuizEventStore implements QuizEventStore
 {
-    /** @var QuestionAnswered[] */
+    /** @var QuizEvent[] */
     private $events = [];
 
     public function add(quizEvent $event): void
@@ -66,15 +66,37 @@ class InMemoryQuizEventStore implements QuizEventStore
             return null;
         }
 
-        $guesses = [];
+        $answersCount = 0;
         foreach (array_reverse($eventsForUser) as $quizEvent) {
-            if ($quizEvent instanceof QuestionAsked) {
+            if ($this->isNewQuestionEvent($quizEvent)) {
                 break;
             }
-            $guesses[] = $quizEvent;
+            $answersCount++;
         }
 
-        return \count($guesses);
+        return $answersCount;
+    }
+
+    public function answersCountAll(UserId $userId): array
+    {
+        $quizEvents = $this->byUser($userId);
+
+        $answerCountAll = [];
+        $answerCount = 0;
+        foreach ($quizEvents as $quizEvent) {
+            if ($this->isNewQuestionEvent($quizEvent)) {
+                $answerCount = 0;
+                continue;
+            }
+            if ($this->isQuestionAnswered($quizEvent)) {
+                $answerCount++;
+            }
+            if ($this->isQuestionCorrectlyAnswered($quizEvent)) {
+                $answerCountAll[(string) $quizEvent->questionId()] = $answerCount;
+            }
+        }
+
+        return $answerCountAll;
     }
 
     public function correctlyAnsweredQuestionsByUser(UserId $userId): array
@@ -95,5 +117,20 @@ class InMemoryQuizEventStore implements QuizEventStore
     private function hasCompletedQuiz(array $eventsForUser): bool
     {
         return end($eventsForUser) instanceof QuizCompleted;
+    }
+
+    private function isNewQuestionEvent($quizEvent): bool
+    {
+        return $quizEvent instanceof QuestionAsked;
+    }
+
+    private function isQuestionAnswered($quizEvent): bool
+    {
+        return $quizEvent instanceof QuestionAnswered;
+    }
+
+    private function isQuestionCorrectlyAnswered($quizEvent): bool
+    {
+        return $quizEvent instanceof QuestionAnswered && $quizEvent->isCorrect();
     }
 }
