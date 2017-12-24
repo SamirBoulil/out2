@@ -66,15 +66,15 @@ class InMemoryQuizEventStore implements QuizEventStore
             return null;
         }
 
-        $guesses = 0;
+        $answersCount = 0;
         foreach (array_reverse($eventsForUser) as $quizEvent) {
             if ($this->isNewQuestionEvent($quizEvent)) {
                 break;
             }
-            $guesses++;
+            $answersCount++;
         }
 
-        return $guesses;
+        return $answersCount;
     }
 
     public function answersCountAll(UserId $userId): array

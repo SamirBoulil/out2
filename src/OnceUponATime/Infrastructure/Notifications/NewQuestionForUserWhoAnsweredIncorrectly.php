@@ -16,7 +16,7 @@ use OnceUponATime\Domain\Event\QuizEventStore;
  */
 class NewQuestionForUserWhoAnsweredIncorrectly implements QuestionAnsweredNotify
 {
-    private const MAX_GUESSES = 2;
+    private const MAX_ANSWERS = 2;
 
     /** @var QuizEventStore */
     private $quizEventStore;
@@ -42,6 +42,6 @@ class NewQuestionForUserWhoAnsweredIncorrectly implements QuestionAnsweredNotify
 
     private function tooManyTries($answersCount): bool
     {
-        return $answersCount >= self::MAX_GUESSES;
+        return $answersCount >= self::MAX_ANSWERS;
     }
 }

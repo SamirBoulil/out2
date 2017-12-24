@@ -83,9 +83,9 @@ class ShowClueHandler
         return $this->quizEventStore->answersCount($user->id());
     }
 
-    private function getClue($guessesCount, $question): Clue
+    private function getClue($questionsAnswered, $question): Clue
     {
-        if (0 === $guessesCount) {
+        if (0 === $questionsAnswered) {
             return $question->clue1();
         }
 

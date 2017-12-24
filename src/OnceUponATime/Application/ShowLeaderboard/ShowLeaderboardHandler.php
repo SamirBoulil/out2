@@ -43,9 +43,9 @@ class ShowLeaderboardHandler
     private function rankForUser(User $user): Rank
     {
         $points = 0;
-        $guessesCountForUser = $this->quizEventStore->answersCountAll($user->id());
-        foreach ($guessesCountForUser as $questionId => $guessesCount) {
-            $points += $this->pointsForAnswersCount($guessesCount);
+        $answersCountForUser = $this->quizEventStore->answersCountAll($user->id());
+        foreach ($answersCountForUser as $questionId => $answersCount) {
+            $points += $this->pointsForAnswersCount($answersCount);
         }
 
         return Rank::assign($user->id(), Points::fromInteger($points));
@@ -53,12 +53,14 @@ class ShowLeaderboardHandler
 
     /**
      * A user can earn 3 points max:
-     * - 3 points if he finds the answer without any clue (guessesCount = 1)
-     * - 2 points if he finds the answer with 1 clue (guessesCount = 2)
-     * - 1 points if he finds the answer with 2 clue (guessesCount = 3)
+     * - 3 points if he finds the answer without any clue (answersCount = 1)
+     * - 2 points if he finds the answer with 1 clue (answersCount = 2)
+     * - 1 points if he finds the answer with 2 clue (answersCount = 3)
+     *
+     * TODO: This kind of rule should probably live in the domain layer ?
      */
     private function pointsForAnswersCount(int $answersCount): int
     {
-        return 3 - ($answersCount-1);
+        return 3 - ($answersCount - 1);
     }
 }
