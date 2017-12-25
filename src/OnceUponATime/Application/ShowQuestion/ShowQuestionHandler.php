@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application\ShowQuestion;
 
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuizEventStore;
@@ -45,11 +47,11 @@ class ShowQuestionHandler
         return $this->questionRepository->byId($questionId);
     }
 
-    private function getUser($showQuestion): User
+    private function getUser(ShowQuestion $showQuestion): User
     {
-        $user = $this->userRepository->byId(UserId::fromString($showQuestion->userId));
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($showQuestion->externalUserId));
         if (null === $user) {
-            throw InvalidUserId::fromString($showQuestion->userId);
+            throw InvalidExternalUserId::fromString($showQuestion->externalUserId);
         }
 
         return $user;

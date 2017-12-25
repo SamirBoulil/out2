@@ -14,6 +14,7 @@ use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\Question\Statement;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Infrastructure\Common\OnceUponATimeApplicationContainer;
+use PHPUnit\Runner\Exception;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -84,13 +85,13 @@ class FeatureContext implements Context
     }
 
     /**
-     * @Then /^I should see the text "([^"]*)"$/
+     * @Then /^I should see the text "(.*)"$/
      */
     public function iShouldSeeTheText($expectedText)
     {
         $current = trim($this->commandTester->getDisplay());
 
-        if ($current !== $expectedText) {
+        if (false === strpos($current, $expectedText)) {
             throw new LogicException(sprintf('Current output is: "%s"', $current));
         }
     }

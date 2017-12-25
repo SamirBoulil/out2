@@ -5,8 +5,8 @@ Feature: User registration
 
   Scenario: Register a new user and show the first question
     Given the following questions:
-      | id                                   | statement                      | clue_1    | clue_2               | answer  |
-      | 7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9 | "Who is the greatest magician?" | "italian" | "it's like a hoodie" | houdini |
+      | id                                   | statement                     | clue_1  | clue_2             | answer  |
+      | 7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9 | Who is the greatest magician? | italian | it's like a hoodie | houdini |
     When I run the command "out:register" with the following arguments:
       | argument    | value           |
       | name        | samir boulil    |
@@ -15,4 +15,14 @@ Feature: User registration
     When I run the command "out:show-question" with the following arguments:
       | argument    | value           |
       | external-id | @my_external_id |
-    Then I should see the text "<info>Who is the greatest magician?</info>"
+    Then I should see the text "Who is the greatest magician?"
+
+  Scenario: Shows an error when the external user id does not exist
+    Given the following questions:
+      | id                                   | statement                     | clue_1  | clue_2             | answer  |
+      | 7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9 | Who is the greatest magician? | italian | it's like a hoodie | houdini |
+    When I run the command "out:show-question" with the following arguments:
+      | argument    | value                     |
+      | external-id | @unknown_external_user_id |
+    Then I should see the text "Sorry an error occured while trying to retrieve the question for user "@unknown_external_user_id"."
+    And I should see the text "It seems the user with external id "@unknown_external_user_id" is not registered."

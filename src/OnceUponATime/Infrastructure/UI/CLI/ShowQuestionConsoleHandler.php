@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\UI\CLI;
 
-use OnceUponATime\Application\RegisterUser\RegisterUser;
-use OnceUponATime\Application\RegisterUser\RegisterUserHandler;
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
 use Symfony\Component\Console\Command\Command;
@@ -35,8 +34,7 @@ class ShowQuestionConsoleHandler extends Command
             ->setName('out:show-question')
             ->setDescription('Shows the question a user has to answer')
             ->setHelp('This commands displays the question\'s statement')
-            ->addArgument('external-id', InputArgument::REQUIRED, 'External user id (Slack id)')
-        ;
+            ->addArgument('external-id', InputArgument::REQUIRED, 'External user id (Slack id)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -44,8 +42,30 @@ class ShowQuestionConsoleHandler extends Command
         $command = new ShowQuestion();
         $command->externalUserId = $input->getArgument('external-id');
 
-        $question = $this->showQuestionHandler->handle($command);
+        try {
+            $question = $this->showQuestionHandler->handle($command);
+        } catch (InvalidExternalUserId $e) {
+            $this->showError($e->id(), $output);
 
-        $output->writeln(sprintf('<info>%s</info>', (string) $question->statement()));
+            return;
+        }
+
+        $output->writeln(sprintf('<info>%s</info>', $question->statement()));
+    }
+
+    private function showError(string $invalidExternalId, OutputInterface $output)
+    {
+        $output->writeln(
+            sprintf(
+                '<error>Sorry an error occured while trying to retrieve the question for user "%s".</error>',
+                $invalidExternalId
+            )
+        );
+        $output->writeln(
+            sprintf(
+                '<error>It seems the user with external id "%s" is not registered.</error>',
+                $invalidExternalId
+            )
+        );
     }
 }
