@@ -11,6 +11,9 @@ use OnceUponATime\Application\AskQuestion\QuestionAskedNotify;
 use OnceUponATime\Application\AskQuestion\QuizCompletedNotify;
 use OnceUponATime\Application\RegisterUser\RegisterUserHandler;
 use OnceUponATime\Application\RegisterUser\UserRegisteredNotify;
+use OnceUponATime\Application\ShowClue\ShowClueHandler;
+use OnceUponATime\Application\ShowLeaderboard\ShowLeaderboardHandler;
+use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
@@ -67,9 +70,12 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
         /**
          * Persistence
          */
-        $containerBuilder->register(UserRepository::class, InMemoryUserRepository::class);
-        $containerBuilder->register(QuestionRepository::class, InMemoryQuestionRepository::class);
-        $containerBuilder->register(QuizEventStore::class, InMemoryQuizEventStore::class);
+        $containerBuilder->register(UserRepository::class, InMemoryUserRepository::class)
+            ->setPublic(true);
+        $containerBuilder->register(QuestionRepository::class, InMemoryQuestionRepository::class)
+            ->setPublic(true);
+        $containerBuilder->register(QuizEventStore::class, InMemoryQuizEventStore::class)
+            ->setPublic(true);
 
         /**
          * Notify
@@ -82,17 +88,17 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
 
         $containerBuilder
             ->register(QuestionAnsweredNotify::class, QuestionAnsweredNotifyMany::class)
-            ->addArgument( new Reference(PublishToEventStore::class))
-            ->addArgument( new Reference(NewQuestionForUserWhoAnsweredCorrectly::class))
-            ->addArgument( new Reference(NewQuestionForUserWhoAnsweredIncorrectly::class));
+            ->addArgument(new Reference(PublishToEventStore::class))
+            ->addArgument(new Reference(NewQuestionForUserWhoAnsweredCorrectly::class))
+            ->addArgument(new Reference(NewQuestionForUserWhoAnsweredIncorrectly::class));
         $containerBuilder->register(PublishToEventStore::class, PublishToEventStore::class)
             ->addArgument(new Reference(QuizEventStore::class));
         $containerBuilder->register(NewQuestionForUserWhoAnsweredCorrectly::class, NewQuestionForUserWhoAnsweredCorrectly::class)
-            ->addArgument( new Reference(AskQuestionHandler::class));
+            ->addArgument(new Reference(AskQuestionHandler::class));
         $containerBuilder->register(NewQuestionForUserWhoAnsweredIncorrectly::class,
             NewQuestionForUserWhoAnsweredIncorrectly::class)
-            ->addArgument( new Reference(QuizEventStore::class))
-            ->addArgument( new Reference(AskQuestionHandler::class));
+            ->addArgument(new Reference(QuizEventStore::class))
+            ->addArgument(new Reference(AskQuestionHandler::class));
 
         $containerBuilder
             ->register(QuestionAskedNotify::class, QuestionAskedNotifyMany::class)
@@ -120,22 +126,22 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             ->addArgument(new Reference(QuestionAskedNotify::class));
         $containerBuilder
             ->register(RegisterUserHandler::class, RegisterUserHandler::class)
-            ->addArgument( new Reference(UserRepository::class))
-            ->addArgument( new Reference(UserRegisteredNotify::class));
+            ->addArgument(new Reference(UserRepository::class))
+            ->addArgument(new Reference(UserRegisteredNotify::class));
         $containerBuilder
             ->register(ShowClueHandler::class, ShowClueHandler::class)
-            ->addArgument( new Reference(UserRepository::class))
-            ->addArgument( new Reference(QuestionRepository::class))
-            ->addArgument( new Reference(QuizEventStore::class));
+            ->addArgument(new Reference(UserRepository::class))
+            ->addArgument(new Reference(QuestionRepository::class))
+            ->addArgument(new Reference(QuizEventStore::class));
         $containerBuilder
             ->register(ShowLeaderboardHandler::class, ShowLeaderboardHandler::class)
-            ->addArgument( new Reference(UserRepository::class))
-            ->addArgument( new Reference(QuizEventStore::class));
+            ->addArgument(new Reference(UserRepository::class))
+            ->addArgument(new Reference(QuizEventStore::class));
         $containerBuilder
             ->register(ShowQuestionHandler::class, ShowQuestionHandler::class)
-            ->addArgument( new Reference(UserRepository::class))
-            ->addArgument( new Reference(QuestionRepository::class))
-            ->addArgument( new Reference(QuizEventStore::class));
+            ->addArgument(new Reference(UserRepository::class))
+            ->addArgument(new Reference(QuestionRepository::class))
+            ->addArgument(new Reference(QuizEventStore::class));
 
         /**
          * Command
