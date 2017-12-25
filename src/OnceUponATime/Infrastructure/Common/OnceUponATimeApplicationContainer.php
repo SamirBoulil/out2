@@ -29,6 +29,7 @@ use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use OnceUponATime\Infrastructure\UI\CLI\RegisterUserConsoleHandler;
+use OnceUponATime\Infrastructure\UI\CLI\ShowQuestionConsoleHandler;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -117,6 +118,7 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             ->addArgument(new Reference(QuestionRepository::class))
             ->addArgument(new Reference(QuizEventStore::class))
             ->addArgument(new Reference(QuestionAnsweredNotify::class));
+
         $containerBuilder
             ->register(AskQuestionHandler::class, AskQuestionHandler::class)
             ->addArgument(new Reference(UserRepository::class))
@@ -124,19 +126,23 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             ->addArgument(new Reference(QuizEventStore::class))
             ->addArgument(new Reference(QuizCompletedNotify::class))
             ->addArgument(new Reference(QuestionAskedNotify::class));
+
         $containerBuilder
             ->register(RegisterUserHandler::class, RegisterUserHandler::class)
             ->addArgument(new Reference(UserRepository::class))
             ->addArgument(new Reference(UserRegisteredNotify::class));
+
         $containerBuilder
             ->register(ShowClueHandler::class, ShowClueHandler::class)
             ->addArgument(new Reference(UserRepository::class))
             ->addArgument(new Reference(QuestionRepository::class))
             ->addArgument(new Reference(QuizEventStore::class));
+
         $containerBuilder
             ->register(ShowLeaderboardHandler::class, ShowLeaderboardHandler::class)
             ->addArgument(new Reference(UserRepository::class))
             ->addArgument(new Reference(QuizEventStore::class));
+
         $containerBuilder
             ->register(ShowQuestionHandler::class, ShowQuestionHandler::class)
             ->addArgument(new Reference(UserRepository::class))
@@ -150,12 +156,24 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             ->register(RegisterUserConsoleHandler::class, RegisterUserConsoleHandler::class)
             ->addArgument(new Reference(RegisterUserHandler::class));
 
+        $containerBuilder
+            ->register(ShowQuestionConsoleHandler::class, ShowQuestionConsoleHandler::class)
+            ->addArgument(new Reference(ShowQuestionHandler::class));
+
         /**
          * Application
          */
         $containerBuilder
             ->register(Application::class, Application::class)
-            ->addMethodCall('add', [new Reference(RegisterUserConsoleHandler::class)])
+            ->addMethodCall(
+                'addCommands',
+                [
+                    [
+                        new Reference(RegisterUserConsoleHandler::class),
+                        new Reference(ShowQuestionConsoleHandler::class),
+                    ],
+                ]
+            )
             ->setPublic(true);
 
         $containerBuilder->compile();
