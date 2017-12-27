@@ -31,7 +31,7 @@ class AskQuestionHandler
     private $quizEventStore;
 
     /** @var QuizCompletedNotify */
-    private $noQuestionsLeftNotify;
+    private $quizCompletedNotify;
 
     /** @var QuestionAskedNotify */
     private $questionAskedNotify;
@@ -40,13 +40,13 @@ class AskQuestionHandler
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
         QuizEventStore $quizEventStore,
-        QuizCompletedNotify $noQuestionsLeftNotify,
+        QuizCompletedNotify $quizCompletedNotify,
         QuestionAskedNotify $questionAskedNotify
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;
         $this->quizEventStore = $quizEventStore;
-        $this->noQuestionsLeftNotify = $noQuestionsLeftNotify;
+        $this->quizCompletedNotify = $quizCompletedNotify;
         $this->questionAskedNotify = $questionAskedNotify;
     }
 
@@ -55,7 +55,7 @@ class AskQuestionHandler
         $user = $this->getUser($nextQuestion);
         $unansweredQuestions = $this->findUnansweredQuestions($user->id());
         if (empty($unansweredQuestions)) {
-            $this->noQuestionsLeftNotify->quizCompleted(new QuizCompleted($user->id()));
+            $this->quizCompletedNotify->quizCompleted(new QuizCompleted($user->id()));
 
             return null;
         }

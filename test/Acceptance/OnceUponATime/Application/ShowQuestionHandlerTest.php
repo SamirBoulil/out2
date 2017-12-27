@@ -73,7 +73,7 @@ class ShowQuestionHandlerTest extends TestCase
     public function it_shows_the_current_question_of_the_user()
     {
         $showQuestion = new ShowQuestion();
-        $showQuestion->userId = self::USER_ID;
+        $showQuestion->externalUserId = self::USER_ID;
         $question = $this->showQuestionHandler->handle($showQuestion);
         $this->assertTrue(QuestionId::fromString(self::QUESTION_ID)->equals($question->id()));
     }
@@ -85,7 +85,7 @@ class ShowQuestionHandlerTest extends TestCase
     {
         $this->expectException(InvalidUserId::class);
         $showQuestion = new ShowQuestion();
-        $showQuestion->userId = '00000000-0000-0000-0000-000000000000';
+        $showQuestion->externalUserId = '00000000-0000-0000-0000-000000000000';
         $this->showQuestionHandler->handle($showQuestion);
     }
 }

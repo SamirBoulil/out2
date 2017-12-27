@@ -30,11 +30,20 @@ class RegisterUserHandler
 
     public function register(RegisterUser $registerUser): void
     {
-        $externalUserId = ExternalUserId::fromString($registerUser->externalUserId);
-        $name = Name::fromString($registerUser->name);
-        $userId = $this->userRepository->nextIdentity();
-        $user = User::register($userId, $externalUserId, $name);
+        $user = $this->createNewUser($registerUser);
         $this->userRepository->add($user);
-        $this->notify->userRegistered(new UserRegistered($userId, $name));
+        $this->notify->userRegistered(new UserRegistered($user->id(), $user->name()));
+    }
+
+    private function createNewUser(RegisterUser $registerUser): User
+    {
+        $userId = $this->userRepository->nextIdentity();
+        $user = User::register(
+            $userId,
+            ExternalUserId::fromString($registerUser->externalUserId),
+            Name::fromString($registerUser->name)
+        );
+
+        return $user;
     }
 }

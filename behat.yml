@@ -1,0 +1,6 @@
+default:
+    suites:
+        acceptance:
+            paths: [ "%paths.base%/test/System/CLI/features"]
+            contexts:
+                - Tests\System\CLI\FeatureContext
