@@ -6,6 +6,8 @@ namespace OnceUponATime\Infrastructure\UI\CLI;
 
 use OnceUponATime\Application\RegisterUser\RegisterUser;
 use OnceUponATime\Application\RegisterUser\RegisterUserHandler;
+use OnceUponATime\Application\ShowQuestion\ShowQuestion;
+use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,9 +22,13 @@ class RegisterUserConsoleHandler extends Command
     /** @var RegisterUserHandler */
     private $registerUserHandler;
 
-    public function __construct(RegisterUserHandler $showQuestionHandler)
+    /** @var ShowQuestionHandler */
+    private $showQuestionHandler;
+
+    public function __construct(RegisterUserHandler $registerUserHandler, ShowQuestionHandler $showQuestionHandler)
     {
-        $this->registerUserHandler = $showQuestionHandler;
+        $this->registerUserHandler = $registerUserHandler;
+        $this->showQuestionHandler = $showQuestionHandler;
 
         parent::__construct();
     }
@@ -40,12 +46,32 @@ class RegisterUserConsoleHandler extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->registerUser($input->getArgument('name'), $input->getArgument('external-id'), $output);
+        $this->showFirstQuestion($input->getArgument('external-id'), $output);
+    }
+
+    /**
+     * @param $name
+     * @param $externalUserId
+     *
+     */
+    protected function registerUser(string $name, string $externalUserId, OutputInterface $output): void
+    {
         $command = new RegisterUser();
-        $command->name = $input->getArgument('name');
-        $command->externalUserId = $input->getArgument('external-id');
-
+        $command->name = $name;
+        $command->externalUserId = $externalUserId;
         $this->registerUserHandler->register($command);
+        $output->writeln('<info>You are successfully registered!</info>');
+    }
 
-        $output->writeln('<success>You are successfully registered</success>');
+    private function showFirstQuestion(string $externalUserId, OutputInterface $output)
+    {
+        $command = new ShowQuestion();
+        $command->externalUserId = $externalUserId;
+
+        $question = $this->showQuestionHandler->handle($command);
+
+        $output->writeln('<info>Here is your first question:</info>');
+        $output->writeln(sprintf('<info>%s</info>', $question->statement()));
     }
 }

@@ -21,9 +21,9 @@ class ShowQuestionConsoleHandler extends Command
     /** @var ShowQuestionHandler */
     private $showQuestionHandler;
 
-    public function __construct(ShowQuestionHandler $showQuestionHandler)
+    public function __construct(ShowQuestionHandler $registerUserHandler)
     {
-        $this->showQuestionHandler = $showQuestionHandler;
+        $this->showQuestionHandler = $registerUserHandler;
 
         parent::__construct();
     }
