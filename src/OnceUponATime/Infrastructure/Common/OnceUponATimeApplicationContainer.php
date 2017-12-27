@@ -41,6 +41,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class OnceUponATimeApplicationContainer implements ContainerInterface
 {
+    /** @var ContainerInterface */
+    protected $container;
+
     public function __construct()
     {
         $this->container = $this->buildContainer();

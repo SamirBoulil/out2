@@ -33,7 +33,7 @@ class RegisterUserConsoleHandler extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('out:register')
@@ -44,17 +44,12 @@ class RegisterUserConsoleHandler extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->registerUser($input->getArgument('name'), $input->getArgument('external-id'), $output);
         $this->showFirstQuestion($input->getArgument('external-id'), $output);
     }
 
-    /**
-     * @param $name
-     * @param $externalUserId
-     *
-     */
     protected function registerUser(string $name, string $externalUserId, OutputInterface $output): void
     {
         $command = new RegisterUser();
@@ -64,7 +59,7 @@ class RegisterUserConsoleHandler extends Command
         $output->writeln('<info>You are successfully registered!</info>');
     }
 
-    private function showFirstQuestion(string $externalUserId, OutputInterface $output)
+    private function showFirstQuestion(string $externalUserId, OutputInterface $output): void
     {
         $command = new ShowQuestion();
         $command->externalUserId = $externalUserId;

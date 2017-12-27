@@ -28,7 +28,7 @@ class ShowQuestionConsoleHandler extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('out:show-question')
@@ -37,7 +37,7 @@ class ShowQuestionConsoleHandler extends Command
             ->addArgument('external-id', InputArgument::REQUIRED, 'External user id (Slack id)');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $command = new ShowQuestion();
         $command->externalUserId = $input->getArgument('external-id');
@@ -53,7 +53,7 @@ class ShowQuestionConsoleHandler extends Command
         $output->writeln(sprintf('<info>%s</info>', $question->statement()));
     }
 
-    private function showError(string $invalidExternalId, OutputInterface $output)
+    private function showError(string $invalidExternalId, OutputInterface $output): void
     {
         $output->writeln(
             sprintf(
