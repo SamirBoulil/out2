@@ -33,7 +33,7 @@ class NewQuestionForNewUser implements UserRegisteredNotify
     private function askNewQuestion(UserRegistered $event): void
     {
         $nextQuestion = new AskQuestion();
-        $nextQuestion->userId = (string) $event->userId();
+        $nextQuestion->externalUserId = (string) $event->userId();
         $this->nextQuestionHandler->handle($nextQuestion);
     }
 }

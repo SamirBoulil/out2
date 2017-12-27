@@ -28,6 +28,7 @@ use OnceUponATime\Infrastructure\Notifications\UserRegisteredNotifyMany;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
+use OnceUponATime\Infrastructure\UI\CLI\AnswerQuestionConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\RegisterUserConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\ShowQuestionConsoleHandler;
 use Psr\Container\ContainerInterface;
@@ -89,9 +90,13 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
 
         $containerBuilder
             ->register(QuestionAnsweredNotify::class, QuestionAnsweredNotifyMany::class)
-            ->addArgument(new Reference(PublishToEventStore::class))
-            ->addArgument(new Reference(NewQuestionForUserWhoAnsweredCorrectly::class))
-            ->addArgument(new Reference(NewQuestionForUserWhoAnsweredIncorrectly::class));
+            ->addArgument(
+                [
+                    new Reference(PublishToEventStore::class),
+                    new Reference(NewQuestionForUserWhoAnsweredCorrectly::class),
+                    new Reference(NewQuestionForUserWhoAnsweredIncorrectly::class),
+                ]
+            );
         $containerBuilder->register(PublishToEventStore::class, PublishToEventStore::class)
             ->addArgument(new Reference(QuizEventStore::class));
         $containerBuilder->register(NewQuestionForUserWhoAnsweredCorrectly::class, NewQuestionForUserWhoAnsweredCorrectly::class)
@@ -161,6 +166,11 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             ->register(ShowQuestionConsoleHandler::class, ShowQuestionConsoleHandler::class)
             ->addArgument(new Reference(ShowQuestionHandler::class));
 
+        $containerBuilder
+            ->register(AnswerQuestionConsoleHandler::class, AnswerQuestionConsoleHandler::class)
+            ->addArgument(new Reference(AnswerQuestionHandler::class))
+            ->addArgument(new Reference(AskQuestionHandler::class));
+
         /**
          * Application
          */
@@ -172,6 +182,7 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
                     [
                         new Reference(RegisterUserConsoleHandler::class),
                         new Reference(ShowQuestionConsoleHandler::class),
+                        new Reference(AnswerQuestionConsoleHandler::class),
                     ],
                 ]
             )

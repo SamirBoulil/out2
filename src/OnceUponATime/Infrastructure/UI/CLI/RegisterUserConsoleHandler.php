@@ -63,9 +63,7 @@ class RegisterUserConsoleHandler extends Command
     {
         $command = new ShowQuestion();
         $command->externalUserId = $externalUserId;
-
         $question = $this->showQuestionHandler->handle($command);
-
         $output->writeln('<info>Here is your first question:</info>');
         $output->writeln(sprintf('<info>%s</info>', $question->statement()));
     }

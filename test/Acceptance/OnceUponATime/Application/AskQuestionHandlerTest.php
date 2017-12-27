@@ -129,7 +129,7 @@ class AskQuestionHandlerTest extends TestCase
     private function getNextQuestion(string $userId): ?Question
     {
         $nextQuestion = new AskQuestion();
-        $nextQuestion->userId = $userId;
+        $nextQuestion->externalUserId = $userId;
         $nextQuestionHandler = new AskQuestionHandler(
             $this->userRepository,
             $this->questionRepository,

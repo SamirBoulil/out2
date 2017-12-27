@@ -11,5 +11,5 @@ namespace OnceUponATime\Application\AskQuestion;
 class AskQuestion
 {
     /** @var string */
-    public $userId;
+    public $externalUserId;
 }

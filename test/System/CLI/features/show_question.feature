@@ -14,7 +14,7 @@ Feature: Show the question
       | type          | user_id                              | question_id                          |
       | questionAsked | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |
 
-  Scenario: Register a new user and show the first question
+  Scenario: Show the question the user has to answer
     When I run the command "out:show-question" with the following arguments:
       | argument    | value           |
       | external-id | @my_external_id |

@@ -6,6 +6,7 @@ namespace OnceUponATime\Application\AskQuestion;
 
 use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
@@ -67,9 +68,9 @@ class AskQuestionHandler
 
     private function getUser(AskQuestion $nextQuestion): User
     {
-        $user = $this->userRepository->byId(UserId::fromString($nextQuestion->userId));
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($nextQuestion->externalUserId));
         if (null === $user) {
-            throw InvalidUserId::fromString($nextQuestion->userId);
+            throw InvalidUserId::fromString($nextQuestion->externalUserId);
         }
 
         return $user;

@@ -33,7 +33,7 @@ class NewQuestionForUserWhoAnsweredCorrectly implements QuestionAnsweredNotify
     private function askNewQuestion(QuestionAnswered $event): void
     {
         $nextQuestion = new AskQuestion();
-        $nextQuestion->userId = (string) $event->userId();
+        $nextQuestion->externalUserId = (string) $event->userId();
         $this->askQuestionHandler->handle($nextQuestion);
     }
 }

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application\AnswerQuestion;
 
-use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
-use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
@@ -62,14 +62,13 @@ class AnswerQuestionHandler
     }
 
     /**
-     * @throws InvalidUserId
+     * @throws InvalidExternalUserId
      */
     private function getUser(AnswerQuestion $answerQuestion): User
     {
-        $userId = UserId::fromString($answerQuestion->userId);
-        $user = $this->userRepository->byId($userId);
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($answerQuestion->externalUserId));
         if (null === $user) {
-            throw InvalidUserId::fromString($answerQuestion->userId);
+            throw InvalidExternalUserId::fromString($answerQuestion->externalUserId);
         }
 
         return $user;

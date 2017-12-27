@@ -35,7 +35,7 @@ class NewQuestionForUserWhoAnsweredIncorrectly implements QuestionAnsweredNotify
         $answersCount = $this->quizEventStore->answersCount($event->userId());
         if ($this->tooManyTries($answersCount)) {
             $newQuestionForUser = new AskQuestion();
-            $newQuestionForUser->userId = (string) $event->userId();
+            $newQuestionForUser->externalUserId = (string) $event->userId();
             $this->askQuestionHandler->handle($newQuestionForUser);
         }
     }
