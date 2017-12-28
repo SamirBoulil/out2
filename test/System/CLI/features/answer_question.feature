@@ -21,7 +21,7 @@ Feature: Answer the question
       | external-id | @my_external_id |
       | answer      | houdini         |
     Then I should see the text "Correct! Well done!"
-    Then I should see the text "Here is a new question for you:"
+    And I should see the text "Here is a new question for you:"
     And I should see the text "Who is the strongest athelete?"
 
 #  Scenario: Answering incorrectly the question will show the first clue

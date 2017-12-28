@@ -11,7 +11,7 @@ namespace OnceUponATime\Application\AnswerQuestion;
 class AnswerQuestion
 {
     /** @var string */
-    public $externalUserId;
+    public $userId;
 
     /** @var string */
     public $answer;

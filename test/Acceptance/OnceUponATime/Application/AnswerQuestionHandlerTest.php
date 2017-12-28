@@ -87,7 +87,7 @@ class AnswerQuestionHandlerTest extends TestCase
     public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_correct()
     {
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->externalUserId = self::USER_ID;
+        $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@wrong_answer>';
 
         $this->assertFalse($this->answerQuestionHandler->handle($answerQuestion));
@@ -100,7 +100,7 @@ class AnswerQuestionHandlerTest extends TestCase
     public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_incorrect()
     {
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->externalUserId = self::USER_ID;
+        $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@right_answer>';
 
         $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
@@ -113,7 +113,7 @@ class AnswerQuestionHandlerTest extends TestCase
     public function it_throws_if_the_user_id_is_not_found()
     {
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->externalUserId = '00000000-0000-0000-0000-000000000000';
+        $answerQuestion->userId = '00000000-0000-0000-0000-000000000000';
         $answerQuestion->answer = '<@right_answer>';
         $this->expectException(InvalidUserId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
@@ -125,7 +125,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $this->expectException(NoQuestionToAnswer::class);
         $this->quizEventStore->add(new QuizCompleted(UserId::fromString(self::USER_ID)));
         $answerQuestion = new AnswerQuestion();
-        $answerQuestion->externalUserId = self::USER_ID;
+        $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@an_answer>';
         $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
     }

@@ -8,8 +8,8 @@ use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Question;
-use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
@@ -66,9 +66,9 @@ class AnswerQuestionHandler
      */
     private function getUser(AnswerQuestion $answerQuestion): User
     {
-        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($answerQuestion->externalUserId));
+        $user = $this->userRepository->byId(UserId::fromString($answerQuestion->userId));
         if (null === $user) {
-            throw InvalidExternalUserId::fromString($answerQuestion->externalUserId);
+            throw InvalidExternalUserId::fromString($answerQuestion->userId);
         }
 
         return $user;

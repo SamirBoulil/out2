@@ -6,9 +6,12 @@ namespace OnceUponATime\Infrastructure\UI\CLI;
 
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
-use OnceUponATime\Application\AskQuestion\AskQuestion;
 use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
-use OnceUponATime\Application\InvalidExternalUserId;
+use OnceUponATime\Application\ShowQuestion\ShowQuestion;
+use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Repository\UserRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,15 +26,21 @@ class AnswerQuestionConsoleHandler extends Command
     /** @var AnswerQuestionHandler */
     private $answerQuestionHandler;
 
-    /** @var AskQuestionHandler */
-    private $askQuestionHandler;
+    /** @var ShowQuestionHandler */
+    private $showQuestionHandler;
 
-    public function __construct(AnswerQuestionHandler $answerQuestionHandler, AskQuestionHandler $askQuestionHandler)
-    {
-        $this->answerQuestionHandler = $answerQuestionHandler;
+    /** @var UserRepository */
+    private $userRepository;
 
+    public function __construct(
+        AnswerQuestionHandler $answerQuestionHandler,
+        ShowQuestionHandler $showQuestionHandler,
+        UserRepository $userRepository
+    ) {
         parent::__construct();
-        $this->askQuestionHandler = $askQuestionHandler;
+        $this->answerQuestionHandler = $answerQuestionHandler;
+        $this->showQuestionHandler = $showQuestionHandler;
+        $this->userRepository = $userRepository;
     }
 
     protected function configure(): void
@@ -46,19 +55,19 @@ class AnswerQuestionConsoleHandler extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        try {
-            $isCorrect = $this->answerQuestion($input);
-        } catch (InvalidExternalUserId $e) {
-            $this->showError($e->id(), $output);
+        $externalId = $input->getArgument('external-id');
+        $answer = $input->getArgument('answer');
+        $user = $this->getUser($externalId, $output);
+        if (null === $user) {
+            $this->showError($externalId, $output);
 
             return;
         }
-
-        if (true === $isCorrect) {
+        if ($this->isAnswerCorrect($user, $answer)) {
             $output->writeln('<info>Correct! Well done!</info>');
-            $askQuestion = new AskQuestion();
-            $askQuestion->externalUserId = $input->getArgument('external-id');
-            $question = $this->askQuestionHandler->handle($askQuestion);
+            $showQuestion = new ShowQuestion();
+            $showQuestion->userId = (string) $user->id();
+            $question = $this->showQuestionHandler->handle($showQuestion);
             if (null !== $question) {
                 $output->writeln('Here is a new question for you:');
                 $output->writeln(sprintf('<info>%s</info>', $question->statement()));
@@ -66,6 +75,16 @@ class AnswerQuestionConsoleHandler extends Command
 //                $output->writeln('<info>Well done! You have successfully completed the quiz!</info>');
             }
         }
+    }
+
+    private function getUser(string $externalId, OutputInterface $output): ?User
+    {
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalId));
+        if (null === $user) {
+            $this->showError($externalId, $output);
+        }
+
+        return $user;
     }
 
     private function showError(string $invalidExternalId, OutputInterface $output): void
@@ -84,18 +103,11 @@ class AnswerQuestionConsoleHandler extends Command
         );
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return \OnceUponATime\Domain\Entity\Question\Question
-     *
-     */
-    protected function answerQuestion(InputInterface $input): \OnceUponATime\Domain\Entity\Question\Question
+    private function isAnswerCorrect(User $user, string $answer): bool
     {
         $command = new AnswerQuestion();
-        $command->externalUserId = $input->getArgument('external-id');
-        $command->answer = $input->getArgument('answer');
-
+        $command->userId = (string) $user->id();
+        $command->answer = $answer;
         $isCorrect = $this->answerQuestionHandler->handle($command);
 
         return $isCorrect;
