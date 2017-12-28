@@ -28,7 +28,7 @@ class PointsTest extends TestCase
      */
     public function it_should_be_constructed_from_an_integer()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         Points::fromInteger('wrong_input');
     }
 

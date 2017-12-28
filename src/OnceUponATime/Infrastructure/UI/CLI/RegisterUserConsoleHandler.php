@@ -8,6 +8,8 @@ use OnceUponATime\Application\RegisterUser\RegisterUser;
 use OnceUponATime\Application\RegisterUser\RegisterUserHandler;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Repository\UserRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,13 +26,20 @@ class RegisterUserConsoleHandler extends Command
 
     /** @var ShowQuestionHandler */
     private $showQuestionHandler;
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
 
-    public function __construct(RegisterUserHandler $registerUserHandler, ShowQuestionHandler $showQuestionHandler)
-    {
+    public function __construct(
+        RegisterUserHandler $registerUserHandler,
+        ShowQuestionHandler $showQuestionHandler,
+        UserRepository $userRepository
+    ) {
+        parent::__construct();
         $this->registerUserHandler = $registerUserHandler;
         $this->showQuestionHandler = $showQuestionHandler;
-
-        parent::__construct();
+        $this->userRepository = $userRepository;
     }
 
     protected function configure(): void
@@ -61,8 +70,9 @@ class RegisterUserConsoleHandler extends Command
 
     private function showFirstQuestion(string $externalUserId, OutputInterface $output): void
     {
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalUserId));
         $command = new ShowQuestion();
-        $command->externalUserId = $externalUserId;
+        $command->userId = (string) $user->id();
         $question = $this->showQuestionHandler->handle($command);
         $output->writeln('<info>Here is your first question:</info>');
         $output->writeln(sprintf('<info>%s</info>', $question->statement()));

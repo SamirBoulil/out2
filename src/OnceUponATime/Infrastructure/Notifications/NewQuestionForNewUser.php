@@ -18,11 +18,11 @@ use OnceUponATime\Domain\Event\UserRegistered;
 class NewQuestionForNewUser implements UserRegisteredNotify
 {
     /** @var AskQuestionHandler */
-    private $nextQuestionHandler;
+    private $askQuestionHandler;
 
-    public function __construct(AskQuestionHandler $nextQuestionHandler)
+    public function __construct(AskQuestionHandler $askQuestionHandler)
     {
-        $this->nextQuestionHandler = $nextQuestionHandler;
+        $this->askQuestionHandler = $askQuestionHandler;
     }
 
     public function userRegistered(UserRegistered $event): void
@@ -32,8 +32,8 @@ class NewQuestionForNewUser implements UserRegisteredNotify
 
     private function askNewQuestion(UserRegistered $event): void
     {
-        $nextQuestion = new AskQuestion();
-        $nextQuestion->externalUserId = (string) $event->userId();
-        $this->nextQuestionHandler->handle($nextQuestion);
+        $askQuestion = new AskQuestion();
+        $askQuestion->userId = (string) $event->userId();
+        $this->askQuestionHandler->handle($askQuestion);
     }
 }
