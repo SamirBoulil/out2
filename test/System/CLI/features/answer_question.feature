@@ -23,6 +23,11 @@ Feature: Answer the question
     Then I should see the text "Correct! Well done!"
     And I should see the text "Here is a new question for you:"
     And I should see the text "Who is the strongest athelete?"
+    And there should be the following events in the event store:
+      | type             | user_id                              | question_id                          | is_correct |
+      | questionAsked    | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |            |
+      | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | true       |
+      | questionAsked    | 22222222-2222-2222-2222-222222222222 | BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB |            |
 
 #  Scenario: Answering incorrectly the question will show the first clue
 #    When I run the command "out:answer-question" with the following arguments:

@@ -16,6 +16,7 @@ use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
+use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizEvent;
 use OnceUponATime\Domain\Event\QuizEventStore;
@@ -148,6 +149,77 @@ class FeatureContext implements Context
             UserId::fromString($event['user_id']),
             QuestionId::fromString($event['question_id'])
         );
+
         return $questionAsked;
+    }
+
+    /**
+     * @Given /^there should be the following events in the event store:$/
+     */
+    public function thereShouldBeTheFollowingEventsInTheEventStore(TableNode $expectedEvents)
+    {
+        $events = $this->getEvents();
+        foreach ($expectedEvents->getHash() as $i => $expectedEvent) {
+            $this->assertSameEvent($expectedEvent, $events[$i]);
+        }
+    }
+
+    private function getEvents(): array
+    {
+        return $this->container->get(QuizEventStore::class)->all();
+    }
+
+    private function assertSameEvent(array $expectedEvent, QuizEvent $event)
+    {
+        $this->assertEventType($expectedEvent, $event);
+        if (isset($expectedEvent['user_id'])) {
+            $this->assertUserId($expectedEvent['user_id'], $event);
+        }
+        if (isset($expectedEvent['question_id'])) {
+            $this->assertQuestionId($expectedEvent['question_id'], $event);
+        }
+        if (isset($expectedEvent['is_correct']) && '' !== $expectedEvent['is_correct']) {
+            $this->assertIsCorrect($expectedEvent['is_correct'], $event);
+        }
+    }
+
+    private function assertEventType(array $expectedEvent, QuizEvent $event): void
+    {
+        if (('questionAsked' === $expectedEvent['type'] && !$event instanceof QuestionAsked) ||
+            ('questionAnswered' === $expectedEvent['type'] && !$event instanceof QuestionAnswered)
+        ) {
+            throw new \LogicException(
+                sprintf('Expected event of type "%s", "%s" given', $expectedEvent['type'], get_class($event))
+            );
+        }
+    }
+
+    private function assertUserId(string $expectedUserId, QuizEvent $event): void
+    {
+        if ($expectedUserId !== (string) $event->userId()) {
+            throw new \LogicException(
+                sprintf('Expeceted user_id "%s", "%s" given', $expectedUserId, $event->userId())
+            );
+        }
+    }
+
+    private function assertQuestionId(string $expectedQuestionId, QuizEvent $event): void
+    {
+        if ($expectedQuestionId !== (string) $event->questionId()) {
+            throw new \LogicException(
+                sprintf('Expeceted user_id "%s", "%s" given', $expectedQuestionId, $event->questionId())
+            );
+        }
+    }
+
+    private function assertIsCorrect(string $expectedIsCorrect, QuestionAnswered $event)
+    {
+        if (($expectedIsCorrect === 'true' && false === $event->isCorrect()) ||
+            ($expectedIsCorrect === 'false' && true === $event->isCorrect())
+        ) {
+            throw new \LogicException(
+                sprintf('Expeceted is_correct "%s", "%s" given', $expectedIsCorrect, $event->isCorrect())
+            );
+        }
     }
 }
