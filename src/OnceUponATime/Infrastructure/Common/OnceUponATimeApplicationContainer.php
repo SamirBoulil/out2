@@ -170,9 +170,10 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
 
         $containerBuilder
             ->register(AnswerQuestionConsoleHandler::class, AnswerQuestionConsoleHandler::class)
+            ->addArgument(new Reference(UserRepository::class))
             ->addArgument(new Reference(AnswerQuestionHandler::class))
             ->addArgument(new Reference(ShowQuestionHandler::class))
-            ->addArgument(new Reference(UserRepository::class));
+            ->addArgument(new Reference(ShowClueHandler::class));
 
         /**
          * Application

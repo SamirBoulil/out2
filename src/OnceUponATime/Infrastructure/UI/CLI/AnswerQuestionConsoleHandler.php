@@ -7,6 +7,8 @@ namespace OnceUponATime\Infrastructure\UI\CLI;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
 use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
+use OnceUponATime\Application\ShowClue\ShowClue;
+use OnceUponATime\Application\ShowClue\ShowClueHandler;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
@@ -32,15 +34,20 @@ class AnswerQuestionConsoleHandler extends Command
     /** @var UserRepository */
     private $userRepository;
 
+    /** @var ShowClueHandler */
+    private $showClueHandler;
+
     public function __construct(
+        UserRepository $userRepository,
         AnswerQuestionHandler $answerQuestionHandler,
         ShowQuestionHandler $showQuestionHandler,
-        UserRepository $userRepository
+        ShowClueHandler $showClueHandler
     ) {
         parent::__construct();
+        $this->userRepository = $userRepository;
         $this->answerQuestionHandler = $answerQuestionHandler;
         $this->showQuestionHandler = $showQuestionHandler;
-        $this->userRepository = $userRepository;
+        $this->showClueHandler = $showClueHandler;
     }
 
     protected function configure(): void
@@ -72,8 +79,15 @@ class AnswerQuestionConsoleHandler extends Command
                 $output->writeln('Here is a new question for you:');
                 $output->writeln(sprintf('<info>%s</info>', $question->statement()));
             } else {
-//                $output->writeln('<info>Well done! You have successfully completed the quiz!</info>');
+                $output->writeln('<info>Congratulations you completed the quiz!</info>');
             }
+        } else {
+            $output->writeln('Incorrect answer!');
+            $output->writeln('Here is a clue:');
+            $showClue = new ShowClue();
+            $showClue->userId = (string) $user->id();
+            $clue = $this->showClueHandler->handle($showClue);
+            $output->writeln(sprintf('Clue: %s', (string) $clue));
         }
     }
 

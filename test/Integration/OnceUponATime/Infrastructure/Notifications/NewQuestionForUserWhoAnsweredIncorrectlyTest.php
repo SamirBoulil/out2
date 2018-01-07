@@ -72,16 +72,16 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTest extends TestCase
     /**
      * @test
      */
-    public function it_adds_a_new_question_event_in_the_quiz_event_store_when_the_user_answers_incorrectly_too_many_times()
+    public function it_adds_a_new_question_event_in_the_quiz_event_store_when_the_user_answers_incorrectly_three_times()
     {
         $userId = UserId::fromString(self::USER_ID);
         $questionId = QuestionId::fromString(self::QUESTION_ID);
 
-        $this->userAnsweredIncorrectlyTimes($userId, $questionId, 2);
-        $this->userAnswersIncorrectly($userId, $questionId);
+        $this->userAnsweredIncorrectlyTimes($userId, $questionId, 3);
+        $this->triggerEvent($userId, $questionId);
 
         $quizEvents = $this->quizEventStore->byUser($userId);
-        $this->assertCount(4, $quizEvents);
+        $this->assertCount(5, $quizEvents);
         $lastEvent = end($quizEvents);
         $this->assertInstanceOf(QuestionAsked::class, $lastEvent);
     }
@@ -97,7 +97,7 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTest extends TestCase
         $this->quizEventStore->add(new QuestionAsked($userId, $questionId));
         $this->quizEventStore->add(new QuestionAnswered($userId, $questionId, false));
 
-        $this->userAnswersIncorrectly($userId, $questionId);
+        $this->triggerEvent($userId, $questionId);
 
         $quizEvents = $this->quizEventStore->byUser($userId);
         $lastEvent = end($quizEvents);
@@ -112,7 +112,7 @@ class NewQuestionForUserWhoAnsweredIncorrectlyTest extends TestCase
         }
     }
 
-    private function userAnswersIncorrectly(UserId $userId, QuestionId $questionId): void
+    private function triggerEvent(UserId $userId, QuestionId $questionId): void
     {
         $lastTry = new QuestionAnswered($userId, $questionId, false);
         $handler = new NewQuestionForUserWhoAnsweredIncorrectly($this->quizEventStore, $this->askQuestionHandler);
