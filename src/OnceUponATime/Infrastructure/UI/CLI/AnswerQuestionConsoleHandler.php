@@ -11,6 +11,7 @@ use OnceUponATime\Application\ShowClue\ShowClue;
 use OnceUponATime\Application\ShowClue\ShowClueHandler;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
+use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Repository\UserRepository;
@@ -71,23 +72,9 @@ class AnswerQuestionConsoleHandler extends Command
             return;
         }
         if ($this->isAnswerCorrect($user, $answer)) {
-            $output->writeln('<info>Correct! Well done!</info>');
-            $showQuestion = new ShowQuestion();
-            $showQuestion->userId = (string) $user->id();
-            $question = $this->showQuestionHandler->handle($showQuestion);
-            if (null !== $question) {
-                $output->writeln('Here is a new question for you:');
-                $output->writeln(sprintf('<info>%s</info>', $question->statement()));
-            } else {
-                $output->writeln('<info>Congratulations you completed the quiz!</info>');
-            }
+            $this->displayNextQuestion($output, $user);
         } else {
-            $output->writeln('Incorrect answer!');
-            $output->writeln('Here is a clue:');
-            $showClue = new ShowClue();
-            $showClue->userId = (string) $user->id();
-            $clue = $this->showClueHandler->handle($showClue);
-            $output->writeln(sprintf('Clue: %s', (string) $clue));
+            $this->displayNextClue($output, $user);
         }
     }
 
@@ -125,5 +112,35 @@ class AnswerQuestionConsoleHandler extends Command
         $isCorrect = $this->answerQuestionHandler->handle($command);
 
         return $isCorrect;
+    }
+
+    private function displayNextQuestion(OutputInterface $output, $user): void
+    {
+        $question = $this->getNextQuestion($output, $user);
+        if (null !== $question) {
+            $output->writeln('Here is a new question for you:');
+            $output->writeln(sprintf('<info>%s</info>', $question->statement()));
+        } else {
+            $output->writeln('<info>Congratulations you completed the quiz!</info>');
+        }
+    }
+
+    private function getNextQuestion(OutputInterface $output, $user): ?Question
+    {
+        $output->writeln('<info>Correct! Well done!</info>');
+        $showQuestion = new ShowQuestion();
+        $showQuestion->userId = (string) $user->id();
+
+        return $this->showQuestionHandler->handle($showQuestion);
+    }
+
+    protected function displayNextClue(OutputInterface $output, $user): void
+    {
+        $output->writeln('Incorrect answer!');
+        $output->writeln('Here is a clue:');
+        $showClue = new ShowClue();
+        $showClue->userId = (string) $user->id();
+        $clue = $this->showClueHandler->handle($showClue);
+        $output->writeln(sprintf('Clue: %s', (string) $clue));
     }
 }

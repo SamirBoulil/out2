@@ -7,6 +7,7 @@ namespace OnceUponATime\Infrastructure\UI\CLI;
 use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
+use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Repository\UserRepository;
@@ -85,18 +86,11 @@ class ShowQuestionConsoleHandler extends Command
         );
     }
 
-    /**
-     * @param User $user
-     *
-     * @return null|\OnceUponATime\Domain\Entity\Question\Question
-     *
-     */
-    private function getQuestion(User $user)
+    private function getQuestion(User $user): ?Question
     {
         $command = new ShowQuestion();
         $command->userId = (string) $user->id();
-        $question = $this->showQuestionHandler->handle($command);
 
-        return $question;
+        return $this->showQuestionHandler->handle($command);
     }
 }
