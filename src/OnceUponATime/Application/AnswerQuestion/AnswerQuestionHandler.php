@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Application\AnswerQuestion;
 
-use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -62,14 +62,13 @@ class AnswerQuestionHandler
     }
 
     /**
-     * @throws InvalidUserId
+     * @throws InvalidExternalUserId
      */
     private function getUser(AnswerQuestion $answerQuestion): User
     {
-        $userId = UserId::fromString($answerQuestion->userId);
-        $user = $this->userRepository->byId($userId);
+        $user = $this->userRepository->byId(UserId::fromString($answerQuestion->userId));
         if (null === $user) {
-            throw InvalidUserId::fromString($answerQuestion->userId);
+            throw InvalidExternalUserId::fromString($answerQuestion->userId);
         }
 
         return $user;

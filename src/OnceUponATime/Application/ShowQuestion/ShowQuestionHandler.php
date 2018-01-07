@@ -39,19 +39,22 @@ class ShowQuestionHandler
         $this->quizEventStore = $quizEventStore;
     }
 
-    public function handle($showQuestion): Question
+    public function handle($showQuestion): ?Question
     {
         $user = $this->getUser($showQuestion);
         $questionId = $this->quizEventStore->questionToAnswerForUser($user->id());
+        if (null === $questionId) {
+            return null;
+        }
 
         return $this->questionRepository->byId($questionId);
     }
 
     private function getUser(ShowQuestion $showQuestion): User
     {
-        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($showQuestion->externalUserId));
+        $user = $this->userRepository->byId(UserId::fromString($showQuestion->userId));
         if (null === $user) {
-            throw InvalidExternalUserId::fromString($showQuestion->externalUserId);
+            throw InvalidExternalUserId::fromString($showQuestion->userId);
         }
 
         return $user;

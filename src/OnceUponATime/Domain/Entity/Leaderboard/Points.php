@@ -15,7 +15,7 @@ class Points
     /** @var int */
     private $total;
 
-    public static function fromInteger($total): Points
+    public static function fromInteger(int $total): Points
     {
         Assertion::integer($total);
 

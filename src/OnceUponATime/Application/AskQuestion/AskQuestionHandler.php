@@ -8,7 +8,6 @@ use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
-use OnceUponATime\Domain\Event\QuestionAnswered;
 use OnceUponATime\Domain\Event\QuestionAsked;
 use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEventStore;
@@ -50,9 +49,9 @@ class AskQuestionHandler
         $this->questionAskedNotify = $questionAskedNotify;
     }
 
-    public function handle(AskQuestion $nextQuestion): ?Question
+    public function handle(AskQuestion $askQuestion): ?Question
     {
-        $user = $this->getUser($nextQuestion);
+        $user = $this->getUser($askQuestion);
         $unansweredQuestions = $this->findUnansweredQuestions($user->id());
         if (empty($unansweredQuestions)) {
             $this->quizCompletedNotify->quizCompleted(new QuizCompleted($user->id()));
@@ -65,11 +64,11 @@ class AskQuestionHandler
         return $question;
     }
 
-    private function getUser(AskQuestion $nextQuestion): User
+    private function getUser(AskQuestion $askQuestion): User
     {
-        $user = $this->userRepository->byId(UserId::fromString($nextQuestion->userId));
+        $user = $this->userRepository->byId(UserId::fromString($askQuestion->userId));
         if (null === $user) {
-            throw InvalidUserId::fromString($nextQuestion->userId);
+            throw InvalidUserId::fromString($askQuestion->userId);
         }
 
         return $user;

@@ -16,7 +16,7 @@ use OnceUponATime\Domain\Event\QuizEventStore;
  */
 class NewQuestionForUserWhoAnsweredIncorrectly implements QuestionAnsweredNotify
 {
-    private const MAX_ANSWERS = 2;
+    private const MAX_ANSWERS = 3;
 
     /** @var QuizEventStore */
     private $quizEventStore;

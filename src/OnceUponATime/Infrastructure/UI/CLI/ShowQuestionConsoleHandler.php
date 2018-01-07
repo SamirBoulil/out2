@@ -7,6 +7,10 @@ namespace OnceUponATime\Infrastructure\UI\CLI;
 use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
+use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Domain\Entity\User\ExternalUserId;
+use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Repository\UserRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,11 +25,14 @@ class ShowQuestionConsoleHandler extends Command
     /** @var ShowQuestionHandler */
     private $showQuestionHandler;
 
-    public function __construct(ShowQuestionHandler $registerUserHandler)
-    {
-        $this->showQuestionHandler = $registerUserHandler;
+    /** @var UserRepository */
+    private $userRepository;
 
+    public function __construct(ShowQuestionHandler $registerUserHandler, UserRepository $userRepository)
+    {
         parent::__construct();
+        $this->showQuestionHandler = $registerUserHandler;
+        $this->userRepository = $userRepository;
     }
 
     protected function configure(): void
@@ -39,18 +46,28 @@ class ShowQuestionConsoleHandler extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $command = new ShowQuestion();
-        $command->externalUserId = $input->getArgument('external-id');
-
-        try {
-            $question = $this->showQuestionHandler->handle($command);
-        } catch (InvalidExternalUserId $e) {
-            $this->showError($e->id(), $output);
+        $externalId = $input->getArgument('external-id');
+        $user = $this->getUser($externalId, $output);
+        if (null === $user) {
+            $this->showError($externalId, $output);
 
             return;
         }
+        $question = $this->getQuestion($user);
+        if (null !== $question) {
+            $output->writeln(sprintf('<info>%s</info>', $question->statement()));
+        }
+        $output->writeln("<info>Congratulations you completed the quiz!</info>");
+    }
 
-        $output->writeln(sprintf('<info>%s</info>', $question->statement()));
+    private function getUser(string $externalId, OutputInterface $output): ?User
+    {
+        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalId));
+        if (null === $user) {
+            $this->showError($externalId, $output);
+        }
+
+        return $user;
     }
 
     private function showError(string $invalidExternalId, OutputInterface $output): void
@@ -67,5 +84,13 @@ class ShowQuestionConsoleHandler extends Command
                 $invalidExternalId
             )
         );
+    }
+
+    private function getQuestion(User $user): ?Question
+    {
+        $command = new ShowQuestion();
+        $command->userId = (string) $user->id();
+
+        return $this->showQuestionHandler->handle($command);
     }
 }

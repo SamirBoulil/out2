@@ -22,7 +22,7 @@ class UserId
     {
     }
 
-    public static function fromString($id): UserId
+    public static function fromString(string $id): UserId
     {
         Assertion::notEmpty($id);
         Assertion::uuid($id);
