@@ -52,7 +52,11 @@ class ShowQuestionConsoleHandler extends Command
 
             return;
         }
-        $this->displayQuestion($user, $output);
+        $question = $this->getQuestion($user);
+        if (null !== $question) {
+            $output->writeln(sprintf('<info>%s</info>', $question->statement()));
+        }
+        $output->writeln("<info>Congratulations you completed the quiz!</info>");
     }
 
     private function getUser(string $externalId, OutputInterface $output): ?User
@@ -81,11 +85,18 @@ class ShowQuestionConsoleHandler extends Command
         );
     }
 
-    private function displayQuestion(User $user, OutputInterface $output): void
+    /**
+     * @param User $user
+     *
+     * @return null|\OnceUponATime\Domain\Entity\Question\Question
+     *
+     */
+    private function getQuestion(User $user)
     {
         $command = new ShowQuestion();
         $command->userId = (string) $user->id();
         $question = $this->showQuestionHandler->handle($command);
-        $output->writeln(sprintf('<info>%s</info>', $question->statement()));
+
+        return $question;
     }
 }

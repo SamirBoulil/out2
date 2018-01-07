@@ -43,6 +43,9 @@ class ShowQuestionHandler
     {
         $user = $this->getUser($showQuestion);
         $questionId = $this->quizEventStore->questionToAnswerForUser($user->id());
+        if (null === $questionId) {
+            return null;
+        }
 
         return $this->questionRepository->byId($questionId);
     }

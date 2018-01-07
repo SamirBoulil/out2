@@ -40,7 +40,7 @@ class ShowClueHandler
         $this->quizEventStore = $quizEventStore;
     }
 
-    public function handle(ShowClue $showClue)
+    public function handle(ShowClue $showClue): ?Clue
     {
         $user = $this->getUser($showClue);
         $question = $this->getQuestionToAnswer($user);
@@ -78,12 +78,16 @@ class ShowClueHandler
         return $this->quizEventStore->answersCount($user->id());
     }
 
-    private function getClue($questionsAnswered, $question): Clue
+    private function getClue($questionsAnswered, $question): ?Clue
     {
-        if (0 === $questionsAnswered) {
+        if (1 === $questionsAnswered) {
             return $question->clue1();
         }
 
-        return $question->clue2();
+        if (2 === $questionsAnswered) {
+            return $question->clue2();
+        }
+
+        return null;
     }
 }

@@ -84,8 +84,20 @@ class ShowClueHandlerTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_show_a_clue()
+    {
+        $askClue = new ShowClue();
+        $askClue->userId = self::USER_ID;
+        $clue = $this->askClueHandler->handle($askClue);
+        $this->assertNull($clue);
+    }
+
+    /**
+     * @test
+     */
     public function it_shows_the_first_clue_for_the_user()
     {
+        $this->answerIncorrectly();
         $askClue = new ShowClue();
         $askClue->userId = self::USER_ID;
         $clue = $this->askClueHandler->handle($askClue);
@@ -97,6 +109,7 @@ class ShowClueHandlerTest extends TestCase
      */
     public function it_finds_the_second_clue_for_the_user()
     {
+        $this->answerIncorrectly();
         $this->answerIncorrectly();
         $askClue = new ShowClue();
         $askClue->userId = self::USER_ID;

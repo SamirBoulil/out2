@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\OnceUponATime\Application;
 
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
@@ -17,6 +18,8 @@ use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAsked;
+use OnceUponATime\Domain\Event\QuizCompleted;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
@@ -30,6 +33,9 @@ class ShowQuestionHandlerTest extends TestCase
 {
     private const QUESTION_ID = '7d7fd0b2-0cb5-42ac-b697-3f7bfce24df9';
     private const USER_ID = '3a021c08-ad15-43aa-aba3-8626fecd39a7';
+
+    /** @var QuizEventStore */
+    private $quizEventStore;
 
     /** @var ShowQuestionHandler */
     private $showQuestionHandler;
@@ -55,15 +61,15 @@ class ShowQuestionHandlerTest extends TestCase
         $userRepository->add($user);
 
         $questionAsked = new QuestionAsked($userId, QuestionId::fromString(self::QUESTION_ID));
-        $quizEventStore = new InMemoryQuizEventStore();
-        $quizEventStore->add($questionAsked);
+        $this->quizEventStore = new InMemoryQuizEventStore();
+        $this->quizEventStore->add($questionAsked);
 
         $this->testEventSubscriber = new TestEventSubscriber();
 
         $this->showQuestionHandler = new ShowQuestionHandler(
             $userRepository,
             $questionRepository,
-            $quizEventStore
+            $this->quizEventStore
         );
     }
 
@@ -81,9 +87,22 @@ class ShowQuestionHandlerTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_null_when_the_quiz_is_completed()
+    {
+        $quizCompleted = new QuizCompleted(UserId::fromString(self::USER_ID));
+        $this->quizEventStore->add($quizCompleted);
+        $showQuestion = new ShowQuestion();
+        $showQuestion->userId = self::USER_ID;
+        $question = $this->showQuestionHandler->handle($showQuestion);
+        $this->assertNull($question);
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_when_the_user_id_is_not_known()
     {
-        $this->expectException(InvalidUserId::class);
+        $this->expectException(InvalidExternalUserId::class);
         $showQuestion = new ShowQuestion();
         $showQuestion->userId = '00000000-0000-0000-0000-000000000000';
         $this->showQuestionHandler->handle($showQuestion);
