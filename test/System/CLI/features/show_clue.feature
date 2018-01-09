@@ -11,7 +11,7 @@ Feature: Show the clue
       | id                                   | external_user_id | name  |
       | 22222222-2222-2222-2222-222222222222 | @my_external_id  | Samir |
 
-  Scenario: It does not show the clue if the user hasn't received any
+  Scenario: It shows the last clue the game gave (first clue)
     Given the following events:
       | type             | user_id                              | question_id                          | is_correct |
       | questionAsked    | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |            |
@@ -20,6 +20,17 @@ Feature: Show the clue
       | argument    | value           |
       | external-id | @my_external_id |
     Then I should see the text "Clue: italian"
+
+  Scenario: It shows the last clue the game gave (second clue)
+    Given the following events:
+      | type             | user_id                              | question_id                          | is_correct |
+      | questionAsked    | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |            |
+      | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | false      |
+      | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | false      |
+    When I run the command "out:show-clue" with the following arguments:
+      | argument    | value           |
+      | external-id | @my_external_id |
+    Then I should see the text "Clue: it's like a hoodie"
 
   Scenario: It does not show the clue if the user hasn't received any
     Given the following events:

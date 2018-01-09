@@ -65,7 +65,7 @@ class AnswerQuestionConsoleHandler extends Command
     {
         $externalId = $input->getArgument('external-id');
         $answer = $input->getArgument('answer');
-        $user = $this->getUser($externalId, $output);
+        $user = $this->getUser($externalId);
         if (null === $user) {
             $this->showError($externalId, $output);
 
@@ -78,14 +78,9 @@ class AnswerQuestionConsoleHandler extends Command
         }
     }
 
-    private function getUser(string $externalId, OutputInterface $output): ?User
+    private function getUser(string $externalId): ?User
     {
-        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalId));
-        if (null === $user) {
-            $this->showError($externalId, $output);
-        }
-
-        return $user;
+        return $this->userRepository->byExternalId(ExternalUserId::fromString($externalId));
     }
 
     private function showError(string $invalidExternalId, OutputInterface $output): void

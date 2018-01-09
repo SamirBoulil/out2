@@ -47,7 +47,7 @@ class ShowQuestionConsoleHandler extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $externalId = $input->getArgument('external-id');
-        $user = $this->getUser($externalId, $output);
+        $user = $this->getUser($externalId);
         if (null === $user) {
             $this->showError($externalId, $output);
 
@@ -62,14 +62,9 @@ class ShowQuestionConsoleHandler extends Command
         $output->writeln("<info>Congratulations you completed the quiz!</info>");
     }
 
-    private function getUser(string $externalId, OutputInterface $output): ?User
+    private function getUser(string $externalId): ?User
     {
-        $user = $this->userRepository->byExternalId(ExternalUserId::fromString($externalId));
-        if (null === $user) {
-            $this->showError($externalId, $output);
-        }
-
-        return $user;
+        return $this->userRepository->byExternalId(ExternalUserId::fromString($externalId));
     }
 
     private function showError(string $invalidExternalId, OutputInterface $output): void
