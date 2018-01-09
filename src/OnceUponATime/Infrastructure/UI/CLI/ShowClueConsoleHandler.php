@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OnceUponATime\Infrastructure\UI\CLI;
 
-use OnceUponATime\Application\InvalidExternalUserId;
-use OnceUponATime\Application\ShowQuestion\ShowQuestion;
-use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
-use OnceUponATime\Domain\Entity\Question\Question;
+use OnceUponATime\Application\NoQuestionToAnswer;
+use OnceUponATime\Application\ShowClue\ShowClue;
+use OnceUponATime\Application\ShowClue\ShowClueHandler;
+use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Repository\UserRepository;
@@ -20,27 +20,27 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class ShowQuestionConsoleHandler extends Command
+class ShowClueConsoleHandler extends Command
 {
-    /** @var ShowQuestionHandler */
-    private $showQuestionHandler;
-
     /** @var UserRepository */
     private $userRepository;
 
-    public function __construct(ShowQuestionHandler $registerUserHandler, UserRepository $userRepository)
+    /** @var ShowClueHandler */
+    private $showClueHandler;
+
+    public function __construct(UserRepository $userRepository, ShowClueHandler $showClueHandler)
     {
         parent::__construct();
-        $this->showQuestionHandler = $registerUserHandler;
         $this->userRepository = $userRepository;
+        $this->showClueHandler = $showClueHandler;
     }
 
     protected function configure(): void
     {
         $this
-            ->setName('out:show-question')
-            ->setDescription('Shows the question a user has to answer')
-            ->setHelp('This commands displays the question\'s statement')
+            ->setName('out:show-clue')
+            ->setDescription('Shows the last clue the game gave you.')
+            ->setHelp('This commands displays the question\'s clue')
             ->addArgument('external-id', InputArgument::REQUIRED, 'External user id (Slack id)');
     }
 
@@ -53,13 +53,17 @@ class ShowQuestionConsoleHandler extends Command
 
             return;
         }
-        $question = $this->getQuestion($user);
-        if (null !== $question) {
-            $output->writeln(sprintf('<info>%s</info>', $question->statement()));
+        try {
+            $clue = $this->getClue($user);
+            if (null !== $clue) {
+                $output->writeln(sprintf('<info>Clue: %s</info>', (string) $clue));
 
-            return;
+                return;
+            }
+            $output->writeln("<info>There is no clue to show.</info>");
+        } catch (NoQuestionToAnswer $e) {
+            $output->writeln("<info>You've completed the quiz! there is no clue to show.</info>");
         }
-        $output->writeln("<info>Congratulations you completed the quiz!</info>");
     }
 
     private function getUser(string $externalId): ?User
@@ -71,7 +75,7 @@ class ShowQuestionConsoleHandler extends Command
     {
         $output->writeln(
             sprintf(
-                '<error>Sorry an error occured while trying to retrieve the question for user "%s".</error>',
+                '<error>Sorry an error occured while trying to retrieve the clue for the question "%s".</error>',
                 $invalidExternalId
             )
         );
@@ -83,11 +87,11 @@ class ShowQuestionConsoleHandler extends Command
         );
     }
 
-    private function getQuestion(User $user): ?Question
+    private function getClue(User $user): ?Clue
     {
-        $command = new ShowQuestion();
-        $command->userId = (string) $user->id();
+        $showClue = new ShowClue();
+        $showClue->userId = (string) $user->id();
 
-        return $this->showQuestionHandler->handle($command);
+        return $this->showClueHandler->handle($showClue);
     }
 }

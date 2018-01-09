@@ -30,6 +30,7 @@ use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
 use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use OnceUponATime\Infrastructure\UI\CLI\AnswerQuestionConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\RegisterUserConsoleHandler;
+use OnceUponATime\Infrastructure\UI\CLI\ShowClueConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\ShowQuestionConsoleHandler;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
@@ -175,6 +176,11 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             ->addArgument(new Reference(ShowQuestionHandler::class))
             ->addArgument(new Reference(ShowClueHandler::class));
 
+        $containerBuilder
+            ->register(ShowClueConsoleHandler::class, ShowClueConsoleHandler::class)
+            ->addArgument(new Reference(UserRepository::class))
+            ->addArgument(new Reference(ShowClueHandler::class));
+
         /**
          * Application
          */
@@ -187,6 +193,7 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
                         new Reference(RegisterUserConsoleHandler::class),
                         new Reference(ShowQuestionConsoleHandler::class),
                         new Reference(AnswerQuestionConsoleHandler::class),
+                        new Reference(ShowClueConsoleHandler::class),
                     ],
                 ]
             )
