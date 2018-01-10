@@ -31,6 +31,7 @@ use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
 use OnceUponATime\Infrastructure\UI\CLI\AnswerQuestionConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\RegisterUserConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\ShowClueConsoleHandler;
+use OnceUponATime\Infrastructure\UI\CLI\ShowLeaderboardConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\ShowQuestionConsoleHandler;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
@@ -181,6 +182,11 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             ->addArgument(new Reference(UserRepository::class))
             ->addArgument(new Reference(ShowClueHandler::class));
 
+        $containerBuilder
+            ->register(ShowLeaderboardConsoleHandler::class, ShowLeaderboardConsoleHandler::class)
+            ->addArgument(new Reference(UserRepository::class))
+            ->addArgument(new Reference(ShowLeaderboardHandler::class));
+
         /**
          * Application
          */
@@ -194,6 +200,7 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
                         new Reference(ShowQuestionConsoleHandler::class),
                         new Reference(AnswerQuestionConsoleHandler::class),
                         new Reference(ShowClueConsoleHandler::class),
+                        new Reference(ShowLeaderboardConsoleHandler::class),
                     ],
                 ]
             )
