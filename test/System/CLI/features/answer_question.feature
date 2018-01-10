@@ -87,3 +87,5 @@ Feature: Answer the question
       | answer      | houdini                   |
     Then I should see the text "Sorry an error occured while trying to retrieve the question for user "@unknown_external_user_id"."
     And I should see the text "It seems the user with external id "@unknown_external_user_id" is not registered."
+
+    # Case the quiz is completed nothing to answer
