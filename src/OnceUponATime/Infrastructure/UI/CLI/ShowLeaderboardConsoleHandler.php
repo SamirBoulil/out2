@@ -38,7 +38,7 @@ class ShowLeaderboardConsoleHandler extends Command
     {
         $this
             ->setName('out:leaderboard')
-            ->setDescription('Display the leaderboard for all registered user');
+            ->setDescription('Display the leaderboard of all players');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): void
@@ -49,11 +49,8 @@ class ShowLeaderboardConsoleHandler extends Command
 
     private function displayLeaderboard(Leaderboard $leaderboard, OutputInterface $output)
     {
-        $table = new Table($output);
-        $table->setHeaders(['Rank', 'Name', 'Points']);
         $rows = $this->getTableRows($leaderboard->publish());
-        $table->setRows($rows);
-        $table->render();
+        $this->displayTable($output, $rows);
     }
 
     private function getTableRows(array $ranks): array
@@ -67,6 +64,14 @@ class ShowLeaderboardConsoleHandler extends Command
         }
 
         return $rows;
+    }
+
+    private function displayTable(OutputInterface $output, $rows): void
+    {
+        $table = new Table($output);
+        $table->setHeaders(['Rank', 'Name', 'Points']);
+        $table->setRows($rows);
+        $table->render();
     }
 
     private function getUsername(UserId $userId): Name
