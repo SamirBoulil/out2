@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\System\CLI;
 
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use LogicException;
 use OnceUponATime\Domain\Entity\Question\Answer;
@@ -57,11 +58,20 @@ class FeatureContext implements Context
     /**
      * @When /^I run the command "([^"]*)" with the following arguments:$/
      */
-    public function iRunTheCommandWithTheFollowingArguments($commandName, TableNode $arguments)
+    public function iRunTheCommandWithTheFollowingArguments(string $commandName, TableNode $arguments)
     {
         $this->commandTester = $this->getCommandTester($commandName);
         $arguments = $this->getArguments($arguments);
         $this->commandTester->execute($arguments);
+    }
+
+    /**
+     * @When /^I run the command "([^"]*)":$/
+     */
+    public function iRunTheCommand(string $commandName)
+    {
+        $this->commandTester = $this->getCommandTester($commandName);
+        $this->commandTester->execute([]);
     }
 
     /**
@@ -73,6 +83,20 @@ class FeatureContext implements Context
 
         if (false === strpos($current, $expectedText)) {
             throw new LogicException(sprintf('Current output is: "%s"', $current));
+        }
+    }
+
+    /**
+     * @Then /^I should see following table:$/
+     */
+    public function iShouldSeeFollowingTable(PyStringNode $expectedTable)
+    {
+        $tableOutput = explode("\n", $this->commandTester->getDisplay());
+
+        foreach (explode("\n", (string) $expectedTable) as $i => $expectedOutput) {
+            if ($expectedOutput !== $tableOutput[$i]) {
+                throw new LogicException(sprintf('Current output is: "%s"', $tableOutput[$i]));
+            }
         }
     }
 
