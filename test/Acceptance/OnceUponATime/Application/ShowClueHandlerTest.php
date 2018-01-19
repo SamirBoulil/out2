@@ -9,6 +9,7 @@ use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Application\ShowClue\ShowClue;
 use OnceUponATime\Application\ShowClue\ShowClueHandler;
+use OnceUponATime\Application\ShowClue\ShowClueHandlerResponse;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
 use OnceUponATime\Domain\Entity\Question\Question;
@@ -68,9 +69,7 @@ class ShowClueHandlerTest extends TestCase
         $this->userRepository = new InMemoryUserRepository();
         $this->userRepository->add($user);
 
-        $questionAsked = new QuestionAsked($userId, $questionId);
         $this->quizEventStore = new InMemoryQuizEventStore();
-        $this->quizEventStore->add($questionAsked);
 
         $this->testEventSubscriber = new TestEventSubscriber();
 
@@ -86,10 +85,12 @@ class ShowClueHandlerTest extends TestCase
      */
     public function it_does_not_show_a_clue()
     {
+        $this->askQuestionToUser();
         $askClue = new ShowClue();
         $askClue->userId = self::USER_ID;
-        $clue = $this->askClueHandler->handle($askClue);
-        $this->assertNull($clue);
+        $response = $this->askClueHandler->handle($askClue);
+        $this->assertNull($response->clue);
+        $this->assertFalse($response->isQuizCompleted);
     }
 
     /**
@@ -97,11 +98,13 @@ class ShowClueHandlerTest extends TestCase
      */
     public function it_shows_the_first_clue_for_the_user()
     {
+        $this->askQuestionToUser();
         $this->answerIncorrectly();
         $askClue = new ShowClue();
         $askClue->userId = self::USER_ID;
-        $clue = $this->askClueHandler->handle($askClue);
-        $this->assertSame('Clue 1', (string) $clue);
+        $response = $this->askClueHandler->handle($askClue);
+        $this->assertSame('Clue 1', (string) $response->clue);
+        $this->assertFalse($response->isQuizCompleted);
     }
 
     /**
@@ -109,12 +112,13 @@ class ShowClueHandlerTest extends TestCase
      */
     public function it_finds_the_second_clue_for_the_user()
     {
+        $this->askQuestionToUser();
         $this->answerIncorrectly();
         $this->answerIncorrectly();
         $askClue = new ShowClue();
         $askClue->userId = self::USER_ID;
-        $clue = $this->askClueHandler->handle($askClue);
-        $this->assertSame('Clue 2', (string) $clue);
+        $response = $this->askClueHandler->handle($askClue);
+        $this->assertSame('Clue 2', (string) $response->clue);
     }
 
     /**
@@ -131,13 +135,28 @@ class ShowClueHandlerTest extends TestCase
     /**
      * @test
      */
+    public function it_throws_if_the_user_has_completed_the_quiz()
+    {
+        $this->askQuestionToUser();
+        $this->userHasCompletedQuiz();
+        $showClue = new ShowClue();
+        $showClue->userId = self::USER_ID;
+        $response = $this->askClueHandler->handle($showClue);
+        $this->assertNull($response->clue);
+        $this->assertTrue($response->isQuizCompleted);
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_if_the_user_has_no_question_to_answer()
     {
-        $this->userHasCompletedQuiz();
         $this->expectException(NoQuestionToAnswer::class);
-        $askClue = new ShowClue();
-        $askClue->userId = self::USER_ID;
-        $this->assertNull($this->askClueHandler->handle($askClue));
+        $showClue = new ShowClue();
+        $showClue->userId = self::USER_ID;
+        $response = $this->askClueHandler->handle($showClue);
+        $this->assertNull($response->clue);
+        $this->assertTrue($response->isQuizCompleted);
     }
 
     private function answerIncorrectly(): void
@@ -150,8 +169,16 @@ class ShowClueHandlerTest extends TestCase
         $this->quizEventStore->add($questionAnswered);
     }
 
-    private function userHasCompletedQuiz()
+    private function userHasCompletedQuiz(): void
     {
         $this->quizEventStore->add(new QuizCompleted(UserId::fromString(self::USER_ID)));
+    }
+
+    private function askQuestionToUser(): void
+    {
+        $userId = UserId::fromString(self::USER_ID);
+        $questionId = QuestionId::fromString(self::QUESTION_ID);
+        $questionAsked = new QuestionAsked($userId, $questionId);
+        $this->quizEventStore->add($questionAsked);
     }
 }

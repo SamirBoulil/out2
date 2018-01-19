@@ -11,9 +11,11 @@ use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
+use OnceUponATime\Infrastructure\UI\CLI\AnswerQuestionConsoleHandler;
 
 /**
  * TODO: This handler returns whether the answer is right for the question. does it make sense ? shouldn't this be
@@ -31,7 +33,7 @@ class AnswerQuestionHandler
     private $questionRepository;
 
     /** @var QuizEventStore */
-    private $questionsAnsweredEventStore;
+    private $quizEventStore;
 
     /** @var QuestionAnsweredNotify */
     private $notify;
@@ -39,26 +41,27 @@ class AnswerQuestionHandler
     public function __construct(
         UserRepository $userRepository,
         QuestionRepository $questionRepository,
-        QuizEventStore $questionsAnsweredEventStore,
+        QuizEventStore $quizEventStore,
         QuestionAnsweredNotify $notify
     ) {
         $this->userRepository = $userRepository;
         $this->questionRepository = $questionRepository;
-        $this->questionsAnsweredEventStore = $questionsAnsweredEventStore;
+        $this->quizEventStore = $quizEventStore;
         $this->notify = $notify;
     }
 
-    public function handle(AnswerQuestion $answerQuestion): bool
+    public function handle(AnswerQuestion $answerQuestion): AnswerQuestionHandlerResponse
     {
         $user = $this->getUser($answerQuestion);
-        $question = $this->getCurrentQuestionForUser($user);
-        $answer = $this->getAnswer($answerQuestion);
-        $isCorrect = $question->isCorrect($answer);
-        $this->notify->questionAnswered(new QuestionAnswered($user->id(), $question->id(), $isCorrect));
+        if ($this->userHasCompletedQuiz($user)) {
+            return $this->createResponse(false, true);
+        }
+
+        $isCorrect = $this->answerQuestion($answerQuestion, $user);
 
         // TODO: Should it really return something ? (CQRS behavior?)
         // TODO: Should it be something as simple as a boolean ? or an object related to the handler instead of a primitive type ?
-        return $isCorrect;
+        return $this->createResponse($isCorrect, false);
     }
 
     /**
@@ -74,18 +77,37 @@ class AnswerQuestionHandler
         return $user;
     }
 
+    private function userHasCompletedQuiz(User $user): bool
+    {
+        return $this->quizEventStore->isQuizCompleted($user->id());
+    }
+
+    private function createResponse(bool $isCorrect, bool $isQuizCompleted): AnswerQuestionHandlerResponse
+    {
+        $answer = new AnswerQuestionHandlerResponse();
+        $answer->isCorrect = $isCorrect;
+        $answer->isQuizCompleted = $isQuizCompleted;
+
+        return $answer;
+    }
+
+    private function answerQuestion(AnswerQuestion $answerQuestion, $user): bool
+    {
+        $question = $this->getCurrentQuestionForUser($user);
+        $answer = Answer::fromString($answerQuestion->answer);
+        $isCorrect = $question->isCorrect($answer);
+        $this->notify->questionAnswered(new QuestionAnswered($user->id(), $question->id(), $isCorrect));
+
+        return $isCorrect;
+    }
+
     private function getCurrentQuestionForUser(User $user): Question
     {
-        $questionId = $this->questionsAnsweredEventStore->questionToAnswerForUser($user->id());
+        $questionId = $this->quizEventStore->questionToAnswerForUser($user->id());
         if (null === $questionId) {
             throw NoQuestionToAnswer::fromString((string) $user->id());
         }
 
         return $this->questionRepository->byId($questionId);
-    }
-
-    private function getAnswer(AnswerQuestion $answerQuestion): Answer
-    {
-        return Answer::fromString($answerQuestion->answer);
     }
 }

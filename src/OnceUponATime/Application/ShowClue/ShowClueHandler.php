@@ -40,13 +40,18 @@ class ShowClueHandler
         $this->quizEventStore = $quizEventStore;
     }
 
-    public function handle(ShowClue $showClue): ?Clue
+    public function handle(ShowClue $showClue): ShowClueHandlerResponse
     {
         $user = $this->getUser($showClue);
+        if ($this->userHasCompletedQuiz($user)) {
+            return $this->createResponse(null, true);
+        }
+
         $question = $this->getQuestionToAnswer($user);
         $answersCount = $this->answersCount($user);
+        $clue = $this->getClue($answersCount, $question);
 
-        return $this->getClue($answersCount, $question);
+        return $this->createResponse($clue, false);
     }
 
     /**
@@ -61,6 +66,11 @@ class ShowClueHandler
         }
 
         return $user;
+    }
+
+    private function userHasCompletedQuiz(User $user): bool
+    {
+        return $this->quizEventStore->isQuizCompleted($user->id());
     }
 
     private function getQuestionToAnswer(User $user): Question
@@ -89,5 +99,14 @@ class ShowClueHandler
         }
 
         return null;
+    }
+
+    private function createResponse(?Clue $clue, bool $isQuizCompleted): ShowClueHandlerResponse
+    {
+        $response = new ShowClueHandlerResponse();
+        $response->clue = $clue;
+        $response->isQuizCompleted = $isQuizCompleted;
+
+        return $response;
     }
 }

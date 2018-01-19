@@ -6,7 +6,9 @@ namespace Tests\Acceptance\OnceUponATime\Application;
 
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
+use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandlerResponse;
 use OnceUponATime\Application\AnswerQuestion\QuestionAnsweredNotify;
+use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Domain\Entity\Question\Answer;
@@ -66,9 +68,7 @@ class AnswerQuestionHandlerTest extends TestCase
         $userRepository = new InMemoryUserRepository();
         $userRepository->add($user);
 
-        $questionAsked = new QuestionAsked($userId, $questionId);
         $this->quizEventStore = new InMemoryQuizEventStore();
-        $this->quizEventStore->add($questionAsked);
 
         $this->testEventSubscriber = new TestEventSubscriber();
         $notify = new QuestionAnsweredNotifyMany([$this->testEventSubscriber]);
@@ -86,11 +86,16 @@ class AnswerQuestionHandlerTest extends TestCase
      */
     public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_correct()
     {
+        $this->askQuestionToUser();
+
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@wrong_answer>';
 
-        $this->assertFalse($this->answerQuestionHandler->handle($answerQuestion));
+        $response = $this->answerQuestionHandler->handle($answerQuestion);
+        $this->assertInstanceOf(AnswerQuestionHandlerResponse::class, $response);
+        $this->assertFalse($response->isCorrect);
+        $this->assertFalse($response->isQuizCompleted);
         $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
     }
 
@@ -99,11 +104,16 @@ class AnswerQuestionHandlerTest extends TestCase
      */
     public function it_handles_an_answer_to_a_question_and_tells_if_the_answer_is_incorrect()
     {
+        $this->askQuestionToUser();
+
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@right_answer>';
 
-        $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
+        $response = $this->answerQuestionHandler->handle($answerQuestion);
+        $this->assertInstanceOf(AnswerQuestionHandlerResponse::class, $response);
+        $this->assertTrue($response->isCorrect);
+        $this->assertFalse($response->isQuizCompleted);
         $this->assertTrue($this->testEventSubscriber->isQuestionAnswered);
     }
 
@@ -115,21 +125,48 @@ class AnswerQuestionHandlerTest extends TestCase
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->userId = '00000000-0000-0000-0000-000000000000';
         $answerQuestion->answer = '<@right_answer>';
-        $this->expectException(InvalidUserId::class);
+        $this->expectException(InvalidExternalUserId::class);
         $this->answerQuestionHandler->handle($answerQuestion);
         $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
     }
 
-    public function it_throws_if_the_has_no_question_to_answer()
+    /**
+     * @test
+     */
+    public function it_throws_if_the_has_no_question_to_answer_and_has_not_completed_the_quiz()
     {
         $this->expectException(NoQuestionToAnswer::class);
-        $this->quizEventStore->add(new QuizCompleted(UserId::fromString(self::USER_ID)));
         $answerQuestion = new AnswerQuestion();
         $answerQuestion->userId = self::USER_ID;
         $answerQuestion->answer = '<@an_answer>';
-        $this->assertTrue($this->answerQuestionHandler->handle($answerQuestion));
+        $this->answerQuestionHandler->handle($answerQuestion);
     }
 
+    /**
+     * @test
+     */
+    public function it_tells_if_the_user_has_already_completed_the_quiz()
+    {
+        $this->quizEventStore->add(new QuizCompleted(UserId::fromString(self::USER_ID)));
+
+        $answerQuestion = new AnswerQuestion();
+        $answerQuestion->userId = self::USER_ID;
+        $answerQuestion->answer = '<@dummy_answer>';
+
+        $response = $this->answerQuestionHandler->handle($answerQuestion);
+        $this->assertInstanceOf(AnswerQuestionHandlerResponse::class, $response);
+        $this->assertFalse($response->isCorrect);
+        $this->assertTrue($response->isQuizCompleted);
+        $this->assertFalse($this->testEventSubscriber->isQuestionAnswered);
+    }
+
+    private function askQuestionToUser()
+    {
+        $userId = UserId::fromString(self::USER_ID);
+        $questionId = QuestionId::fromString(self::QUESTION_ID);
+        $questionAsked = new QuestionAsked($userId, $questionId);
+        $this->quizEventStore->add($questionAsked);
+    }
     /**
      * TODO: How can I / should I unit test the notification system ?
      * TODO: Quid Acceptance VS unit testing application layer ?

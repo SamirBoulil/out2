@@ -49,19 +49,25 @@ class AskQuestionHandler
         $this->questionAskedNotify = $questionAskedNotify;
     }
 
-    public function handle(AskQuestion $askQuestion): ?Question
+    public function handle(AskQuestion $askQuestion): AskQuestionHandlerResponse
     {
         $user = $this->getUser($askQuestion);
         $unansweredQuestions = $this->findUnansweredQuestions($user->id());
+
+        if ($this->userHasCompletedQuiz($user)) {
+            return $this->createResponse(null, true);
+        }
+
         if (empty($unansweredQuestions)) {
             $this->quizCompletedNotify->quizCompleted(new QuizCompleted($user->id()));
 
-            return null;
+            return $this->createResponse(null, true);
         }
+
         $question = $this->pickRandomQuestion($unansweredQuestions);
         $this->questionAskedNotify->questionAsked(new QuestionAsked($user->id(), $question->id()));
 
-        return $question;
+        return $this->createResponse($question, false);
     }
 
     private function getUser(AskQuestion $askQuestion): User
@@ -92,5 +98,19 @@ class AskQuestionHandler
     private function pickRandomQuestion(array $questions): Question
     {
         return $questions[array_rand($questions)];
+    }
+
+    private function createResponse($question, $isQuizCompleted): AskQuestionHandlerResponse
+    {
+        $response = new AskQuestionHandlerResponse();
+        $response->isQuizCompleted = $isQuizCompleted;
+        $response->question = $question;
+
+        return $response;
+    }
+
+    private function userHasCompletedQuiz(User $user): bool
+    {
+        return $this->quizEventStore->isQuizCompleted($user->id());
     }
 }

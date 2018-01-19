@@ -56,7 +56,7 @@ class InMemoryQuizEventStore implements QuizEventStore
             }
         }
 
-        throw new \LogicException(sprintf('User "%s" has no question to answer.', (string) $userId));
+        return null;
     }
 
     public function answersCount(UserId $userId): ?int
@@ -112,6 +112,13 @@ class InMemoryQuizEventStore implements QuizEventStore
         }
 
         return $correctlyAnsweredQuestions;
+    }
+
+    public function isQuizCompleted(UserId $userId): bool
+    {
+        $userEvents = $this->byUser($userId);
+
+        return end($userEvents) instanceof QuizCompleted;
     }
 
     private function hasCompletedQuiz(array $eventsForUser): bool

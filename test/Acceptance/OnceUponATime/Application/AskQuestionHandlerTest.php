@@ -6,6 +6,7 @@ namespace Tests\Acceptance\OnceUponATime\Application;
 
 use OnceUponATime\Application\AskQuestion\AskQuestion;
 use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
+use OnceUponATime\Application\AskQuestion\AskQuestionHandlerResponse;
 use OnceUponATime\Application\InvalidUserId;
 use OnceUponATime\Domain\Entity\Question\Answer;
 use OnceUponATime\Domain\Entity\Question\Clue;
@@ -17,6 +18,7 @@ use OnceUponATime\Domain\Entity\User\Name;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Event\QuestionAnswered;
+use OnceUponATime\Domain\Event\QuizCompleted;
 use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\QuestionRepository;
 use OnceUponATime\Domain\Repository\UserRepository;
@@ -87,8 +89,10 @@ class AskQuestionHandlerTest extends TestCase
      */
     public function it_finds_the_next_question_for_a_new_user()
     {
-        $question = $this->getNextQuestion(self::USER_ID);
-        $this->assertInstanceOf(Question::class, $question);
+        $response = $this->getNextQuestion(self::USER_ID);
+        $this->assertInstanceOf(AskQuestionHandlerResponse::class, $response);
+        $this->assertInstanceOf(Question::class, $response->question);
+        $this->assertFalse($response->isQuizCompleted);
         $this->assertTrue($this->testEventSubscriber->isQuestionAsked);
     }
 
@@ -98,23 +102,41 @@ class AskQuestionHandlerTest extends TestCase
     public function it_finds_the_next_unresolved_question_for_the_user()
     {
         $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_1);
-        $question = $this->getNextQuestion(self::USER_ID);
-        $this->assertNotNull($question);
-        $this->assertInstanceOf(Question::class, $question);
-        $this->assertSame(self::QUESTION_ID_2, (string) $question->id());
+        $response = $this->getNextQuestion(self::USER_ID);
+        $this->assertInstanceOf(AskQuestionHandlerResponse::class, $response);
+        $this->assertInstanceOf(Question::class, $response->question);
+        $this->assertSame(self::QUESTION_ID_2, (string) $response->question->id());
+        $this->assertFalse($response->isQuizCompleted);
         $this->assertTrue($this->testEventSubscriber->isQuestionAsked);
+    }
+
+    /**
+     * There is something not clear between this test and the one below.
+     *
+     * @test
+     */
+    public function it_returns_is_completed_equals_true_when_the_user_has_just_answered_all_the_questions_and_the_quiz_completed_event_has_not_been_added()
+    {
+        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_1);
+        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_2);
+        $response = $this->getNextQuestion(self::USER_ID);
+        $this->assertInstanceOf(AskQuestionHandlerResponse::class, $response);
+        $this->assertNull($response->question);
+        $this->assertTrue($response->isQuizCompleted);
+        $this->assertTrue($this->testEventSubscriber->isQuizCompleted);
     }
 
     /**
      * @test
      */
-    public function it_returns_null_when_the_user_has_answered_all_the_questions()
+    public function it_returns_is_completed_equals_true_when_the_usr_has_answered_all_the_questions()
     {
-        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_1);
-        $this->userHasAnsweredQuestion(self::USER_ID, self::QUESTION_ID_2);
-        $question = $this->getNextQuestion(self::USER_ID);
-        $this->assertNull($question);
-        $this->assertTrue($this->testEventSubscriber->isQuizCompleted);
+        $this->userHasCompletedQuiz(self::USER_ID);
+        $response = $this->getNextQuestion(self::USER_ID);
+        $this->assertInstanceOf(AskQuestionHandlerResponse::class, $response);
+        $this->assertNull($response->question);
+        $this->assertTrue($response->isQuizCompleted);
+        $this->assertFalse($this->testEventSubscriber->isQuizCompleted);
     }
 
     /**
@@ -126,7 +148,7 @@ class AskQuestionHandlerTest extends TestCase
         $this->getNextQuestion('00000000-0000-0000-0000-000000000000');
     }
 
-    private function getNextQuestion(string $userId): ?Question
+    private function getNextQuestion(string $userId): AskQuestionHandlerResponse
     {
         $nextQuestion = new AskQuestion();
         $nextQuestion->userId = $userId;
@@ -149,5 +171,11 @@ class AskQuestionHandlerTest extends TestCase
             true
         );
         $this->quizEventStore->add($questionAnswered);
+    }
+
+    private function userHasCompletedQuiz(string $userId): void
+    {
+        $quizCompleted = new QuizCompleted(UserId::fromString($userId));
+        $this->quizEventStore->add($quizCompleted);
     }
 }
