@@ -20,4 +20,9 @@ use OnceUponATime\Domain\Repository\UserRepository;
  */
 class ShowQuestionHandlerResponse
 {
+    /** @var Question */
+    public $question;
+
+    /** @var bool */
+    public $isQuizCompleted;
 }

@@ -104,9 +104,9 @@ class AnswerQuestionConsoleHandler extends Command
         $command = new AnswerQuestion();
         $command->userId = (string) $user->id();
         $command->answer = $answer;
-        $isCorrect = $this->answerQuestionHandler->handle($command);
+        $response = $this->answerQuestionHandler->handle($command);
 
-        return $isCorrect;
+        return $response->isCorrect;
     }
 
     private function displayNextQuestion(OutputInterface $output, $user): void
@@ -126,7 +126,7 @@ class AnswerQuestionConsoleHandler extends Command
         $showQuestion = new ShowQuestion();
         $showQuestion->userId = (string) $user->id();
 
-        return $this->showQuestionHandler->handle($showQuestion);
+        return $this->showQuestionHandler->handle($showQuestion)->question;
     }
 
     protected function displayNextClue(OutputInterface $output, $user): void
@@ -136,6 +136,6 @@ class AnswerQuestionConsoleHandler extends Command
         $showClue = new ShowClue();
         $showClue->userId = (string) $user->id();
         $clue = $this->showClueHandler->handle($showClue);
-        $output->writeln(sprintf('Clue: %s', (string) $clue));
+        $output->writeln(sprintf('Clue: %s', (string) $clue->clue));
     }
 }
