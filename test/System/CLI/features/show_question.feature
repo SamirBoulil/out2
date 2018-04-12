@@ -20,7 +20,7 @@ Feature: Show the question
       | external-id | @my_external_id |
     Then I should see the text "Who is the greatest magician?"
 
-  Scenario: Show a congratulation message whenever a user a completed the quiz
+  Scenario: Show a congratulation message whenever a user has completed the quiz
     Given the following events:
       | type             | user_id                              | question_id                          | is_correct |
       | questionAsked    | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |            |

@@ -52,6 +52,10 @@ class AskQuestionHandler
     public function handle(AskQuestion $askQuestion): ?Question
     {
         $user = $this->getUser($askQuestion);
+        if ($this->userHasCompletedQuiz($user)) {
+            throw NoQuestionToAnswer::fromString((string)$user->id());
+        }
+
         $unansweredQuestions = $this->findUnansweredQuestions($user->id());
         if (empty($unansweredQuestions)) {
             $this->quizCompletedNotify->quizCompleted(new QuizCompleted($user->id()));
@@ -62,6 +66,11 @@ class AskQuestionHandler
         $this->questionAskedNotify->questionAsked(new QuestionAsked($user->id(), $question->id()));
 
         return $question;
+    }
+
+    private function userHasCompletedQuiz(User $user): bool
+    {
+        return $this->quizEventStore->isQuizCompleted($user->id());
     }
 
     private function getUser(AskQuestion $askQuestion): User

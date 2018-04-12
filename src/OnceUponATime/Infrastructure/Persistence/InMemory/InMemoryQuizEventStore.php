@@ -133,4 +133,11 @@ class InMemoryQuizEventStore implements QuizEventStore
     {
         return $quizEvent instanceof QuestionAnswered && $quizEvent->isCorrect();
     }
+
+    public function isQuizCompleted(UserId $userId): bool
+    {
+        $userEvents = $this->byUser($userId);
+
+        return end($userEvents) instanceof QuizCompleted;
+    }
 }
