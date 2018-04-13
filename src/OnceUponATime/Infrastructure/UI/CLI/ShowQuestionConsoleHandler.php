@@ -10,6 +10,7 @@ use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\UserRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,17 +23,21 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ShowQuestionConsoleHandler extends Command
 {
-    /** @var ShowQuestionHandler */
-    private $showQuestionHandler;
-
     /** @var UserRepository */
     private $userRepository;
 
-    public function __construct(ShowQuestionHandler $registerUserHandler, UserRepository $userRepository)
+    /** @var QuizEventStore */
+    private $quizEventStore;
+
+    /** @var ShowQuestionHandler */
+    private $showQuestionHandler;
+
+    public function __construct(UserRepository $userRepository, QuizEventStore $quizEventStore, ShowQuestionHandler $registerUserHandler)
     {
         parent::__construct();
-        $this->showQuestionHandler = $registerUserHandler;
         $this->userRepository = $userRepository;
+        $this->quizEventStore = $quizEventStore;
+        $this->showQuestionHandler = $registerUserHandler;
     }
 
     protected function configure(): void
@@ -53,13 +58,19 @@ class ShowQuestionConsoleHandler extends Command
 
             return;
         }
+
+        if ($this->quizEventStore->isQuizCompleted($user->id())) {
+            $output->writeln("<info>Congratulations you completed the quiz!</info>");
+
+            return;
+        }
+
         $question = $this->getQuestion($user);
         if (null !== $question) {
             $output->writeln(sprintf('<info>%s</info>', $question->statement()));
 
             return;
         }
-        $output->writeln("<info>Congratulations you completed the quiz!</info>");
     }
 
     private function getUser(string $externalId): ?User

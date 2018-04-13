@@ -135,9 +135,10 @@ class ShowClueHandlerTest extends TestCase
     {
         $this->userHasCompletedQuiz();
         $this->expectException(NoQuestionToAnswer::class);
+
         $askClue = new ShowClue();
         $askClue->userId = self::USER_ID;
-        $this->assertNull($this->askClueHandler->handle($askClue));
+        $this->askClueHandler->handle($askClue);
     }
 
     private function answerIncorrectly(): void

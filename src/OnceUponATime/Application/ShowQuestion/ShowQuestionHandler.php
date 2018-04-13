@@ -6,6 +6,7 @@ namespace OnceUponATime\Application\ShowQuestion;
 
 use OnceUponATime\Application\InvalidExternalUserId;
 use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
@@ -42,12 +43,13 @@ class ShowQuestionHandler
     public function handle($showQuestion): ?Question
     {
         $user = $this->getUser($showQuestion);
-        $questionId = $this->quizEventStore->questionToAnswerForUser($user->id());
-        if (null === $questionId) {
-            return null;
+        if ($this->userHasCompletedQuiz($user)) {
+            throw NoQuestionToAnswer::fromString((string) $user->id());
         }
 
-        return $this->questionRepository->byId($questionId);
+        $question = $this->getCurrentQuestion($user);
+
+        return $question;
     }
 
     private function getUser(ShowQuestion $showQuestion): User
@@ -58,5 +60,20 @@ class ShowQuestionHandler
         }
 
         return $user;
+    }
+
+    private function userHasCompletedQuiz(User $user): bool
+    {
+        return $this->quizEventStore->isQuizCompleted($user->id());
+    }
+
+    private function getCurrentQuestion(User $user): Question
+    {
+        $questionId = $this->quizEventStore->questionToAnswerForUser($user->id());
+        if (null === $questionId) {
+            throw NoQuestionToAnswer::fromString((string) $user->id());
+        }
+
+        return $this->questionRepository->byId($questionId);
     }
 }

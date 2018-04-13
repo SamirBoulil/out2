@@ -6,7 +6,6 @@ namespace OnceUponATime\Infrastructure\UI\CLI;
 
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestion;
 use OnceUponATime\Application\AnswerQuestion\AnswerQuestionHandler;
-use OnceUponATime\Application\AskQuestion\AskQuestionHandler;
 use OnceUponATime\Application\ShowClue\ShowClue;
 use OnceUponATime\Application\ShowClue\ShowClueHandler;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
@@ -14,6 +13,7 @@ use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
 use OnceUponATime\Domain\Entity\Question\Question;
 use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
+use OnceUponATime\Domain\Event\QuizEventStore;
 use OnceUponATime\Domain\Repository\UserRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -37,15 +37,21 @@ class AnswerQuestionConsoleHandler extends Command
 
     /** @var ShowClueHandler */
     private $showClueHandler;
+    /**
+     * @var QuizEventStore
+     */
+    private $quizEventStore;
 
     public function __construct(
         UserRepository $userRepository,
+        QuizEventStore $quizEventStore,
         AnswerQuestionHandler $answerQuestionHandler,
         ShowQuestionHandler $showQuestionHandler,
         ShowClueHandler $showClueHandler
     ) {
         parent::__construct();
         $this->userRepository = $userRepository;
+        $this->quizEventStore = $quizEventStore;
         $this->answerQuestionHandler = $answerQuestionHandler;
         $this->showQuestionHandler = $showQuestionHandler;
         $this->showClueHandler = $showClueHandler;
@@ -65,16 +71,26 @@ class AnswerQuestionConsoleHandler extends Command
     {
         $externalId = $input->getArgument('external-id');
         $answer = $input->getArgument('answer');
+
         $user = $this->getUser($externalId);
         if (null === $user) {
             $this->showError($externalId, $output);
 
             return;
         }
-        if ($this->isAnswerCorrect($user, $answer)) {
-            $this->displayNextQuestion($output, $user);
-        } else {
+
+        if (!$this->isAnswerCorrect($user, $answer)) {
             $this->displayNextClue($output, $user);
+
+            return;
+        }
+
+        $output->writeln('<info>Correct! Well done!</info>');
+
+        if ($this->isQuizCompleted($user)) {
+            $this->displayCongratulations($output);
+        } else {
+            $this->displayNextQuestion($output, $user);
         }
     }
 
@@ -116,13 +132,12 @@ class AnswerQuestionConsoleHandler extends Command
             $output->writeln('Here is a new question for you:');
             $output->writeln(sprintf('<info>%s</info>', $question->statement()));
         } else {
-            $output->writeln('<info>Congratulations you completed the quiz!</info>');
+            throw new \LogicException(sprintf('There was no question to display to the user %s', (string) $user->id()));
         }
     }
 
     private function getNextQuestion(OutputInterface $output, $user): ?Question
     {
-        $output->writeln('<info>Correct! Well done!</info>');
         $showQuestion = new ShowQuestion();
         $showQuestion->userId = (string) $user->id();
 
@@ -137,5 +152,21 @@ class AnswerQuestionConsoleHandler extends Command
         $showClue->userId = (string) $user->id();
         $clue = $this->showClueHandler->handle($showClue);
         $output->writeln(sprintf('Clue: %s', (string) $clue));
+    }
+
+    private function displayCongratulations(OutputInterface $output): void
+    {
+        $output->writeln('<info>Congratulations you completed the quiz!</info>');
+    }
+
+    /**
+     * @param $user
+     *
+     * @return bool
+     *
+     */
+    protected function isQuizCompleted(User $user): bool
+    {
+        return $this->quizEventStore->isQuizCompleted($user->id());
     }
 }

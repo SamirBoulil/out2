@@ -16,7 +16,7 @@ Feature: Answer the question
       | questionAsked | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |
 
   Scenario: User answer correctly the question
-    When I run the command "out:answer-question" with the following arguments:
+    When I answer the question with:
       | argument    | value           |
       | external-id | @my_external_id |
       | answer      | houdini         |
@@ -30,7 +30,7 @@ Feature: Answer the question
       | questionAsked    | 22222222-2222-2222-2222-222222222222 | BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB |            |
 
   Scenario: Answering incorrectly the question will show the first clue
-    When I run the command "out:answer-question" with the following arguments:
+    When I answer the question with:
       | argument    | value           |
       | external-id | @my_external_id |
       | answer      | marco polo      |
@@ -43,11 +43,11 @@ Feature: Answer the question
       | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | false      |
 
   Scenario: Answering incorrectly the question two times will show the second clue
-    When I run the command "out:answer-question" with the following arguments:
+    When I answer the question with:
       | argument    | value           |
       | external-id | @my_external_id |
       | answer      | wrong answer    |
-    When I run the command "out:answer-question" with the following arguments:
+    When I answer the question with:
       | argument    | value           |
       | external-id | @my_external_id |
       | answer      | wrong answer    |
@@ -61,12 +61,12 @@ Feature: Answer the question
       | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | false      |
 
   Scenario: User answer correctly the question and completes the quiz
-    When I run the command "out:answer-question" with the following arguments:
+    When I answer the question with:
       | argument    | value           |
       | external-id | @my_external_id |
       | answer      | houdini         |
     Then I should see the text "Correct! Well done!"
-    When I run the command "out:answer-question" with the following arguments:
+    When I answer the question with:
       | argument    | value           |
       | external-id | @my_external_id |
       | answer      | bolt            |
@@ -81,7 +81,7 @@ Feature: Answer the question
       | quizCompleted    | 22222222-2222-2222-2222-222222222222 |                                      |            |
 
   Scenario: Shows an error when the external user id does not exist
-    When I run the command "out:answer-question" with the following arguments:
+    When I answer the question with:
       | argument    | value                     |
       | external-id | @unknown_external_user_id |
       | answer      | houdini                   |

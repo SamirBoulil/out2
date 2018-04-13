@@ -51,7 +51,7 @@ Feature: Display the leaderboard
       | questionAnswered | 33333333-3333-3333-3333-333333333333 | CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC | false      |
       | questionAnswered | 33333333-3333-3333-3333-333333333333 | CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC | true       |
       | questionAsked    | 33333333-3333-3333-3333-333333333333 | BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB |            |
-    When I run the command "out:leaderboard":
+    When I show the leaderboard
     Then I should see following table:
     """
     +------+--------+--------+

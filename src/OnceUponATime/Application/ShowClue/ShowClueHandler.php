@@ -43,6 +43,10 @@ class ShowClueHandler
     public function handle(ShowClue $showClue): ?Clue
     {
         $user = $this->getUser($showClue);
+        if ($this->userHasCompletedQuiz($user)) {
+            throw NoQuestionToAnswer::fromString((string) $user->id());
+        }
+
         $question = $this->getQuestionToAnswer($user);
         $answersCount = $this->answersCount($user);
 
@@ -71,6 +75,11 @@ class ShowClueHandler
         }
 
         return $this->questionRepository->byId($questionId);
+    }
+
+    private function userHasCompletedQuiz(User $user): bool
+    {
+        return $this->quizEventStore->isQuizCompleted($user->id());
     }
 
     private function answersCount(User $user): int

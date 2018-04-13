@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\OnceUponATime\Application;
 
 use OnceUponATime\Application\InvalidExternalUserId;
-use OnceUponATime\Application\InvalidUserId;
+use OnceUponATime\Application\NoQuestionToAnswer;
 use OnceUponATime\Application\ShowQuestion\ShowQuestion;
 use OnceUponATime\Application\ShowQuestion\ShowQuestionHandler;
 use OnceUponATime\Domain\Entity\Question\Answer;
@@ -60,9 +60,7 @@ class ShowQuestionHandlerTest extends TestCase
         $userRepository = new InMemoryUserRepository();
         $userRepository->add($user);
 
-        $questionAsked = new QuestionAsked($userId, QuestionId::fromString(self::QUESTION_ID));
         $this->quizEventStore = new InMemoryQuizEventStore();
-        $this->quizEventStore->add($questionAsked);
 
         $this->testEventSubscriber = new TestEventSubscriber();
 
@@ -78,6 +76,7 @@ class ShowQuestionHandlerTest extends TestCase
      */
     public function it_shows_the_current_question_of_the_user()
     {
+        $this->askQuestionToUser();
         $showQuestion = new ShowQuestion();
         $showQuestion->userId = self::USER_ID;
         $question = $this->showQuestionHandler->handle($showQuestion);
@@ -87,14 +86,14 @@ class ShowQuestionHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_null_when_the_quiz_is_completed()
+    public function it_tells_when_the_user_has_completed_the_quiz()
     {
-        $quizCompleted = new QuizCompleted(UserId::fromString(self::USER_ID));
-        $this->quizEventStore->add($quizCompleted);
+        $this->askQuestionToUser();
+        $this->userHasCompletedQuiz();
+        $this->expectException(NoQuestionToAnswer::class);
         $showQuestion = new ShowQuestion();
         $showQuestion->userId = self::USER_ID;
-        $question = $this->showQuestionHandler->handle($showQuestion);
-        $this->assertNull($question);
+        $this->showQuestionHandler->handle($showQuestion);
     }
 
     /**
@@ -102,9 +101,24 @@ class ShowQuestionHandlerTest extends TestCase
      */
     public function it_throws_when_the_user_id_is_not_known()
     {
+        $this->askQuestionToUser();
         $this->expectException(InvalidExternalUserId::class);
         $showQuestion = new ShowQuestion();
         $showQuestion->userId = '00000000-0000-0000-0000-000000000000';
         $this->showQuestionHandler->handle($showQuestion);
+    }
+
+    private function askQuestionToUser(): void
+    {
+        $questionAsked = new QuestionAsked(
+            UserId::fromString(self::USER_ID),
+            QuestionId::fromString(self::QUESTION_ID)
+        );
+        $this->quizEventStore->add($questionAsked);
+    }
+
+    private function userHasCompletedQuiz(): void
+    {
+        $this->quizEventStore->add(new QuizCompleted(UserId::fromString(self::USER_ID)));
     }
 }
