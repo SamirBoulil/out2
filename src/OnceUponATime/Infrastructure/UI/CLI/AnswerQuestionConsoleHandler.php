@@ -165,8 +165,8 @@ class AnswerQuestionConsoleHandler extends Command
      * @return bool
      *
      */
-    protected function isQuizCompleted($user): bool
+    protected function isQuizCompleted(User $user): bool
     {
         return $this->quizEventStore->isQuizCompleted($user->id());
-}
+    }
 }

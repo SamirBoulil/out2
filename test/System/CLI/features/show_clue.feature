@@ -16,7 +16,7 @@ Feature: Show the clue
       | type             | user_id                              | question_id                          | is_correct |
       | questionAsked    | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |            |
       | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | false      |
-    When I run the command "out:show-clue" with the following arguments:
+    When I show my clue:
       | argument    | value           |
       | external-id | @my_external_id |
     Then I should see the text "Clue: italian"
@@ -27,7 +27,7 @@ Feature: Show the clue
       | questionAsked    | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |            |
       | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | false      |
       | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | false      |
-    When I run the command "out:show-clue" with the following arguments:
+    When I show my clue:
       | argument    | value           |
       | external-id | @my_external_id |
     Then I should see the text "Clue: it's like a hoodie"
@@ -36,7 +36,7 @@ Feature: Show the clue
     Given the following events:
       | type          | user_id                              | question_id                          |
       | questionAsked | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |
-    When I run the command "out:show-clue" with the following arguments:
+    When I show my clue:
       | argument    | value           |
       | external-id | @my_external_id |
     Then I should see the text "There is no clue to show."
@@ -47,13 +47,13 @@ Feature: Show the clue
       | questionAsked    | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA |            |
       | questionAnswered | 22222222-2222-2222-2222-222222222222 | AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA | true       |
       | quizCompleted    | 22222222-2222-2222-2222-222222222222 |                                      |            |
-    When I run the command "out:show-clue" with the following arguments:
+    When I show my clue:
       | argument    | value           |
       | external-id | @my_external_id |
     Then I should see the text "You've completed the quiz! there is no clue to show."
 
   Scenario: Shows an error when the external user id does not exist
-    When I run the command "out:show-clue" with the following arguments:
+    When I show my clue:
       | argument    | value                     |
       | external-id | @unknown_external_user_id |
     Then I should see the text "Sorry an error occured while trying to retrieve the clue for the question "@unknown_external_user_id"."

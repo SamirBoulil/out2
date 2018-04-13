@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\System\CLI;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use LogicException;
@@ -53,16 +54,6 @@ class FeatureContext implements Context
         foreach ($questions->getHash() as $question) {
             $this->createQuestion($question);
         }
-    }
-
-    /**
-     * @When /^I run the command "([^"]*)" with the following arguments:$/
-     */
-    public function iRunTheCommandWithTheFollowingArguments(string $commandName, TableNode $arguments)
-    {
-        $this->commandTester = $this->getCommandTester($commandName);
-        $arguments = $this->getArguments($arguments);
-        $this->commandTester->execute($arguments);
     }
 
     /**
@@ -281,5 +272,52 @@ class FeatureContext implements Context
     private function createQuizCompleted($event): QuizEvent
     {
         return new QuizCompleted(UserId::fromString($event['user_id']));
+    }
+
+    /**
+     * @When /^I show my current question:$/
+     */
+    public function iShowMyCurrentQuestion(TableNode $table)
+    {
+        $this->runCommand('out:show-question', $table);
+    }
+
+    /**
+     * @When /^I show my clue:$/
+     */
+    public function iShowMyClue(TableNode $table)
+    {
+        $this->runCommand('out:show-clue', $table);
+    }
+
+    /**
+     * @When /^I register:$/
+     */
+    public function iRegister(TableNode $table)
+    {
+        $this->runCommand('out:register', $table);
+    }
+
+    /**
+     * @When /^I show the leaderboard$/
+     */
+    public function iShowTheLeaderboard()
+    {
+        $this->runCommand('out:leaderboard', new TableNode([]));
+    }
+
+    /**
+     * @When /^I answer the question with:$/
+     */
+    public function iAnswerTheQuestionWith(TableNode $table)
+    {
+        $this->runCommand('out:answer-question', $table);
+    }
+
+    private function runCommand(string $commandName, TableNode $arguments)
+    {
+        $this->commandTester = $this->getCommandTester($commandName);
+        $arguments = $this->getArguments($arguments);
+        $this->commandTester->execute($arguments);
     }
 }

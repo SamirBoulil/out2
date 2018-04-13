@@ -23,15 +23,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ShowQuestionConsoleHandler extends Command
 {
-    /** @var ShowQuestionHandler */
-    private $showQuestionHandler;
-
     /** @var UserRepository */
     private $userRepository;
-    /**
-     * @var QuizEventStore
-     */
+
+    /** @var QuizEventStore */
     private $quizEventStore;
+
+    /** @var ShowQuestionHandler */
+    private $showQuestionHandler;
 
     public function __construct(UserRepository $userRepository, QuizEventStore $quizEventStore, ShowQuestionHandler $registerUserHandler)
     {

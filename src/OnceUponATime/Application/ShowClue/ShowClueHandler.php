@@ -82,7 +82,6 @@ class ShowClueHandler
         return $this->quizEventStore->isQuizCompleted($user->id());
     }
 
-
     private function answersCount(User $user): int
     {
         return $this->quizEventStore->answersCount($user->id());
