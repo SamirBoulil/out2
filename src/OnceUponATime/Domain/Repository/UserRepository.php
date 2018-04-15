@@ -17,9 +17,9 @@ interface UserRepository
 {
     public function add(User $user): void;
 
-    public function byId(UserId $userId): ?User;
-
     public function all(): array;
+
+    public function byId(UserId $userId): ?User;
 
     public function nextIdentity(): UserId;
 

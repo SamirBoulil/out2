@@ -8,13 +8,14 @@ use OnceUponATime\Domain\Entity\User\ExternalUserId;
 use OnceUponATime\Domain\Entity\User\User;
 use OnceUponATime\Domain\Entity\User\UserId;
 use OnceUponATime\Domain\Repository\UserRepository;
+use OnceUponATime\Infrastructure\Persistence\Common\AbstractUserRepository;
 use Ramsey\Uuid\Uuid;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class InMemoryUserRepository implements UserRepository
+final class InMemoryUserRepository extends AbstractUserRepository
 {
     /** @var array */
     private $users = [];
@@ -24,29 +25,8 @@ class InMemoryUserRepository implements UserRepository
         $this->users[(string) $user->id()] = $user;
     }
 
-    public function byId(UserId $userId): ?User
-    {
-        return $this->users[(string) $userId] ?? null;
-    }
-
     public function all(): array
     {
         return array_values($this->users);
-    }
-
-    public function nextIdentity(): UserId
-    {
-        return UserId::fromString((string) Uuid::uuid4());
-    }
-
-    public function byExternalId(ExternalUserId $externalUserId): ?User
-    {
-        foreach ($this->users as $id => $user) {
-            if ($user->externalUserId()->equals($externalUserId)) {
-                return $user;
-            }
-        }
-
-        return null;
     }
 }
