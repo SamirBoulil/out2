@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  */
 class UserRepositoryTest extends TestCase
 {
-    public function getUserRepositories()
+    public function getUserRepositories(): array
     {
         return [
             'in memory repository' => [new InMemoryUserRepository()],

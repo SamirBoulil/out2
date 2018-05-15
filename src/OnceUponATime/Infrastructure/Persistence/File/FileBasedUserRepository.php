@@ -16,9 +16,9 @@ use OnceUponATime\Infrastructure\Persistence\Common\AbstractUserRepository;
  */
 class FileBasedUserRepository extends AbstractUserRepository
 {
-    const USER_ID = 'id';
-    const EXTERNAL_USER_ID = 'external_user_id';
-    const USER_NAME = 'name';
+    private const USER_ID = 'id';
+    private const EXTERNAL_USER_ID = 'external_user_id';
+    private const USER_NAME = 'name';
 
     /** @var string */
     private $filePath;
