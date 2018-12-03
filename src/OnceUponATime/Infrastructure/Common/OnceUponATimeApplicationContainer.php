@@ -25,9 +25,9 @@ use OnceUponATime\Infrastructure\Notifications\QuestionAnsweredNotifyMany;
 use OnceUponATime\Infrastructure\Notifications\QuestionAskedNotifyMany;
 use OnceUponATime\Infrastructure\Notifications\QuizCompletedNotifyMany;
 use OnceUponATime\Infrastructure\Notifications\UserRegisteredNotifyMany;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuestionRepository;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryQuizEventStore;
-use OnceUponATime\Infrastructure\Persistence\InMemory\InMemoryUserRepository;
+use OnceUponATime\Infrastructure\Persistence\File\FileBasedQuestionRepository;
+use OnceUponATime\Infrastructure\Persistence\File\FileBasedQuizEventStore;
+use OnceUponATime\Infrastructure\Persistence\File\FileBasedUserRepository;
 use OnceUponATime\Infrastructure\UI\CLI\AnswerQuestionConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\RegisterUserConsoleHandler;
 use OnceUponATime\Infrastructure\UI\CLI\ShowClueConsoleHandler;
@@ -74,11 +74,14 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
         /**
          * Persistence
          */
-        $containerBuilder->register(UserRepository::class, InMemoryUserRepository::class)
+        $containerBuilder->register(UserRepository::class, FileBasedUserRepository::class)
+            ->addArgument('/tmp/out/users.json')
             ->setPublic(true);
-        $containerBuilder->register(QuestionRepository::class, InMemoryQuestionRepository::class)
+        $containerBuilder->register(QuestionRepository::class, FileBasedQuestionRepository::class)
+            ->addArgument('/tmp/out/questions.json')
             ->setPublic(true);
-        $containerBuilder->register(QuizEventStore::class, InMemoryQuizEventStore::class)
+        $containerBuilder->register(QuizEventStore::class, FileBasedQuizEventStore::class)
+            ->addArgument('/tmp/out/events.json')
             ->setPublic(true);
 
         /**
@@ -101,7 +104,8 @@ class OnceUponATimeApplicationContainer implements ContainerInterface
             );
         $containerBuilder->register(PublishToEventStore::class, PublishToEventStore::class)
             ->addArgument(new Reference(QuizEventStore::class));
-        $containerBuilder->register(NewQuestionForUserWhoAnsweredCorrectly::class, NewQuestionForUserWhoAnsweredCorrectly::class)
+        $containerBuilder->register(NewQuestionForUserWhoAnsweredCorrectly::class,
+            NewQuestionForUserWhoAnsweredCorrectly::class)
             ->addArgument(new Reference(AskQuestionHandler::class));
         $containerBuilder->register(NewQuestionForUserWhoAnsweredIncorrectly::class,
             NewQuestionForUserWhoAnsweredIncorrectly::class)

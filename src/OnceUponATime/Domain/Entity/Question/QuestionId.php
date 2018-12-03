@@ -38,8 +38,8 @@ class QuestionId
         return $this->id;
     }
 
-    public function equals($userId): bool
+    public function equals(QuestionId $questionId): bool
     {
-        return $userId instanceof self && (string) $this === (string) $userId;
+        return $questionId instanceof self && (string) $this === (string) $questionId;
     }
 }
