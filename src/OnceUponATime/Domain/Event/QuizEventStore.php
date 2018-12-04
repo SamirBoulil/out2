@@ -7,9 +7,6 @@ namespace OnceUponATime\Domain\Event;
 use OnceUponATime\Domain\Entity\Question\QuestionId;
 use OnceUponATime\Domain\Entity\User\UserId;
 
-/**
- * TODO: Not sure this interface should be in domain ? (but repositories are so...)
- */
 interface QuizEventStore
 {
     public function add(quizEvent $event): void;
@@ -25,4 +22,6 @@ interface QuizEventStore
     public function correctlyAnsweredQuestionsByUser(UserId $userId): array;
 
     public function isQuizCompleted(UserId $userId): bool;
+
+    public function all(): array;
 }

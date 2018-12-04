@@ -40,7 +40,7 @@ class ShowQuestionHandler
         $this->quizEventStore = $quizEventStore;
     }
 
-    public function handle($showQuestion): ?Question
+    public function handle(ShowQuestion $showQuestion): ?Question
     {
         $user = $this->getUser($showQuestion);
         if ($this->userHasCompletedQuiz($user)) {

@@ -20,7 +20,7 @@ class QuizCompleted implements QuizEvent
         $this->userId = $userId;
     }
 
-    public function userId()
+    public function userId(): UserId
     {
         return $this->userId;
     }

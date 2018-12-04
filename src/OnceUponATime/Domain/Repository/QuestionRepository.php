@@ -9,7 +9,7 @@ use OnceUponATime\Domain\Entity\Question\QuestionId;
 
 interface QuestionRepository
 {
-    public function add(Question $user): void;
+    public function add(Question $question): void;
 
     public function byId(QuestionId $questionId): ?Question;
 
